@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedCare HMS{% endblock %}</title>
+    
+    <!-- Poppins Font from Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Your CSS remains unchanged */
+        :root {
+            --primary-teal: #0E7490;          /* deep teal for header/sidebar top */
+            --primary-dark-teal: #0C4A6E;     /* darker shade for hover/active */
+            --sky-blue: #0284C7;              /* vibrant button/links */
+            --light-sky-blue: #38BDF8;        /* highlights, borders */
+            --background-light: #F1F5F9;      /* page background */
+            --background-white: #FFFFFF;      /* cards, containers */
+            --accent-blue: #14B8A6;           /* secondary accent (close to aqua) */
+            --text-dark: #1E293B;             /* dark slate for text */
+            --shadow-light: rgba(15, 23, 42, 0.05);
+            --shadow-medium: rgba(15, 23, 42, 0.15);
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 70px;
+        }
+
+        * {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3, h4, h5, h6, .btn, .nav-link, .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            font-family: poppins, 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        /* Prevent shaking by using transform3d for hardware acceleration */
+        .smooth-transform {
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
+            will-change: transform;
+        }
+        
+        /* Logo Styling */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-blue) 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        
+        /* Navbar Styling */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            padding: 1rem 0;
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            position: relative;
+            z-index: 1030;
+        }
+        
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 4px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+            color: white !important;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            background-color: var(--sky-blue);
+            color: var(--primary-teal) !important;
+            font-weight: 600;
+        }
+        
+        /* Sidebar Styling */
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            z-index: 1020;
+            box-shadow: 4px 0 12px var(--shadow-medium);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        
+        .sidebar-brand {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            white-space: nowrap;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .sidebar-brand .logo-text {
+            opacity: 0;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem 0;
+        }
+        
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+        
+        .menu-section-title {
+            padding: 0.75rem 1.5rem 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-section-title {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .menu-item {
+            position: relative;
+        }
+        
+        .menu-link {
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.875rem 1.5rem;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .menu-link:hover {
+            background-color: rgba(135, 206, 235, 0.15);
+            color: white;
+            padding-left: 2rem;
+        }
+        
+        .menu-link.active {
+            background-color: var(--sky-blue);
+            color: var(--primary-teal);
+            font-weight: 600;
+        }
+        
+        .menu-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background-color: var(--accent-blue);
+        }
+        
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .menu-text {
+            transition: opacity 0.3s ease;
+        }
+        
+        .sidebar.collapsed .menu-text {
+            opacity: 0;
+        }
+        
+        /* Submenu Styling */
+        .submenu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .submenu.show {
+            max-height: 500px;
+        }
+        
+        .submenu .menu-link {
+            padding-left: 3.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .submenu .menu-link:hover {
+            padding-left: 4rem;
+        }
+        
+        .menu-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-toggle.rotated {
+            transform: translateY(-50%) rotate(180deg);
+        }
+        
+        .sidebar.collapsed .menu-toggle {
+            display: none;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content.expanded {
+            margin-left: var(--sidebar-collapsed);
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        /* Admin Topbar */
+        .admin-topbar {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            color: white;
+            padding: 1rem;
+            box-shadow: 0 2px 8px var(--shadow-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .sidebar-toggle:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+        }
+        
+        /* Card Styling */
+        .card-custom {
+            background-color: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px var(--shadow-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+        
+        .card-custom:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-medium);
+        }
+        
+        .card-header-custom {
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--light-sky-blue) 100%);
+            color: var(--primary-teal);
+            font-weight: 600;
+            border: none;
+            padding: 1.25rem 1.5rem;
+        }
+        
+        /* Button Styling */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+        
+        .btn-sky {
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-blue) 100%);
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-sky:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--shadow-medium);
+            color: white;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1199.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content,
+            .main-content.expanded {
+                margin-left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1010;
+                opacity: 0;
+                visibility: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .sidebar-overlay.show {
+                opacity: 1;
+                visibility: visible;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .content-area {
+                padding: 1rem;
+            }
+            
+            .logo-text {
+                font-size: 1.25rem;
+            }
+            
+            .admin-topbar {
+                padding: 0.75rem;
+            }
+        }
+        
+        /* Footer Styling */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            color: white;
+            padding: 3rem 0 1rem;
+            margin-top: auto;
+        }
+        
+        .footer a {
+            color: var(--sky-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: white;
+        }
+        
+        /* Welcome Section */
+        .welcome-section {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--background-white) 0%, var(--background-light) 100%);
+            border-radius: 16px;
+            margin: 2rem 0;
+            box-shadow: 0 8px 24px var(--shadow-light);
+        }
+        
+        .welcome-section h1 {
+            color: var(--primary-teal);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .welcome-section .lead {
+            color: var(--text-dark);
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Alert Styling */
+        .alert-custom {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+        
+        /* Smooth scrollbar for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--sky-blue);
+            border-radius: 2px;
+        }
+        
+        /* Loading states and animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+        
+        /* Loading states and animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Overlay for Mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Regular User Navigation -->
+    {% if not user.is_staff and not user.is_superuser %}
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo-icon">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <span class="logo-text">MedCare HMS</span>
+            </div>
+            
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+                <i class="fas fa-bars text-white"></i>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-calendar-check me-2"></i>Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-file-medical me-2"></i>Medical Records
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-prescription me-2"></i>Prescriptions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-phone me-2"></i>Contact
+                        </a>
+                    </li>
+                </ul>
+                
+                {% if user.is_authenticated %}
+                <div class="d-flex align-items-center flex-column flex-lg-row gap-3">
+                    <span class="navbar-text">
+                        <i class="fas fa-user me-2"></i>Welcome, {{ user.first_name }}
+                    </span>
+                    <a href="{% url 'logout' %}" class="btn btn-sky">
+                        <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    {% endif %}
+
+    <!-- Admin Layout -->
+    {% if user.is_staff or user.is_superuser %}
+    <!-- Admin Sidebar -->
+    <aside class="sidebar smooth-transform" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="logo-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <span class="logo-text">MedCare HMS</span>
+        </div>
+        
+        <ul class="sidebar-menu">
+            <!-- Dashboard Section -->
+            <li class="menu-section">
+                <div class="menu-section-title">Dashboard</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="{% url 'admin_dashboard' %}" class="menu-link active">
+                            <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                            <span class="menu-text">Overview</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
+                            <span class="menu-text">Analytics</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Patient Management Section -->
+            <li class="menu-section">
+                <div class="menu-section-title">Patient Management</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#patientSubmenu">
+                            <span class="menu-icon"><i class="fas fa-procedures"></i></span>
+                            <span class="menu-text">Patients</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="patientSubmenu">
+                            <li><a href="#" class="menu-link">All Patients</a></li>
+                            <li><a href="#" class="menu-link">New Registrations</a></li>
+                            <li><a href="#" class="menu-link">Patient Records</a></li>
+                            <li><a href="#" class="menu-link">Medical History</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#appointmentSubmenu">
+                            <span class="menu-icon"><i class="fas fa-calendar-check"></i></span>
+                            <span class="menu-text">Appointments</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="appointmentSubmenu">
+                            <li><a href="#" class="menu-link">Schedule</a></li>
+                            <li><a href="#" class="menu-link">Pending Approvals</a></li>
+                            <li><a href="#" class="menu-link">Calendar View</a></li>
+                            <li><a href="#" class="menu-link">Reports</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Staff Management Section -->
+            <li class="menu-section">
+                <div class="menu-section-title">Staff Management</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#doctorSubmenu">
+                            <span class="menu-icon"><i class="fas fa-user-md"></i></span>
+                            <span class="menu-text">Doctors</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="doctorSubmenu">
+                            <li><a href="#" class="menu-link">All Doctors</a></li>
+                            <li><a href="#" class="menu-link">Schedules</a></li>
+                            <li><a href="#" class="menu-link">Specializations</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#staffSubmenu">
+                            <span class="menu-icon"><i class="fas fa-users"></i></span>
+                            <span class="menu-text">Staff</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="staffSubmenu">
+                            <li><a href="#" class="menu-link">All Staff</a></li>
+                            <li><a href="#" class="menu-link">Staff Approvals</a></li>
+                            <li><a href="#" class="menu-link">Roles & Permissions</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- System Settings Section -->
+            <li class="menu-section">
+                <div class="menu-section-title">System</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#settingsSubmenu">
+                            <span class="menu-icon"><i class="fas fa-cogs"></i></span>
+                            <span class="menu-text">Settings</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="settingsSubmenu">
+                            <li><a href="#" class="menu-link">General Settings</a></li>
+                            <li><a href="#" class="menu-link">Departments</a></li>
+                            <li><a href="#" class="menu-link">System Config</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
+                            <span class="menu-text">Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- Admin Main Content -->
+    <div class="main-content smooth-transform" id="mainContent">
+        <!-- Admin Topbar -->
+        <div class="admin-topbar">
+            <div class="d-flex align-items-center">
+                <button class="sidebar-toggle me-3" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h5 class="mb-0">Admin Dashboard</h5>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <span class="d-none d-md-inline">
+                    <i class="fas fa-user-shield me-2"></i>Admin: {{ user.first_name }}
+                </span>
+                <a href="{% url 'logout' %}" class="btn btn-sky btn-sm">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+        <!-- Content Area for Both Admin and Regular Users -->
+        <div class="content-area">
+            {% block content %}
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-custom alert-dismissible fade show fade-in-up" role="alert">
+                            <i class="fas fa-info-circle me-2"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if user.is_staff or user.is_superuser %}
+                <!-- Admin Welcome Section -->
+                <div class="welcome-section fade-in-up">
+                    <h1 class="display-4">Welcome to MedCare HMS</h1>
+                    <p class="lead">Your comprehensive healthcare management system</p>
+                    <div class="mt-4">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-4">
+                                <div class="card card-custom h-100">
+                                    <div class="card-header-custom">
+                                        <i class="fas fa-users me-2"></i>Patient Management
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Manage patient records, appointments, and medical history efficiently.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-custom h-100">
+                                    <div class="card-header-custom">
+                                        <i class="fas fa-user-md me-2"></i>Staff Management
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Oversee doctors, nurses, and administrative staff with ease.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card card-custom h-100">
+                                    <div class="card-header-custom">
+                                        <i class="fas fa-chart-bar me-2"></i>Analytics
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Get insights with comprehensive reports and analytics.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Regular User Content -->
+                <div class="welcome-section fade-in-up">
+                    <h1 class="display-4">Welcome to MedCare HMS</h1>
+                    <p class="lead">Your comprehensive healthcare management system</p>
+                    <div class="mt-5">
+                        <img src="https://via.placeholder.com/800x400/87CEEB/1e3a3a?text=MedCare+HMS" 
+                             class="img-fluid rounded shadow-lg" alt="MedCare HMS">
+                    </div>
+                </div>
+                {% endif %}
+            {% endblock %}
+        </div>
+
+        <!-- Footer for Regular Users -->
+        {% if not user.is_staff and not user.is_superuser %}
+        <footer class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4 mb-4">
+                        <div class="logo-container mb-3">
+                            <div class="logo-icon">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <h5 class="logo-text mb-0">MedCare HMS</h5>
+                        </div>
+                        <p>Comprehensive healthcare management for patients and providers.</p>
+                        <div class="d-flex gap-3 mt-3">
+                            <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                            <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i></a>
+                            <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-4">
+                        <h5>Quick Links</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Appointments</a></li>
+                            <li><a href="#">Medical Records</a></li>
+                            <li><a href="#">Prescriptions</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-4 mb-4">
+                        <h5>Support</h5>
+                        <ul class="list-unstyled">
+                            <li><a href="#">FAQ</a></li>
+                            <li><a href="#">Help & Support</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-4 mb-4">
+                        <h5>Contact Us</h5>
+                        <p><i class="fas fa-map-marker-alt me-2"></i>123 Health St, Medical City, MC 12345</p>
+                        <p><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                        <p><i class="fas fa-envelope me-2"></i>support@medcarehms.com</p>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <p>&copy; {% now 'Y' %} MedCare HMS. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+        {% endif %}
+    </div>
+
+    <!-- Bootstrap JS and Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Check if sidebar elements exist before adding event listeners
+            if (sidebar && mainContent && sidebarToggle && sidebarOverlay) {
+                // Toggle sidebar collapse
+                sidebarToggle.addEventListener('click', function () {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded');
+                    if (window.innerWidth <= 1199.98) {
+                        sidebar.classList.toggle('show');
+                        sidebarOverlay.classList.toggle('show');
+                    }
+                });
+
+                // Toggle sidebar overlay for mobile
+                sidebarOverlay.addEventListener('click', function () {
+                    sidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                });
+
+                // Handle submenu toggle
+                const menuLinks = document.querySelectorAll('.menu-link[data-bs-toggle="collapse"]');
+                menuLinks.forEach(link => {
+                    link.addEventListener('click', function (e) {
+                        const targetId = this.getAttribute('data-bs-target');
+                        const submenu = document.querySelector(targetId);
+                        const isExpanded = submenu.classList.contains('show');
+                        const toggleIcon = this.querySelector('.menu-toggle');
+
+                        // Toggle the submenu
+                        submenu.classList.toggle('show');
+                        toggleIcon.classList.toggle('rotated');
+
+                        // Collapse other open submenus in the same section
+                        const parentSection = this.closest('.menu-section');
+                        const otherSubmenus = parentSection.querySelectorAll('.submenu');
+                        otherSubmenus.forEach(otherSubmenu => {
+                            if (otherSubmenu !== submenu && otherSubmenu.classList.contains('show')) {
+                                otherSubmenu.classList.remove('show');
+                                const otherToggle = otherSubmenu.previousElementSibling.querySelector('.menu-toggle');
+                                if (otherToggle) {
+                                    otherToggle.classList.remove('rotated');
+                                }
+                            }
+                        });
+                    });
+                });
+
+                // Handle window resize to ensure proper sidebar state
+                window.addEventListener('resize', function () {
+                    if (window.innerWidth > 1199.98) {
+                        sidebar.classList.remove('show');
+                        sidebarOverlay.classList.remove('show');
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

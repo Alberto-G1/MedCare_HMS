@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Doctor Dashboard - MedCare HMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0">Doctor Dashboard</h2>
+        <div class="d-flex align-items-center">
+            <span class="badge bg-primary me-3">
+                <i class="fas fa-clock me-1"></i>
+                <span id="current-time">{{ current_time|date:"h:i A" }}</span>
+            </span>
+            <span class="badge bg-info">
+                <i class="fas fa-calendar me-1"></i>
+                <span id="current-date">{{ current_time|date:"F j, Y" }}</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Today's Appointments</h6>
+                            <h3 class="mb-0">14</h3>
+                        </div>
+                        <div class="bg-primary p-3 rounded-circle">
+                            <i class="fas fa-calendar-check text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-success">
+                            <i class="fas fa-check-circle me-1"></i> 5 completed
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Waiting Patients</h6>
+                            <h3 class="mb-0">3</h3>
+                        </div>
+                        <div class="bg-warning p-3 rounded-circle">
+                            <i class="fas fa-user-clock text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-danger">
+                            <i class="fas fa-clock me-1"></i> Next: R. Williams
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Messages</h6>
+                            <h3 class="mb-0">7</h3>
+                        </div>
+                        <div class="bg-info p-3 rounded-circle">
+                            <i class="fas fa-envelope text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-primary">
+                            <i class="fas fa-exclamation-circle me-1"></i> 2 urgent
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-custom">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Lab Results</h6>
+                            <h3 class="mb-0">4</h3>
+                        </div>
+                        <div class="bg-success p-3 rounded-circle">
+                            <i class="fas fa-vial text-white fa-2x"></i>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-warning">
+                            <i class="fas fa-clock me-1"></i> 2 pending review
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row">
+        <!-- Upcoming Appointments -->
+        <div class="col-lg-8">
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Today's Appointments</h5>
+                    <div>
+                        <button class="btn btn-sm btn-sky me-2">
+                            <i class="fas fa-sync-alt me-1"></i> Refresh
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary">
+                            <i class="fas fa-filter me-1"></i> Filter
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="table-success">
+                                    <td>9:00 AM</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40/87CEEB/1e3a3a?text=SJ" class="rounded-circle me-2" alt="Patient">
+                                            <div>Sarah Johnson</div>
+                                        </div>
+                                    </td>
+                                    <td>Follow-up visit</td>
+                                    <td><span class="badge bg-success">Completed</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-medical"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="table-warning">
+                                    <td>9:30 AM</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40/87CEEB/1e3a3a?text=RW" class="rounded-circle me-2" alt="Patient">
+                                            <div>Robert Williams</div>
+                                        </div>
+                                    </td>
+                                    <td>Hypertension check</td>
+                                    <td><span class="badge bg-warning">In Progress</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-medical"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>10:15 AM</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40/87CEEB/1e3a3a?text=MG" class="rounded-circle me-2" alt="Patient">
+                                            <div>Maria Gonzalez</div>
+                                        </div>
+                                    </td>
+                                    <td>Annual physical</td>
+                                    <td><span class="badge bg-secondary">Waiting</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-medical"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>10:45 AM</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40/87CEEB/1e3a3a?text=DK" class="rounded-circle me-2" alt="Patient">
+                                            <div>David Kim</div>
+                                        </div>
+                                    </td>
+                                    <td>Back pain evaluation</td>
+                                    <td><span class="badge bg-secondary">Waiting</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-medical"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>11:30 AM</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="https://via.placeholder.com/40x40/87CEEB/1e3a3a?text=JL" class="rounded-circle me-2" alt="Patient">
+                                            <div>Jennifer Lee</div>
+                                        </div>
+                                    </td>
+                                    <td>Diabetes management</td>
+                                    <td><span class="badge bg-secondary">Scheduled</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-medical"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Patient Quick View -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Current Patient: Robert Williams</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center">
+                            <img src="https://via.placeholder.com/120x120/87CEEB/1e3a3a?text=RW" class="rounded-circle mb-3" alt="Patient">
+                            <h5>Robert Williams</h5>
+                            <p class="text-muted">58 years old</p>
+                            <span class="badge bg-info">Hypertension</span>
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Vital Signs</h6>
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <td>BP</td>
+                                            <td>142/88 mmHg</td>
+                                            <td><span class="badge bg-warning">High</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Heart Rate</td>
+                                            <td>78 bpm</td>
+                                            <td><span class="badge bg-success">Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Temperature</td>
+                                            <td>98.6°F</td>
+                                            <td><span class="badge bg-success">Normal</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>O2 Sat</td>
+                                            <td>98%</td>
+                                            <td><span class="badge bg-success">Normal</span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Last Visit</h6>
+                                    <p class="small">3 months ago - Blood pressure follow-up</p>
+                                    <h6>Medications</h6>
+                                    <ul class="small">
+                                        <li>Lisinopril 10mg daily</li>
+                                        <li>Amlodipine 5mg daily</li>
+                                        <li>Atorvastatin 20mg daily</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-sky me-2">
+                                    <i class="fas fa-file-medical me-1"></i> Clinical Notes
+                                </button>
+                                <button class="btn btn-sm btn-outline-primary me-2">
+                                    <i class="fas fa-prescription me-1"></i> Prescribe
+                                </button>
+                                <button class="btn btn-sm btn-outline-info me-2">
+                                    <i class="fas fa-vial me-1"></i> Order Tests
+                                </button>
+                                <button class="btn btn-sm btn-outline-success">
+                                    <i class="fas fa-check-circle me-1"></i> Complete Visit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none">
+                                <div class="bg-primary p-3 rounded-circle d-inline-block">
+                                    <i class="fas fa-stethoscope text-white fa-2x"></i>
+                                </div>
+                                <p class="mt-2 mb-0">Start Consultation</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none">
+                                <div class="bg-info p-3 rounded-circle d-inline-block">
+                                    <i class="fas fa-prescription text-white fa-2x"></i>
+                                </div>
+                                <p class="mt-2 mb-0">e-Prescribe</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none">
+                                <div class="bg-success p-3 rounded-circle d-inline-block">
+                                    <i class="fas fa-vial text-white fa-2x"></i>
+                                </div>
+                                <p class="mt-2 mb-0">Order Tests</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none">
+                                <div class="bg-warning p-3 rounded-circle d-inline-block">
+                                    <i class="fas fa-file-medical text-white fa-2x"></i>
+                                </div>
+                                <p class="mt-2 mb-0">Patient Records</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="col-lg-4">
+            <!-- Upcoming Schedule -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Today's Schedule</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success p-2 rounded-circle me-3">
+                            <i class="fas fa-check text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Sarah Johnson</h6>
+                            <small class="text-muted">9:00 AM - Follow-up visit</small>
+                        </div>
+                        <span class="badge bg-success">Completed</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary p-2 rounded-circle me-3">
+                            <i class="fas fa-user-md text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Robert Williams</h6>
+                            <small class="text-muted">9:30 AM - Hypertension check</small>
+                        </div>
+                        <span class="badge bg-primary">In Progress</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-secondary p-2 rounded-circle me-3">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Maria Gonzalez</h6>
+                            <small class="text-muted">10:15 AM - Annual physical</small>
+                        </div>
+                        <span class="badge bg-secondary">Waiting</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-secondary p-2 rounded-circle me-3">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">David Kim</h6>
+                            <small class="text-muted">10:45 AM - Back pain evaluation</small>
+                        </div>
+                        <span class="badge bg-secondary">Waiting</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light p-2 rounded-circle me-3">
+                            <i class="fas fa-calendar text-muted"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Jennifer Lee</h6>
+                            <small class="text-muted">11:30 AM - Diabetes management</small>
+                        </div>
+                        <span class="badge bg-light text-dark">Scheduled</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Lab Results -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Recent Lab Results</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger p-2 rounded-circle me-3">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Sarah Johnson</h6>
+                            <small class="text-muted">Cholesterol Panel - High LDL</small>
+                            <small class="text-muted d-block">Today, 8:45 AM</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary">Review</button>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success p-2 rounded-circle me-3">
+                            <i class="fas fa-check-circle text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Michael Thompson</h6>
+                            <small class="text-muted">CBC - Normal</small>
+                            <small class="text-muted d-block">Yesterday, 3:22 PM</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary">Review</button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning p-2 rounded-circle me-3">
+                            <i class="fas fa-clock text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Robert Williams</h6>
+                            <small class="text-muted">Metabolic Panel - Pending</small>
+                            <small class="text-muted d-block">Yesterday, 1:15 PM</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary">View</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="card card-custom">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Messages</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger p-2 rounded-circle me-3">
+                            <i class="fas fa-exclamation text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Dr. Rodriguez</h6>
+                            <small class="text-muted">Urgent: Consult needed for patient in ER</small>
+                            <small class="text-muted d-block">15 minutes ago</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary p-2 rounded-circle me-3">
+                            <i class="fas fa-envelope text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Pharmacy</h6>
+                            <small class="text-muted">Prior authorization needed for prescription</small>
+                            <small class="text-muted d-block">1 hour ago</small>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-info p-2 rounded-circle me-3">
+                            <i class="fas fa-calendar text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Admin</h6>
+                            <small class="text-muted">Schedule change next Thursday</small>
+                            <small class="text-muted d-block">2 hours ago</small>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <button class="btn btn-sm btn-sky">
+                            <i class="fas fa-inbox me-1"></i> View All Messages
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Update time and date in real-time
+    function updateDateTime() {
+        const now = new Date();
+        document.getElementById('current-time').textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        document.getElementById('current-date').textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    
+    // Update time immediately and then every minute
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+    
+    // Add interactive functionality to the dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click handlers to table rows for better UX
+        const tableRows = document.querySelectorAll('table tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('click', function() {
+                // For demonstration - would navigate to patient details in real application
+                const patientName = this.cells[1].textContent.trim();
+                alert(`In a real application, this would open ${patientName}'s medical record.`);
+            });
+        });
+        
+        // Consultation button functionality
+        const consultButtons = document.querySelectorAll('.btn-sky, .btn-outline-primary');
+        consultButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation(); // Prevent triggering row click event
+                // For demonstration - would open different modules in real application
+                const btnText = this.textContent.trim();
+                alert(`In a real application, this would open the ${btnText} module.`);
+            });
+        });
+        
+        // Lab result review buttons
+        const labButtons = document.querySelectorAll('.card-custom .btn');
+        labButtons.forEach(btn => {
+            if (btn.textContent.includes('Review') || btn.textContent.includes('View')) {
+                btn.addEventListener('click', function() {
+                    // For demonstration - would open lab results in real application
+                    alert('In a real application, this would open the lab results viewer.');
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
