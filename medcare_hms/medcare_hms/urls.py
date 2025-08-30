@@ -24,5 +24,6 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('patients/', include('patients.urls')),
     path('doctors/', include('doctors.urls')),
+    path('management/', include('management.urls')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=True)),
 ]
