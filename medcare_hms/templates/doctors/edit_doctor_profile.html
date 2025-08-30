@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Doctor Profile{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h2 fw-bold text-custom-dark mb-4">Edit My Profile</h1>
+
+    <div class="card card-custom">
+        <div class="card-header card-header-custom">
+            <h5 class="mb-0"><i class="fas fa-edit me-2"></i>Update Your Information</h5>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="{{ form.specialization.id_for_label }}" class="form-label">Specialization</label>
+                    {{ form.specialization }}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.qualifications.id_for_label }}" class="form-label">Qualifications</label>
+                    {{ form.qualifications }}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.availability.id_for_label }}" class="form-label">Availability</label>
+                    {{ form.availability }}
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success me-2">
+                        <i class="fas fa-save me-1"></i> Save Changes
+                    </button>
+                    <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-secondary">
+                        <i class="fas fa-times me-1"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
