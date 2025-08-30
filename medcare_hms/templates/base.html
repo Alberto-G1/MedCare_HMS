@@ -652,6 +652,16 @@
                     <li class="menu-item">
                         <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#departmentSubmenu">
                             <span class="menu-icon"><i class="fa-solid fa-building-user"></i></i></span>
+                            <span class="menu-text">Billings</span>
+                            <i class="fas fa-chevron-down menu-toggle"></i>
+                        </a>
+                        <ul class="submenu collapse" id="departmentSubmenu">
+                            <li><a href="{% url 'bill_list' %}" class="menu-link">All Bills</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#departmentSubmenu">
+                            <span class="menu-icon"><i class="fa-solid fa-building-user"></i></i></span>
                             <span class="menu-text">Departments</span>
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
@@ -813,6 +823,39 @@
                     </div>
                 </div>
                 {% endif %}
+
+            {% if request.user.userprofile.role == 'RECEPTIONIST' %}
+            <li class="menu-section">
+                <div class="menu-section-title">My Tasks</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="{% url 'receptionist_profile' %}" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-id-card"></i></span>
+                            <span class="menu-text">My Profile</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{% url 'add_patient' %}" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-user-plus"></i></span>
+                            <span class="menu-text">Add New Patient</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{% url 'book_appointment_receptionist' %}" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>
+                            <span class="menu-text">Book Appointment</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="{% url 'bill_list' %}" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-file-invoice"></i></span>
+                            <span class="menu-text">Manage Billing</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            {% endif %}
+
             {% endblock %}
         </div>
 

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Patient{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card card-custom">
+            <div class="card-header card-header-custom">
+                <h2 class="card-title h5 mb-0"><i class="fas fa-user-plus me-2"></i>Register a New Patient (Walk-In)</h2>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-end mt-4">
+                        <a href="{% url 'receptionist_dashboard' %}" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary-custom">Register Patient</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
