@@ -118,6 +118,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Setting to tell Django where to find project-level static files.
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# This setting is for production and tells Django where to collect all static files.
+# It's good practice to add it now.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

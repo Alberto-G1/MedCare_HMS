@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,6 +79,13 @@
             color: white;
             font-size: 18px;
             font-weight: bold;
+            box-shadow: 0 2px 8px var(--shadow-light);
+        }
+
+        .navbar-logo {
+            height: 40px;
+            width: 40px;
+            border-radius: 8px;
             box-shadow: 0 2px 8px var(--shadow-light);
         }
         
@@ -521,11 +530,10 @@
     <nav class="navbar navbar-expand-lg navbar-custom">
         <div class="container">
             <div class="logo-container">
-                <div class="logo-icon">
-                    <i class="fas fa-heartbeat"></i>
-                </div>
+                <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
                 <span class="logo-text">MedCare HMS</span>
             </div>
+
             
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <i class="fas fa-bars text-white"></i>
@@ -580,9 +588,7 @@
     <!-- Admin Sidebar -->
     <aside class="sidebar smooth-transform" id="sidebar">
         <div class="sidebar-brand">
-            <div class="logo-icon">
-                <i class="fas fa-heartbeat"></i>
-            </div>
+            <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
             <span class="logo-text">MedCare HMS</span>
         </div>
         
@@ -793,9 +799,7 @@
                 <div class="row">
                     <div class="col-lg-4 mb-4">
                         <div class="logo-container mb-3">
-                            <div class="logo-icon">
-                                <i class="fas fa-heartbeat"></i>
-                            </div>
+                            <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
                             <h5 class="logo-text mb-0">MedCare HMS</h5>
                         </div>
                         <p>Comprehensive healthcare management for patients and providers.</p>
