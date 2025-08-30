@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}My Bills{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h1 class="h2 mb-4">Billing History</h1>
+    <div class="card card-custom">
+        <div class="card-header card-header-custom">
+            <h5 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>My Bills</h5>
+        </div>
+        <div class="card-body">
+            {% if bills %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Appointment Date</th>
+                                <th>Doctor</th>
+                                <th>Amount</th>
+                                <th>Payment Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for bill in bills %}
+                                <tr>
+                                    <td>{{ bill.appointment.appointment_date|date:"F d, Y" }}</td>
+                                    <td>{{ bill.appointment.doctor }}</td>
+                                    <td>${{ bill.amount }}</td>
+                                    <td>
+                                        <span class="badge {% if bill.payment_status == 'Paid' %}bg-success{% else %}bg-danger{% endif %}">{{ bill.payment_status }}</span>
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary">View Details</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <p class="text-center text-muted mt-3">You have no bills to display.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
