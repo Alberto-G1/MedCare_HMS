@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Admin Dashboard</h1>
+<p>Welcome, Admin! Here you can manage the entire system.</p>
+
+<div class="row">
+    <!-- Staff Management Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Staff Management</h5>
+                <p class="card-text">Approve new staff accounts and manage existing staff members.</p>
+                <!-- This is a placeholder for the full staff management page -->
+                <a href="#" class="btn btn-primary">Manage Staff</a>
+            </div>
+            <div class="card-footer">
+                <h6>Pending Staff Approvals</h6>
+                {% if pending_staff %}
+                    <!-- Existing approval list code -->
+                {% else %}
+                    <p>No pending staff approvals.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- System Configuration Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">System Configuration</h5>
+                <p class="card-text">Manage hospital departments and room allocations.</p>
+                <a href="{% url 'department_list' %}" class="btn btn-secondary me-2">Manage Departments</a>
+                <a href="{% url 'room_list' %}" class="btn btn-secondary">Manage Rooms</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
