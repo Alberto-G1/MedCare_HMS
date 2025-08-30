@@ -1,6 +1,84 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Patient Dashboard{% endblock %}
+
 {% block content %}
-<h1>Patient Dashboard</h1>
-<p>Welcome, {{ user.first_name }}! This is your personal dashboard.</p>
-<!-- Member 1 will build out features here: Book appointments, View records, etc. -->
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold">Welcome, {{ user.first_name|default:user.username }}!</h1>
+            <p class="text-muted">Here's a summary of your health portal.</p>
+        </div>
+        <a href="{% url 'book_appointment' %}" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Book Appointment</a>
+    </div>
+
+    <!-- Profile Status Card -->
+    {% if not profile_exists %}
+    <div class="alert alert-warning d-flex justify-content-between align-items-center fade-in-up">
+        <span><i class="fas fa-exclamation-triangle me-2"></i>Your profile is incomplete. Please update it to access all features.</span>
+        <a href="{% url 'patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
+    </div>
+    {% endif %}
+
+    <!-- Dashboard Cards -->
+    <div class="row fade-in-up">
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-3"><i class="fas fa-user-circle"></i></div>
+                    <h5 class="card-title">My Profile</h5>
+                    <p class="card-text text-muted">View and edit your personal and medical information.</p>
+                    <a href="{% url 'patient_profile' %}" class="btn btn-outline-primary mt-auto">Go to Profile</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-3"><i class="fas fa-calendar-check"></i></div>
+                    <h5 class="card-title">My Appointments</h5>
+                    <p class="card-text text-muted">You have {{ upcoming_appointments|length }} upcoming appointments.</p>
+                    <a href="{% url 'my_appointments' %}" class="btn btn-outline-primary mt-auto">View Appointments</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 mb-4">
+            <div class="card card-custom h-100 text-center">
+                <div class="card-body">
+                    <div class="display-4 text-primary mb-3"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h5 class="card-title">Billing & Payments</h5>
+                    <p class="card-text text-muted">View your billing history and payment status.</p>
+                    <a href="{% url 'my_bills' %}" class="btn btn-outline-primary mt-auto">View Bills</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Appointments Section -->
+    <div class="card card-custom mt-2 fade-in-up">
+        <div class="card-header card-header-custom">
+            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
+        </div>
+        <div class="card-body">
+            {% if upcoming_appointments %}
+                <ul class="list-group list-group-flush">
+                {% for appointment in upcoming_appointments %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Appointment with {{ appointment.doctor }}</h6>
+                            <small class="text-muted">{{ appointment.appointment_date|date:"l, F d, Y" }} at {{ appointment.appointment_time|time:"h:i A" }}</small>
+                        </div>
+                        <span class="badge bg-warning text-dark">{{ appointment.status }}</span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <div class="text-center py-4">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">No upcoming appointments found.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

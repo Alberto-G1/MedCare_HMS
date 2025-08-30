@@ -1,9 +1,11 @@
+from datetime import date
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from patients.models import Appointment, Patient
 
 from .forms import RegistrationForm
 from .models import UserProfile
@@ -131,7 +133,19 @@ def doctor_dashboard(request):
 def receptionist_dashboard(request):
     return render(request, 'accounts/receptionist_dashboard.html')
 
+
 @login_required
 @patient_required
 def patient_dashboard(request):
-    return render(request, 'accounts/patient_dashboard.html')
+    patient, created = Patient.objects.get_or_create(user=request.user)
+    today = date.today()
+    upcoming_appointments = Appointment.objects.filter(patient=patient, appointment_date__gte=today)
+    
+    # A simple check to see if the profile has been filled out
+    profile_exists = patient.date_of_birth is not None and patient.address is not None
+
+    context = {
+        'upcoming_appointments': upcoming_appointments,
+        'profile_exists': profile_exists
+    }
+    return render(request, 'accounts/patient_dashboard.html', context)
