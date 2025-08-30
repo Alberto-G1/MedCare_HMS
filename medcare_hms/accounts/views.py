@@ -6,10 +6,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from patients.models import Appointment, Patient
+from doctors.models import DoctorProfile
 
 from .forms import RegistrationForm
 from .models import UserProfile
 from .decorators import admin_required, doctor_required, receptionist_required, patient_required
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -34,7 +36,7 @@ def register_view(request):
 
             # Create profile
             UserProfile.objects.create(user=user, role=role, contact=contact)
-            
+
             messages.success(request, 'Registration successful!')
 
             if user.is_active:
@@ -42,11 +44,12 @@ def register_view(request):
                 return redirect('dashboard_redirect')
             else:
                 messages.info(request, 'Your account is pending approval from an administrator.')
-                return redirect('login') # Redirect to login page to show messages
+                return redirect('login')  # Redirect to login page to show messages
     else:
         form = RegistrationForm()
-    
+
     return render(request, 'accounts/register.html', {'form': form})
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -67,10 +70,12 @@ def login_view(request):
         form = AuthenticationForm()
     return render(request, 'registration/login.html', {'form': form})
 
+
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been successfully logged out.")
     return redirect('login')
+
 
 @login_required
 def dashboard_redirect_view(request):
@@ -85,11 +90,12 @@ def dashboard_redirect_view(request):
             return redirect('receptionist_dashboard')
         elif profile.role == 'PATIENT':
             return redirect('patient_dashboard')
-    
+
     # Fallback for users without a profile or if something goes wrong
     messages.error(request, "Could not determine user role. Logging out.")
     logout(request)
     return redirect('login')
+
 
 # --- Admin Views ---
 @login_required
@@ -97,6 +103,7 @@ def dashboard_redirect_view(request):
 def admin_dashboard(request):
     pending_staff = UserProfile.objects.filter(user__is_active=False, role__in=['DOCTOR', 'RECEPTIONIST'])
     return render(request, 'accounts/admin_dashboard.html', {'pending_staff': pending_staff})
+
 
 @login_required
 @admin_required
@@ -110,6 +117,7 @@ def approve_user(request, user_id):
         messages.error(request, "User not found.")
     return redirect('admin_dashboard')
 
+
 @login_required
 @admin_required
 def reject_user(request, user_id):
@@ -122,11 +130,13 @@ def reject_user(request, user_id):
         messages.error(request, "User not found.")
     return redirect('admin_dashboard')
 
+
 # --- Other Role Dashboards ---
 @login_required
 @doctor_required
 def doctor_dashboard(request):
     return render(request, 'accounts/doctor_dashboard.html')
+
 
 @login_required
 @receptionist_required

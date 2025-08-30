@@ -20,6 +20,22 @@
         </div>
     </div>
 
+        <!-- NEW WELCOME CARD START -->
+    <div class="card card-custom mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h4 class="card-title">Welcome, Dr. {{ user.first_name|default:user.username }}!</h4>
+                    <p class="card-text text-muted">Here you can manage your appointments and patient records. Keep your profile information up to date.</p>
+                </div>
+                    <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-sky">
+                        <i class="fas fa-user me-2"></i>View My Profile
+                    </a>
+            </div>
+        </div>
+    </div>
+    <!-- NEW WELCOME CARD END -->
+
     <!-- Quick Stats Cards -->
     <div class="row mb-4">
         <div class="col-md-3">
@@ -103,6 +119,8 @@
             </div>
         </div>
     </div>
+
+
 
     <!-- Main Content Area -->
     <div class="row">
