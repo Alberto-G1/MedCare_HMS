@@ -1,71 +1,1177 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title text-center">Register an Account</h2>
+<div class="container-fluid min-vh-100 p-0">
+    <div class="row g-0 min-vh-100">
+        <!-- Left Side - Welcome Message -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-gradient-left">
+            <div class="welcome-content text-center text-white p-5">
+                <div class="logo-container justify-content-center mb-4">
+                    <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="welcome-logo">
+                </div>
+                <h1 class="display-4 fw-bold mb-4 animate-fade-in">Join MedCare HMS</h1>
+                <p class="lead mb-4 animate-fade-in-delay">Create your account and start your healthcare journey with us</p>
+                
+                <div class="benefits-list mt-5">
+                    <div class="benefit-item animate-slide-in">
+                        <div class="benefit-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h5>Easy Registration</h5>
+                            <p>Quick and secure account setup process</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item animate-slide-in-delay">
+                        <div class="benefit-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h5>Secure & Private</h5>
+                            <p>Your health data is protected with enterprise-grade security</p>
+                        </div>
+                    </div>
+                    
+                    <div class="benefit-item animate-slide-in-delay-2">
+                        <div class="benefit-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="benefit-text">
+                            <h5>24/7 Access</h5>
+                            <p>Access your healthcare information anytime, anywhere</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stats-container mt-5 animate-fade-in-delay-2">
+                    <div class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+                        <div class="stat-item">
+                            <div class="stat-number">10,000+</div>
+                            <div class="stat-label">Registered Patients</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">500+</div>
+                            <div class="stat-label">Healthcare Providers</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">99.9%</div>
+                            <div class="stat-label">Uptime</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <form method="post" novalidate> <!-- novalidate prevents browser default validation on error -->
+        </div>
+        
+        <!-- Right Side - Registration Form -->
+        <div class="col-lg-6 d-flex align-items-center justify-content-center bg-light-subtle">
+            <div class="register-container p-5 w-100" style="max-width: 520px;">
+                <div class="text-center mb-5">
+                    <div class="register-header-icon mb-3">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h2 class="fw-bold text-dark mb-2">Create Account</h2>
+                    <p class="text-muted">Fill in your details to get started</p>
+                </div>
+
+                <form method="post" class="needs-validation" novalidate>
                     {% csrf_token %}
                     
                     <!-- Display Non-Field Errors -->
                     {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {% for error in form.non_field_errors %}
-                                <p>{{ error }}</p>
-                            {% endfor %}
+                        <div class="alert alert-danger alert-dismissible fade show modern-alert animate-shake" role="alert">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-exclamation-triangle me-3 fs-5 mt-1"></i>
+                                <div>
+                                    {% for error in form.non_field_errors %}
+                                        <p class="mb-1">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
 
-                    <!-- Render each field with HTML5 validation -->
-                    <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" required maxlength="100" id="{{ form.username.id_for_label }}">
-                        {% if form.username.errors %}<div class="text-danger">{{ form.username.errors.as_text }}</div>{% endif %}
+                    <!-- Username Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.username.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Username</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-user text-primary"></i>
+                            </span>
+                            <input type="text" name="username" class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                                   required maxlength="100" id="{{ form.username.id_for_label }}" 
+                                   placeholder="Choose a unique username">
+                        </div>
+                        {% if form.username.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.username.errors.as_text }}
+                            </div>
+                        {% endif %}
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.email.id_for_label }}" class="form-label">Email</label>
-                        <input type="email" name="email" class="form-control" required id="{{ form.email.id_for_label }}">
-                        {% if form.email.errors %}<div class="text-danger">{{ form.email.errors.as_text }}</div>{% endif %}
+                    <!-- Email Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.email.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Email Address</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-envelope text-primary"></i>
+                            </span>
+                            <input type="email" name="email" class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                                   required id="{{ form.email.id_for_label }}" 
+                                   placeholder="your.email@example.com">
+                        </div>
+                        {% if form.email.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.email.errors.as_text }}
+                            </div>
+                        {% endif %}
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.contact.id_for_label }}" class="form-label">Contact Number</label>
-                        <input type="text" name="contact" class="form-control" required maxlength="20" id="{{ form.contact.id_for_label }}">
-                        {% if form.contact.errors %}<div class="text-danger">{{ form.contact.errors.as_text }}</div>{% endif %}
+                    <!-- Contact Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.contact.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Contact Number</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-phone text-primary"></i>
+                            </span>
+                            <input type="text" name="contact" class="form-control {% if form.contact.errors %}is-invalid{% endif %}" 
+                                   required maxlength="20" id="{{ form.contact.id_for_label }}" 
+                                   placeholder="+1 (555) 123-4567">
+                        </div>
+                        {% if form.contact.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.contact.errors.as_text }}
+                            </div>
+                        {% endif %}
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" required id="{{ form.password.id_for_label }}">
-                        {% if form.password.errors %}<div class="text-danger">{{ form.password.errors.as_text }}</div>{% endif %}
+                    <!-- Password Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Password</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock text-primary"></i>
+                            </span>
+                            <input type="password" name="password" class="form-control {% if form.password.errors %}is-invalid{% endif %}" 
+                                   required id="{{ form.password.id_for_label }}" 
+                                   placeholder="Create a strong password">
+                            <button class="btn btn-outline-secondary modern-toggle" type="button" id="togglePassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.password.errors.as_text }}
+                            </div>
+                        {% endif %}
+                        <div class="password-strength mt-2">
+                            <div class="strength-meter">
+                                <div class="strength-bar" id="strengthBar"></div>
+                            </div>
+                            <small class="text-muted" id="strengthText">Password strength will appear here</small>
+                        </div>
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-control" required id="{{ form.confirm_password.id_for_label }}">
-                        {% if form.confirm_password.errors %}<div class="text-danger">{{ form.confirm_password.errors.as_text }}</div>{% endif %}
+                    <!-- Confirm Password Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.confirm_password.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Confirm Password</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock text-primary"></i>
+                            </span>
+                            <input type="password" name="confirm_password" class="form-control {% if form.confirm_password.errors %}is-invalid{% endif %}" 
+                                   required id="{{ form.confirm_password.id_for_label }}" 
+                                   placeholder="Re-enter your password">
+                            <button class="btn btn-outline-secondary modern-toggle" type="button" id="toggleConfirmPassword">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        {% if form.confirm_password.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.confirm_password.errors.as_text }}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    <div class="mb-3">
-                        <label for="{{ form.role.id_for_label }}" class="form-label">Role</label>
-                        {{ form.role }}
-                        {% if form.role.errors %}<div class="text-danger">{{ form.role.errors.as_text }}</div>{% endif %}
+                    <!-- Role Field -->
+                    <div class="mb-4">
+                        <label for="{{ form.role.id_for_label }}" class="form-label fw-semibold text-dark mb-2">Role</label>
+                        <div class="input-group modern-input">
+                            <span class="input-group-text">
+                                <i class="fas fa-user-tag text-primary"></i>
+                            </span>
+                            {{ form.role }}
+                        </div>
+                        {% if form.role.errors %}
+                            <div class="invalid-feedback d-block mt-2">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                {{ form.role.errors.as_text }}
+                            </div>
+                        {% endif %}
                     </div>
 
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-success">Register</button>
+                    <!-- Terms and Conditions -->
+                    <div class="mb-4">
+                        <div class="form-check modern-checkbox">
+                            <input type="checkbox" class="form-check-input" id="termsAgreement" required>
+                            <label class="form-check-label text-muted fw-medium" for="termsAgreement">
+                                I agree to the <a href="#" class="text-decoration-none fw-semibold register-link">Terms of Service</a> 
+                                and <a href="#" class="text-decoration-none fw-semibold register-link">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mb-4">
+                        <button type="submit" class="btn btn-primary-modern btn-lg fw-semibold py-3 position-relative overflow-hidden">
+                            <span class="btn-text">
+                                <i class="fas fa-user-plus me-2"></i>Create MedCare Account
+                            </span>
+                            <div class="btn-ripple"></div>
+                        </button>
                     </div>
                 </form>
-            </div>
-            <div class="card-footer text-center">
-                <p class="mb-0">Already have an account? <a href="{% url 'login' %}">Login Here</a></p>
+                
+                <div class="text-center mt-4">
+                    <p class="mb-0 text-muted">Already have an account? 
+                        <a href="{% url 'login' %}" class="text-decoration-none fw-semibold login-link">Sign In Here</a>
+                    </p>
+                </div>
+                
+                <div class="security-notice mt-4 p-3 rounded-3">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-shield-alt text-success me-2"></i>
+                        <small class="text-muted">Your information is encrypted and stored securely</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+:root {
+    --primary-teal: #0E7490;
+    --primary-dark-teal: #0C4A6E;
+    --sky-blue: #0284C7;
+    --light-sky-blue: #38BDF8;
+    --background-light: #F1F5F9;
+    --background-white: #FFFFFF;
+    --accent-blue: #14B8A6;
+    --success-green: #10B981;
+    --text-dark: #1E293B;
+    --shadow-light: rgba(15, 23, 42, 0.05);
+    --shadow-medium: rgba(15, 23, 42, 0.15);
+    --shadow-strong: rgba(15, 23, 42, 0.25);
+}
+
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+/* Left Side Gradient Background */
+.bg-gradient-left {
+    background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 50%, var(--sky-blue) 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.bg-gradient-left::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(56, 189, 248, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(20, 184, 166, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.welcome-content {
+    position: relative;
+    z-index: 2;
+    max-width: 500px;
+}
+
+.welcome-logo {
+    height: 80px;
+    width: 80px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Benefits List Styling */
+.benefits-list {
+    text-align: left;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.benefit-item:hover {
+    transform: translateX(10px);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.benefit-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.2rem;
+}
+
+.benefit-text h5 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.benefit-text p {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9rem;
+}
+
+/* Stats Container */
+.stats-container {
+    opacity: 0.9;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 120px;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+/* Right Side Styling */
+.bg-light-subtle {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.register-header-icon {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 8px 24px var(--shadow-medium);
+}
+
+/* Modern Form Styling */
+.modern-input .input-group-text {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    padding: 0.875rem 1rem;
+}
+
+.modern-input .form-control,
+.modern-input select {
+    border: 2px solid #e2e8f0;
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.modern-input select {
+    border-radius: 0 12px 12px 0;
+}
+
+.modern-input .form-control:focus,
+.modern-input select:focus {
+    border-color: var(--sky-blue);
+    box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.1);
+    background: white;
+}
+
+.modern-input .form-control:focus + .input-group-text,
+.modern-input:focus-within .input-group-text {
+    border-color: var(--sky-blue);
+    background: white;
+}
+
+.modern-toggle {
+    border: 2px solid #e2e8f0;
+    border-left: none;
+    border-radius: 0 12px 12px 0;
+    background: white;
+    color: var(--text-dark);
+    transition: all 0.3s ease;
+}
+
+.modern-toggle:hover {
+    background: var(--background-light);
+    color: var(--sky-blue);
+}
+
+/* Password Strength Meter */
+.password-strength {
+    margin-top: 0.5rem;
+}
+
+.strength-meter {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.25rem;
+}
+
+.strength-bar {
+    height: 100%;
+    width: 0%;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.strength-bar.weak { background: #ef4444; width: 25%; }
+.strength-bar.fair { background: #f59e0b; width: 50%; }
+.strength-bar.good { background: #10b981; width: 75%; }
+.strength-bar.strong { background: #059669; width: 100%; }
+
+/* Modern Checkbox */
+.modern-checkbox .form-check-input {
+    width: 1.2em;
+    height: 1.2em;
+    border: 2px solid #cbd5e1;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.modern-checkbox .form-check-input:checked {
+    background-color: var(--success-green);
+    border-color: var(--success-green);
+}
+
+.modern-checkbox .form-check-input:focus {
+    box-shadow: 0 0 0 0.25rem rgba(16, 185, 129, 0.1);
+}
+
+/* Modern Primary Button */
+.btn-primary-modern {
+    background: linear-gradient(135deg, var(--success-green) 0%, var(--accent-blue) 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+    color: white;
+}
+
+.btn-primary-modern:active {
+    transform: translateY(0);
+}
+
+/* Button Ripple Effect */
+.btn-ripple {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn-primary-modern:active .btn-ripple {
+    width: 300px;
+    height: 300px;
+}
+
+/* Links */
+.register-link {
+    color: var(--sky-blue);
+    transition: all 0.2s ease;
+}
+
+.register-link:hover {
+    color: var(--primary-teal);
+}
+
+.login-link {
+    color: var(--success-green);
+    transition: all 0.2s ease;
+}
+
+.login-link:hover {
+    color: var(--accent-blue);
+}
+
+/* Security Notice */
+.security-notice {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+/* Modern Alert */
+.modern-alert {
+    border: none;
+    border-radius: 12px;
+    border-left: 4px solid #dc2626;
+    background: #fef2f2;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+}
+
+.modern-alert p {
+    margin: 0;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+.animate-fade-in-delay {
+    animation: fadeIn 0.8s ease 0.2s forwards;
+    opacity: 0;
+}
+
+.animate-fade-in-delay-2 {
+    animation: fadeIn 0.8s ease 0.4s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in {
+    animation: slideIn 0.8s ease 0.6s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay {
+    animation: slideIn 0.8s ease 0.8s forwards;
+    opacity: 0;
+}
+
+.animate-slide-in-delay-2 {
+    animation: slideIn 0.8s ease 1s forwards;
+    opacity: 0;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease;
+}
+
+/* Responsive Design */
+@media (max-width: 991.98px) {
+    .row.g-0 {
+        flex-direction: column;
+    }
+    
+    .col-lg-6:first-child {
+        order: 2;
+        min-height: 40vh;
+    }
+    
+    .col-lg-6:last-child {
+        order: 1;
+        min-height: 60vh;
+    }
+    
+    .benefits-list {
+        display: none;
+    }
+    
+    .welcome-content {
+        padding: 2rem !important;
+    }
+    
+    .register-container {
+        padding: 2rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .welcome-content {
+        padding: 1.5rem !important;
+    }
+    
+    .register-container {
+        padding: 1.5rem !important;
+    }
+    
+    .benefit-item {
+        margin-bottom: 1rem;
+        padding: 1rem;
+    }
+
+    .stats-container .d-flex {
+        flex-direction: column;
+        gap: 1rem !important;
+    }
+
+    .stat-item {
+        min-width: auto;
+    }
+}
+
+/* Loading states */
+.btn-primary-modern:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-primary-modern:disabled:hover {
+    transform: none;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}
+
+/* Focus states for accessibility */
+.modern-input .form-control:focus,
+.modern-input select:focus,
+.btn-primary-modern:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+}
+
+/* High contrast support */
+@media (prefers-contrast: high) {
+    .benefit-item {
+        border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+    
+    .modern-input .form-control,
+    .modern-input select {
+        border-width: 3px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+</style>
+
+<script>
+// Password visibility toggles
+document.getElementById('togglePassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+document.getElementById('toggleConfirmPassword').addEventListener('click', function() {
+    const passwordInput = document.getElementById('{{ form.confirm_password.id_for_label }}');
+    const icon = this.querySelector('i');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+});
+
+// Password strength checker
+function checkPasswordStrength(password) {
+    let strength = 0;
+    let text = '';
+    
+    if (password.length >= 8) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^A-Za-z0-9]/.test(password)) strength++;
+    
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    
+    strengthBar.className = 'strength-bar';
+    
+    switch(strength) {
+        case 0:
+        case 1:
+            strengthBar.classList.add('weak');
+            text = 'Weak password';
+            break;
+        case 2:
+            strengthBar.classList.add('fair');
+            text = 'Fair password';
+            break;
+        case 3:
+        case 4:
+            strengthBar.classList.add('good');
+            text = 'Good password';
+            break;
+        case 5:
+            strengthBar.classList.add('strong');
+            text = 'Strong password';
+            break;
+    }
+    
+    strengthText.textContent = password.length > 0 ? text : 'Password strength will appear here';
+}
+
+// Initialize password strength checker
+document.getElementById('{{ form.password.id_for_label }}').addEventListener('input', function() {
+    checkPasswordStrength(this.value);
+    // Re-validate confirm password when password changes
+    validatePasswordMatch();
+});
+
+// Password confirmation validation
+function validatePasswordMatch() {
+    const password = document.getElementById('{{ form.password.id_for_label }}').value;
+    const confirmPasswordField = document.getElementById('{{ form.confirm_password.id_for_label }}');
+    const confirmPassword = confirmPasswordField.value;
+    
+    if (confirmPassword.length > 0) {
+        if (password !== confirmPassword) {
+            confirmPasswordField.setCustomValidity('Passwords do not match');
+            confirmPasswordField.classList.add('is-invalid');
+        } else {
+            confirmPasswordField.setCustomValidity('');
+            confirmPasswordField.classList.remove('is-invalid');
+            confirmPasswordField.classList.add('is-valid');
+        }
+    }
+}
+
+document.getElementById('{{ form.confirm_password.id_for_label }}').addEventListener('input', validatePasswordMatch);
+
+// Form validation enhancement
+(function() {
+    'use strict';
+    var forms = document.querySelectorAll('.needs-validation');
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            // Additional custom validation
+            const password = document.getElementById('{{ form.password.id_for_label }}').value;
+            const confirmPassword = document.getElementById('{{ form.confirm_password.id_for_label }}').value;
+            const termsCheckbox = document.getElementById('termsAgreement');
+            
+            // Check if passwords match
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                event.stopPropagation();
+                document.getElementById('{{ form.confirm_password.id_for_label }}').setCustomValidity('Passwords do not match');
+            }
+            
+            // Check if terms are agreed
+            if (!termsCheckbox.checked) {
+                event.preventDefault();
+                event.stopPropagation();
+                termsCheckbox.focus();
+                showToast('Please agree to the Terms of Service and Privacy Policy', 'error');
+            }
+            
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            } else {
+                // Show loading state on submit button
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const btnText = submitBtn.querySelector('.btn-text');
+                const originalText = btnText.innerHTML;
+                
+                btnText.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Creating Account...';
+                submitBtn.disabled = true;
+                
+                // Re-enable button after 10 seconds (fallback)
+                setTimeout(() => {
+                    btnText.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }, 10000);
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+})();
+
+// Real-time field validation
+function addRealTimeValidation() {
+    const fields = [
+        '{{ form.username.id_for_label }}',
+        '{{ form.email.id_for_label }}',
+        '{{ form.contact.id_for_label }}'
+    ];
+    
+    fields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('blur', function() {
+                if (this.value.trim() !== '') {
+                    if (this.checkValidity()) {
+                        this.classList.remove('is-invalid');
+                        this.classList.add('is-valid');
+                    } else {
+                        this.classList.remove('is-valid');
+                        this.classList.add('is-invalid');
+                    }
+                } else {
+                    this.classList.remove('is-valid', 'is-invalid');
+                }
+            });
+            
+            field.addEventListener('input', function() {
+                // Remove validation classes while typing
+                this.classList.remove('is-valid', 'is-invalid');
+            });
+        }
+    });
+}
+
+// Email validation enhancement
+function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Contact number formatting
+function formatContactNumber() {
+    const contactField = document.getElementById('{{ form.contact.id_for_label }}');
+    if (contactField) {
+        contactField.addEventListener('input', function() {
+            // Remove all non-digit characters except + at the beginning
+            let value = this.value.replace(/[^\d+]/g, '');
+            if (value.indexOf('+') > 0) {
+                value = value.replace(/\+/g, '');
+            }
+            this.value = value;
+        });
+    }
+}
+
+// Toast notification system
+function showToast(message, type = 'info') {
+    // Remove existing toast if any
+    const existingToast = document.querySelector('.custom-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+    
+    const toast = document.createElement('div');
+    toast.className = `custom-toast toast-${type}`;
+    
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    };
+    
+    toast.innerHTML = `
+        <div class="toast-content">
+            <i class="${icons[type]} me-2"></i>
+            ${message}
+        </div>
+        <button class="toast-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    document.body.appendChild(toast);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.remove();
+        }
+    }, 5000);
+}
+
+// Username availability checker (simulated)
+function checkUsernameAvailability() {
+    const usernameField = document.getElementById('{{ form.username.id_for_label }}');
+    if (usernameField) {
+        let timeoutId;
+        
+        usernameField.addEventListener('input', function() {
+            const username = this.value.trim();
+            
+            // Clear previous timeout
+            clearTimeout(timeoutId);
+            
+            // Remove previous indicators
+            this.classList.remove('checking-username');
+            
+            if (username.length >= 3) {
+                this.classList.add('checking-username');
+                
+                timeoutId = setTimeout(() => {
+                    // Simulate API call
+                    simulateUsernameCheck(username, this);
+                }, 1000);
+            }
+        });
+    }
+}
+
+function simulateUsernameCheck(username, field) {
+    // This would normally be an AJAX call to your backend
+    // For demo purposes, we'll simulate some taken usernames
+    const takenUsernames = ['admin', 'test', 'user', 'doctor', 'patient'];
+    
+    field.classList.remove('checking-username');
+    
+    if (takenUsernames.includes(username.toLowerCase())) {
+        field.classList.add('username-taken');
+        field.setCustomValidity('Username is already taken');
+    } else {
+        field.classList.remove('username-taken');
+        field.classList.add('username-available');
+        field.setCustomValidity('');
+    }
+}
+
+// Initialize all functionality when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    addRealTimeValidation();
+    formatContactNumber();
+    checkUsernameAvailability();
+    
+    // Add focus effects to input groups
+    document.querySelectorAll('.modern-input input, .modern-input select').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.closest('.modern-input').classList.add('focused');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.closest('.modern-input').classList.remove('focused');
+        });
+    });
+    
+    // Animate stats on scroll (if visible)
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                animateStats();
+            }
+        });
+    }, observerOptions);
+    
+    const statsContainer = document.querySelector('.stats-container');
+    if (statsContainer) {
+        observer.observe(statsContainer);
+    }
+});
+
+// Animate statistics numbers
+function animateStats() {
+    const stats = [
+        { element: document.querySelector('.stat-item:nth-child(1) .stat-number'), target: 10000, suffix: '+' },
+        { element: document.querySelector('.stat-item:nth-child(2) .stat-number'), target: 500, suffix: '+' },
+        { element: document.querySelector('.stat-item:nth-child(3) .stat-number'), target: 99.9, suffix: '%' }
+    ];
+    
+    stats.forEach(stat => {
+        if (stat.element && !stat.element.classList.contains('animated')) {
+            stat.element.classList.add('animated');
+            animateNumber(stat.element, 0, stat.target, stat.suffix);
+        }
+    });
+}
+
+function animateNumber(element, start, end, suffix) {
+    const duration = 2000;
+    const startTime = performance.now();
+    const isDecimal = end % 1 !== 0;
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function
+        const easeOutCubic = 1 - Math.pow(1 - progress, 3);
+        const current = start + (end - start) * easeOutCubic;
+        
+        if (isDecimal) {
+            element.textContent = current.toFixed(1) + suffix;
+        } else {
+            element.textContent = Math.floor(current).toLocaleString() + suffix;
+        }
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// Add additional CSS for new features
+const additionalStyles = `
+<style>
+.checking-username {
+    background-image: url("data:image/svg+xml,%3csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3e%3cg fill='none' fill-rule='evenodd'%3e%3cg fill='%23007bff' fill-opacity='0.4'%3e%3crect x='0' y='0' width='4' height='20' rx='1'%3e%3canimate attributeName='opacity' values='1;.2;1' dur='1s' repeatCount='indefinite'/%3e%3c/rect%3e%3crect x='8' y='0' width='4' height='20' rx='1'%3e%3canimate attributeName='opacity' values='1;.2;1' dur='1s' begin='0.2s' repeatCount='indefinite'/%3e%3c/rect%3e%3crect x='16' y='0' width='4' height='20' rx='1'%3e%3canimate attributeName='opacity' values='1;.2;1' dur='1s' begin='0.4s' repeatCount='indefinite'/%3e%3c/rect%3e%3c/g%3e%3c/g%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px;
+}
+
+.username-available {
+    border-color: #10b981 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='m6.564.75-3.59 3.612-1.538-1.55L0 4.26l2.974 2.99L8 2.193z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+}
+
+.username-taken {
+    border-color: #ef4444 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23ef4444' viewBox='0 0 24 24'%3e%3ccircle cx='12' cy='12' r='10'/%3e%3cpath d='m15 9-6 6'/%3e%3cpath d='m9 9 6 6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+}
+
+.modern-input.focused .input-group-text {
+    border-color: var(--sky-blue);
+    background: rgba(2, 132, 199, 0.05);
+}
+
+.custom-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 300px;
+    z-index: 9999;
+    animation: slideInRight 0.3s ease;
+    border-left: 4px solid;
+}
+
+.toast-success { border-left-color: #10b981; }
+.toast-error { border-left-color: #ef4444; }
+.toast-warning { border-left-color: #f59e0b; }
+.toast-info { border-left-color: #0284c7; }
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    margin-left: 1rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.toast-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
+`;
+
+// Inject additional styles
+document.head.insertAdjacentHTML('beforeend', additionalStyles);
+</script>
+
 {% endblock %}
