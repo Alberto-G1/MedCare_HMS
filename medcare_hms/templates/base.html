@@ -17,7 +17,6 @@
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Your CSS remains unchanged */
         :root {
             --primary-teal: #0E7490;          /* deep teal for header/sidebar top */
             --primary-dark-teal: #0C4A6E;     /* darker shade for hover/active */
@@ -31,6 +30,14 @@
             --shadow-medium: rgba(15, 23, 42, 0.15);
             --sidebar-width: 280px;
             --sidebar-collapsed: 70px;
+
+            /* New color additions */
+            --accent-green: #22C55E;          /* vibrant green */
+            --accent-tan: #D9A466;            /* warm tan */
+            --accent-orange: #F97316;         /* energetic orange */
+            --accent-green-light: #BBF7D0;    /* light green */
+            --accent-tan-light: #FDE68A;      /* light tan */
+            --accent-orange-light: #FED7AA;   /* light orange */
         }
 
         * {
@@ -43,31 +50,28 @@
         h1, h2, h3, h4, h5, h6, .btn, .nav-link, .navbar-brand {
             font-family: 'Poppins', sans-serif;
         }
-        
-        body {
 
-            font-family: 'Poppins', sans-serif;
+        body {
             background-color: var(--background-light);
             color: var(--text-dark);
-            font-family: poppins, 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
         }
-        
+
         /* Prevent shaking by using transform3d for hardware acceleration */
         .smooth-transform {
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
             will-change: transform;
         }
-        
+
         /* Logo Styling */
         .logo-container {
             display: flex;
             align-items: center;
             gap: 12px;
         }
-        
+
         .logo-icon {
             width: 40px;
             height: 40px;
@@ -88,23 +92,24 @@
             border-radius: 8px;
             box-shadow: 0 2px 8px var(--shadow-light);
         }
-        
+
         .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
             color: white;
             letter-spacing: -0.5px;
         }
-        
-        /* Navbar Styling */
+
+        /* Navbar Styling - Made Sticky */
         .navbar-custom {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
-            padding: 1rem 0;
+            padding: 0.8rem 0;
             box-shadow: 0 4px 12px var(--shadow-medium);
-            position: relative;
+            position: sticky;
+            top: 0;
             z-index: 1030;
         }
-        
+
         .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
@@ -114,19 +119,20 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
         }
-        
+
         .nav-link:hover {
             background-color: rgba(135, 206, 235, 0.2);
             color: white !important;
             transform: translateY(-2px);
         }
-        
+
         .nav-link.active {
-            background-color: var(--sky-blue);
-            color: var(--primary-teal) !important;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            color: white !important;
             font-weight: 600;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-        
+
         /* Sidebar Styling */
         .sidebar {
             background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -142,11 +148,11 @@
             overflow-y: auto;
             overflow-x: hidden;
         }
-        
+
         .sidebar.collapsed {
             width: var(--sidebar-collapsed);
         }
-        
+
         .sidebar-brand {
             padding: 1.5rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -156,20 +162,20 @@
             white-space: nowrap;
             transition: opacity 0.3s ease;
         }
-        
+
         .sidebar.collapsed .sidebar-brand .logo-text {
             opacity: 0;
         }
-        
+
         .sidebar-menu {
             list-style: none;
             padding: 1rem 0;
         }
-        
+
         .menu-section {
             margin-bottom: 2rem;
         }
-        
+
         .menu-section-title {
             padding: 0.75rem 1.5rem 0.5rem;
             font-size: 0.75rem;
@@ -179,7 +185,7 @@
             font-weight: 600;
             transition: opacity 0.3s ease;
         }
-        
+
         .sidebar.collapsed .menu-section-title {
             opacity: 0;
             height: 0;
@@ -187,11 +193,11 @@
             margin: 0;
             overflow: hidden;
         }
-        
+
         .menu-item {
             position: relative;
         }
-        
+
         .menu-link {
             color: rgba(255, 255, 255, 0.9);
             padding: 0.875rem 1.5rem;
@@ -202,19 +208,19 @@
             position: relative;
             white-space: nowrap;
         }
-        
+
         .menu-link:hover {
             background-color: rgba(135, 206, 235, 0.15);
             color: white;
             padding-left: 2rem;
         }
-        
+
         .menu-link.active {
-            background-color: var(--sky-blue);
-            color: var(--primary-teal);
+            background: linear-gradient(90deg, var(--accent-green) 0%, rgba(34, 197, 94, 0.7) 100%);
+            color: white;
             font-weight: 600;
         }
-        
+
         .menu-link.active::before {
             content: '';
             position: absolute;
@@ -222,9 +228,9 @@
             top: 0;
             bottom: 0;
             width: 4px;
-            background-color: var(--accent-blue);
+            background-color: var(--accent-orange);
         }
-        
+
         .menu-icon {
             width: 20px;
             height: 20px;
@@ -234,36 +240,45 @@
             justify-content: center;
             flex-shrink: 0;
         }
-        
+
         .menu-text {
             transition: opacity 0.3s ease;
         }
-        
+
         .sidebar.collapsed .menu-text {
             opacity: 0;
         }
-        
-        /* Submenu Styling */
+
+        /* Submenu Styling with Icons */
         .submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background-color: rgba(0, 0, 0, 0.1);
         }
-        
+
         .submenu.show {
             max-height: 500px;
         }
-        
+
         .submenu .menu-link {
             padding-left: 3.5rem;
             font-size: 0.9rem;
         }
-        
+
         .submenu .menu-link:hover {
             padding-left: 4rem;
+            background-color: rgba(255, 255, 255, 0.1);
         }
-        
+
+        .submenu .menu-icon {
+            font-size: 0.8rem;
+            width: 18px;
+            height: 18px;
+            margin-right: 0.8rem;
+            color: var(--accent-tan-light);
+        }
+
         .menu-toggle {
             position: absolute;
             right: 1rem;
@@ -271,15 +286,15 @@
             transform: translateY(-50%);
             transition: transform 0.3s ease;
         }
-        
+
         .menu-toggle.rotated {
             transform: translateY(-50%) rotate(180deg);
         }
-        
+
         .sidebar.collapsed .menu-toggle {
             display: none;
         }
-        
+
         /* Main Content Area */
         .main-content {
             margin-left: var(--sidebar-width);
@@ -288,16 +303,16 @@
             display: flex;
             flex-direction: column;
         }
-        
+
         .main-content.expanded {
             margin-left: var(--sidebar-collapsed);
         }
-        
+
         .content-area {
             flex: 1;
             padding: 2rem;
         }
-        
+
         /* Admin Topbar */
         .admin-topbar {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -307,8 +322,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 1010;
         }
-        
+
         .sidebar-toggle {
             background: none;
             border: none;
@@ -319,11 +337,11 @@
             transition: background-color 0.3s ease;
             cursor: pointer;
         }
-        
+
         .sidebar-toggle:hover {
             background-color: rgba(135, 206, 235, 0.2);
         }
-        
+
         /* Card Styling */
         .card-custom {
             background-color: white;
@@ -333,20 +351,20 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
         }
-        
+
         .card-custom:hover {
             transform: translateY(-4px);
             box-shadow: 0 8px 24px var(--shadow-medium);
         }
-        
+
         .card-header-custom {
-            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--light-sky-blue) 100%);
-            color: var(--primary-teal);
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-green) 100%);
+            color: white;
             font-weight: 600;
             border: none;
             padding: 1.25rem 1.5rem;
         }
-        
+
         /* Button Styling */
         .btn-primary-custom {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -357,12 +375,12 @@
             border-radius: 8px;
             transition: all 0.3s ease;
         }
-        
+
         .btn-primary-custom:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px var(--shadow-medium);
         }
-        
+
         .btn-sky {
             background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-blue) 100%);
             border: none;
@@ -372,28 +390,72 @@
             border-radius: 8px;
             transition: all 0.3s ease;
         }
-        
+
         .btn-sky:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px var(--shadow-medium);
             color: white;
         }
-        
+
+        /* New button styles for login/logout */
+        .btn-login {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #16A34A 100%);
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            color: white;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #EA580C 100%);
+            border: none;
+            color: white;
+            font-weight: 500;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            color: white;
+        }
+
+        /* User status display */
+        .user-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+        }
+
         /* Responsive Design */
         @media (max-width: 1199.98px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-            
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            
+
             .main-content,
             .main-content.expanded {
                 margin-left: 0;
             }
-            
+
             .sidebar-overlay {
                 position: fixed;
                 top: 0;
@@ -406,27 +468,31 @@
                 visibility: hidden;
                 transition: all 0.3s ease;
             }
-            
+
             .sidebar-overlay.show {
                 opacity: 1;
                 visibility: visible;
             }
         }
-        
+
         @media (max-width: 767.98px) {
             .content-area {
                 padding: 1rem;
             }
-            
+
             .logo-text {
                 font-size: 1.25rem;
             }
-            
+
             .admin-topbar {
                 padding: 0.75rem;
             }
+
+            .nav-link {
+                padding: 0.5rem 0.75rem !important;
+            }
         }
-        
+
         /* Footer Styling */
         .footer {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -434,17 +500,17 @@
             padding: 3rem 0 1rem;
             margin-top: auto;
         }
-        
+
         .footer a {
             color: var(--sky-blue);
             text-decoration: none;
             transition: color 0.3s ease;
         }
-        
+
         .footer a:hover {
             color: white;
         }
-        
+
         /* Welcome Section */
         .welcome-section {
             text-align: center;
@@ -454,40 +520,40 @@
             margin: 2rem 0;
             box-shadow: 0 8px 24px var(--shadow-light);
         }
-        
+
         .welcome-section h1 {
             color: var(--primary-teal);
             font-weight: 700;
             margin-bottom: 1.5rem;
         }
-        
+
         .welcome-section .lead {
             color: var(--text-dark);
             font-size: 1.25rem;
             margin-bottom: 2rem;
         }
-        
+
         /* Alert Styling */
         .alert-custom {
             border-radius: 10px;
             border: none;
             box-shadow: 0 2px 8px var(--shadow-light);
         }
-        
+
         /* Smooth scrollbar for sidebar */
         .sidebar::-webkit-scrollbar {
             width: 4px;
         }
-        
+
         .sidebar::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
         }
-        
+
         .sidebar::-webkit-scrollbar-thumb {
-            background: var(--sky-blue);
+            background: var(--accent-green);
             border-radius: 2px;
         }
-        
+
         /* Loading states and animations */
         @keyframes fadeInUp {
             from {
@@ -499,25 +565,25 @@
                 transform: translateY(0);
             }
         }
-        
+
         .fade-in-up {
             animation: fadeInUp 0.6s ease forwards;
         }
-        
-        /* Loading states and animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.6s ease forwards;
+
+        /* Badge styling for notifications */
+        .badge-custom {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #EA580C 100%);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            position: absolute;
+            top: 8px;
+            right: 8px;
         }
     </style>
 </head>
@@ -534,11 +600,11 @@
                 <span class="logo-text">MedCare HMS</span>
             </div>
 
-            
+
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <i class="fas fa-bars text-white"></i>
             </button>
-            
+
             <div class="collapse navbar-collapse" id="navbarContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
                     <li class="nav-item">
@@ -567,17 +633,24 @@
                         </a>
                     </li>
                 </ul>
-                
-                {% if user.is_authenticated %}
+
                 <div class="d-flex align-items-center flex-column flex-lg-row gap-3">
+                    {% if user.is_authenticated %}
                     <span class="navbar-text">
                         <i class="fas fa-user me-2"></i>Welcome, {{ user.first_name }}
                     </span>
                     <a href="{% url 'logout' %}" class="btn btn-sky">
                         <i class="fas fa-sign-out-alt me-2"></i>Logout
                     </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-login">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-register">
+                        <i class="fas fa-user-plus me-2"></i>Register
+                    </a>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </nav>
@@ -591,7 +664,7 @@
             <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
             <span class="logo-text">MedCare HMS</span>
         </div>
-        
+
         <ul class="sidebar-menu">
             <!-- Dashboard Section -->
             <li class="menu-section">
@@ -623,10 +696,10 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="patientSubmenu">
-                            <li><a href="#" class="menu-link">All Patients</a></li>
-                            <li><a href="#" class="menu-link">New Registrations</a></li>
-                            <li><a href="#" class="menu-link">Patient Records</a></li>
-                            <li><a href="#" class="menu-link">Medical History</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-list"></i></span>All Patients</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-user-plus"></i></span>New Registrations</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-folder"></i></span>Patient Records</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-history"></i></span>Medical History</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -636,10 +709,10 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="appointmentSubmenu">
-                            <li><a href="#" class="menu-link">Schedule</a></li>
-                            <li><a href="#" class="menu-link">Pending Approvals</a></li>
-                            <li><a href="#" class="menu-link">Calendar View</a></li>
-                            <li><a href="#" class="menu-link">Reports</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>Schedule</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-clock"></i></span>Pending Approvals</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-calendar-day"></i></span>Calendar View</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-chart-pie"></i></span>Reports</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -650,37 +723,39 @@
                 <div class="menu-section-title">Staff Management</div>
                 <ul class="list-unstyled">
                     <li class="menu-item">
-                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#departmentSubmenu">
-                            <span class="menu-icon"><i class="fa-solid fa-building-user"></i></i></span>
+                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#billingSubmenu">
+                            <span class="menu-icon"><i class="fas fa-money-bill-wave"></i></span>
                             <span class="menu-text">Billings</span>
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
-                        <ul class="submenu collapse" id="departmentSubmenu">
-                            <li><a href="{% url 'bill_list' %}" class="menu-link">All Bills</a></li>
+                        <ul class="submenu collapse" id="billingSubmenu">
+                            <li><a href="{% url 'bill_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-receipt"></i></span>All Bills</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>Generate Bill</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-credit-card"></i></span>Payments</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
                         <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#departmentSubmenu">
-                            <span class="menu-icon"><i class="fa-solid fa-building-user"></i></i></span>
+                            <span class="menu-icon"><i class="fas fa-building"></i></span>
                             <span class="menu-text">Departments</span>
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="departmentSubmenu">
-                            <li><a href="#" class="menu-link">Add Departments</a></li>
-                            <li><a href="{% url 'department_list' %}" class="menu-link">All Departments</a></li>
-                            <li><a href="#" class="menu-link">Specializations</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-plus-circle"></i></span>Add Departments</a></li>
+                            <li><a href="{% url 'department_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-list-ol"></i></span>All Departments</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-stethoscope"></i></span>Specializations</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
                         <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#roomSubmenu">
-                            <span class="menu-icon"><i class="fa-solid fa-person-shelter"></i></span>
+                            <span class="menu-icon"><i class="fas fa-bed"></i></span>
                             <span class="menu-text">Rooms</span>
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="roomSubmenu">
-                            <li><a href="#" class="menu-link">Add Rooms</a></li>
-                            <li><a href="{% url 'room_list' %}" class="menu-link">All Rooms</a></li>
-                            <li><a href="#" class="menu-link">Specializations</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-plus-square"></i></span>Add Rooms</a></li>
+                            <li><a href="{% url 'room_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-list"></i></span>All Rooms</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-tag"></i></span>Room Types</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -690,9 +765,9 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="doctorSubmenu">
-                            <li><a href="#" class="menu-link">All Doctors</a></li>
-                            <li><a href="#" class="menu-link">Schedules</a></li>
-                            <li><a href="#" class="menu-link">Specializations</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-users"></i></span>All Doctors</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-calendar-alt"></i></span>Schedules</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-star"></i></span>Specializations</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -702,9 +777,9 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="staffSubmenu">
-                            <li><a href="#" class="menu-link">All Staff</a></li>
-                            <li><a href="#" class="menu-link">Staff Approvals</a></li>
-                            <li><a href="#" class="menu-link">Roles & Permissions</a></li>
+                            <li><a href="{% url 'staff_management_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-address-book"></i></span>All Staff</a></li>
+                            <li><a href="{% url 'pending_staff_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-user-check"></i></span>Staff Approvals</a></li>
+                            <li><a href="{% url 'deactivated_staff_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-user-shield"></i></span>Deactivated Staff</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -721,9 +796,9 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="settingsSubmenu">
-                            <li><a href="#" class="menu-link">General Settings</a></li>
-                            <li><a href="#" class="menu-link">Departments</a></li>
-                            <li><a href="#" class="menu-link">System Config</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-sliders-h"></i></span>General Settings</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-sitemap"></i></span>Departments</a></li>
+                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-tools"></i></span>System Config</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -747,9 +822,9 @@
                 </button>
                 <h5 class="mb-0">Admin Dashboard</h5>
             </div>
-            
+
             <div class="d-flex align-items-center gap-3">
-                <span class="d-none d-md-inline">
+                <span class="d-none d-md-inline user-status">
                     <i class="fas fa-user-shield me-2"></i>Admin: {{ user.first_name }}
                 </span>
                 <a href="{% url 'logout' %}" class="btn btn-sky btn-sm">
