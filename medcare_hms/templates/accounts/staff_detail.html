@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h2>Staff Details: {{ staff_member.username }}</h2>
+    </div>
+    <div class="card-body">
+        <p><strong>Username:</strong> {{ staff_member.username }}</p>
+        <p><strong>Full Name:</strong> {{ staff_member.get_full_name|default:"Not set" }}</p>
+        <p><strong>Email:</strong> {{ staff_member.email }}</p>
+        <p><strong>Role:</strong> {{ staff_member.userprofile.get_role_display }}</p>
+        <p><strong>Contact:</strong> {{ staff_member.userprofile.contact|default:"Not set" }}</p>
+        <p><strong>Date Joined:</strong> {{ staff_member.date_joined|date:"F d, Y" }}</p>
+        <p><strong>Last Login:</strong> {{ staff_member.last_login|date:"F d, Y, P"|default:"Never" }}</p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'staff_management_list' %}" class="btn btn-secondary">Back to Staff List</a>
+        <a href="{% url 'staff_update' staff_member.pk %}" class="btn btn-primary">Update Details</a>
+    </div>
+</div>
+{% endblock %}

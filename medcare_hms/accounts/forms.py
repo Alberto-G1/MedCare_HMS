@@ -2,6 +2,8 @@
 
 from django import forms
 from django.contrib.auth.models import User
+from .models import UserProfile
+
 
 class RegistrationForm(forms.Form):
     ROLE_CHOICES = (
@@ -41,3 +43,28 @@ class RegistrationForm(forms.Form):
             self.add_error('confirm_password', "Passwords do not match.")
         
         return cleaned_data
+
+class StaffUpdateForm(forms.ModelForm):
+    # Fields from UserProfile model
+    role = forms.ChoiceField(choices=UserProfile.ROLE_CHOICES)
+    contact = forms.CharField(max_length=20, required=False)
+
+    class Meta:
+        model = User
+        fields = ['username', 'first_name', 'last_name', 'email']
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate initial data for profile fields from the user's profile
+        if self.instance.pk and hasattr(self.instance, 'userprofile'):
+            self.fields['role'].initial = self.instance.userprofile.role
+            self.fields['contact'].initial = self.instance.userprofile.contact
+    
+    def save(self, commit=True):
+        user = super().save(commit=commit)
+        if commit:
+            profile = user.userprofile
+            profile.role = self.cleaned_data['role']
+            profile.contact = self.cleaned_data['contact']
+            profile.save()
+        return user
