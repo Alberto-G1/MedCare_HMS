@@ -1,12 +1,45 @@
 from django import forms
+from django.contrib.auth.models import User
 from .models import DoctorProfile
+from management.models import Department
 
 class DoctorProfileForm(forms.ModelForm):
+    # --- Fields from the User model ---
+    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    last_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.filter(is_active=True),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = DoctorProfile
-        fields = ['specialization', 'qualifications', 'availability']
+        fields = [
+            'profile_picture', 'specialization', 'department', 
+            'license_number', 'years_of_experience', 'availability'
+        ]
         widgets = {
-            'specialization': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Cardiologist'}),
-            'qualifications': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'e.g., MBBS, MD'}),
-            'availability': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'e.g., Mon-Fri, 9am-5pm'}),
+            'specialization': forms.TextInput(attrs={'class': 'form-control'}),
+            'license_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'years_of_experience': forms.NumberInput(attrs={'class': 'form-control'}),
+            'availability': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.user:
+            self.fields['first_name'].initial = self.instance.user.first_name
+            self.fields['last_name'].initial = self.instance.user.last_name
+    
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        user = profile.user
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        if commit:
+            user.save()
+            profile.save()
+        return profile

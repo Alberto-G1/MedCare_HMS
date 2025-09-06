@@ -3,52 +3,64 @@
 {% block title %}Patient Dashboard{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container-fluid">
+    <!-- Dashboard Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h2 fw-bold">Welcome, {{ user.first_name|default:user.username }}!</h1>
+            <h1 class="h2 fw-bold text-custom-dark">Welcome, {{ user.first_name|default:user.username }}!</h1>
             <p class="text-muted">Here's a summary of your health portal.</p>
         </div>
-        <a href="{% url 'book_appointment' %}" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Book Appointment</a>
+        <!-- CORRECTION: Namespaced URL -->
+        <a href="{% url 'patients:book_appointment' %}" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Book New Appointment</a>
     </div>
 
-    <!-- Profile Status Card -->
-    {% if not profile_exists %}
+    <!-- Profile Incomplete Warning -->
+    {% if not profile_is_complete %}
     <div class="alert alert-warning d-flex justify-content-between align-items-center fade-in-up">
         <span><i class="fas fa-exclamation-triangle me-2"></i>Your profile is incomplete. Please update it to access all features.</span>
-        <a href="{% url 'patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
+        <!-- CORRECTION: Namespaced URL -->
+        <a href="{% url 'patients:patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
     </div>
     {% endif %}
 
     <!-- Dashboard Cards -->
     <div class="row fade-in-up">
-        <div class="col-lg-4 mb-4">
-            <div class="card card-custom h-100 text-center">
-                <div class="card-body">
-                    <div class="display-4 text-primary mb-3"><i class="fas fa-user-circle"></i></div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center">
+                    <div class="bg-primary p-3 rounded-circle d-inline-block mb-3">
+                        <i class="fas fa-user-circle text-white fa-2x"></i>
+                    </div>
                     <h5 class="card-title">My Profile</h5>
                     <p class="card-text text-muted">View and edit your personal and medical information.</p>
-                    <a href="{% url 'patient_profile' %}" class="btn btn-outline-primary mt-auto">Go to Profile</a>
+                    <!-- CORRECTION: Namespaced URL -->
+                    <a href="{% url 'patients:patient_profile' %}" class="btn btn-outline-primary-custom mt-auto">Go to Profile</a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card card-custom h-100 text-center">
-                <div class="card-body">
-                    <div class="display-4 text-primary mb-3"><i class="fas fa-calendar-check"></i></div>
-                    <h5 class="card-title">My Appointments</h5>
-                    <p class="card-text text-muted">You have {{ upcoming_appointments|length }} upcoming appointments.</p>
-                    <a href="{% url 'my_appointments' %}" class="btn btn-outline-primary mt-auto">View Appointments</a>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center">
+                    <div class="bg-info p-3 rounded-circle d-inline-block mb-3">
+                        <i class="fas fa-calendar-check text-white fa-2x"></i>
+                    </div>
+                    <h5 class="card-title">Upcoming Appointments</h5>
+                    <p class="card-text text-muted">You have <strong>{{ upcoming_appointments|length }}</strong> upcoming appointment(s).</p>
+                    <!-- CORRECTION: Namespaced URL -->
+                    <a href="{% url 'patients:my_appointments' %}" class="btn btn-outline-primary-custom mt-auto">View Appointments</a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-4 mb-4">
-            <div class="card card-custom h-100 text-center">
-                <div class="card-body">
-                    <div class="display-4 text-primary mb-3"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body text-center">
+                    <div class="bg-success p-3 rounded-circle d-inline-block mb-3">
+                        <i class="fas fa-file-invoice-dollar text-white fa-2x"></i>
+                    </div>
                     <h5 class="card-title">Billing & Payments</h5>
-                    <p class="card-text text-muted">View your billing history and payment status.</p>
-                    <a href="{% url 'my_bills' %}" class="btn btn-outline-primary mt-auto">View Bills</a>
+                    <p class="card-text text-muted">You have <strong>{{ unpaid_bills_count }}</strong> unpaid bill(s).</p>
+                    <!-- CORRECTION: Namespaced URL for BILLING app -->
+                    <a href="{% url 'billing:bill_list' %}" class="btn btn-outline-primary-custom mt-auto">View Bills</a>
                 </div>
             </div>
         </div>
@@ -56,26 +68,30 @@
 
     <!-- Upcoming Appointments Section -->
     <div class="card card-custom mt-2 fade-in-up">
-        <div class="card-header card-header-custom">
+        <div class="card-header-custom">
             <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
         </div>
         <div class="card-body">
             {% if upcoming_appointments %}
-                <ul class="list-group list-group-flush">
+                <div class="list-group list-group-flush">
                 {% for appointment in upcoming_appointments %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="mb-0">Appointment with {{ appointment.doctor }}</h6>
-                            <small class="text-muted">{{ appointment.appointment_date|date:"l, F d, Y" }} at {{ appointment.appointment_time|time:"h:i A" }}</small>
+                            <small class="text-muted">{{ appointment.appointment_date|date:"l, F d, Y" }} at {{ appointment.appointment_time|time:"g:i A" }}</small>
                         </div>
-                        <span class="badge bg-warning text-dark">{{ appointment.status }}</span>
-                    </li>
+                        {% if appointment.status == 'Approved' %}<span class="badge bg-success">{{ appointment.status }}</span>
+                        {% elif appointment.status == 'Pending' %}<span class="badge bg-warning">{{ appointment.status }}</span>
+                        {% else %}<span class="badge bg-secondary">{{ appointment.status }}</span>
+                        {% endif %}
+                    </div>
                 {% endfor %}
-                </ul>
+                </div>
             {% else %}
                 <div class="text-center py-4">
                     <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">No upcoming appointments found.</p>
+                    <p class="text-muted mb-0">You have no upcoming appointments.</p>
+                    <a href="{% url 'patients:book_appointment' %}" class="btn btn-sky mt-3">Book One Now</a>
                 </div>
             {% endif %}
         </div>

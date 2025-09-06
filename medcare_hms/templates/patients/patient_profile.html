@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block title %}My Patient Profile{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>My Profile Information</h4>
+        <a href="{% url 'patients:edit_patient_profile' %}" class="btn btn-sky btn-sm">
+            <i class="fas fa-edit me-2"></i>Edit Profile
+        </a>
+    </div>
+    <div class="card-body p-4">
+        <div class="row">
+            <!-- Left Column: Profile Picture & Basic Info -->
+            <div class="col-lg-4 text-center border-end">
+                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid var(--background-white); box-shadow: 0 4px 12px var(--shadow-light);">
+                <h4 class="fw-bold text-custom-dark">{{ profile.user.get_full_name|default:profile.user.username }}</h4>
+                <p class="text-muted">{{ profile.user.email }}</p>
+                <p class="text-muted">Member Since: {{ profile.user.date_joined|date:"F Y" }}</p>
+            </div>
+
+            <!-- Right Column: Detailed Information -->
+            <div class="col-lg-8 ps-lg-5">
+                <!-- Personal Details -->
+                <h5 class="text-primary mb-3">Personal Details</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Full Name</dt>
+                    <dd class="col-sm-8">{{ profile.user.get_full_name|default:"Not Provided" }}</dd>
+
+                    <dt class="col-sm-4">Date of Birth</dt>
+                    <dd class="col-sm-8">{{ profile.date_of_birth|date:"F d, Y"|default:"Not Provided" }}</dd>
+
+                    <dt class="col-sm-4">Gender</dt>
+                    <dd class="col-sm-8">{{ profile.gender|default:"Not Provided" }}</dd>
+                    
+                    <dt class="col-sm-4">Contact Number</dt>
+                    <dd class="col-sm-8">{{ profile.user.userprofile.contact|default:"Not Provided" }}</dd>
+                </dl>
+                <hr class="my-4">
+
+                <!-- Medical Details -->
+                <h5 class="text-primary mb-3">Medical Details</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Blood Group</dt>
+                    <dd class="col-sm-8"><span class="badge bg-danger fs-6">{{ profile.blood_group|default:"Not Provided" }}</span></dd>
+
+                    <dt class="col-sm-4">Medical History</dt>
+                    <dd class="col-sm-8">{{ profile.medical_history|linebreaksbr|default:"No history provided." }}</dd>
+                </dl>
+                <hr class="my-4">
+
+                <!-- Address & Emergency Contact -->
+                <h5 class="text-primary mb-3">Address & Emergency Contact</h5>
+                 <dl class="row">
+                    <dt class="col-sm-4">Address</dt>
+                    <dd class="col-sm-8">{{ profile.address|linebreaksbr|default:"Not Provided" }}</dd>
+                    
+                    <dt class="col-sm-4">Emergency Contact</dt>
+                    <dd class="col-sm-8">{{ profile.emergency_contact_name|default:"Not Provided" }}</dd>
+                    
+                    <dt class="col-sm-4">Emergency Number</dt>
+                    <dd class="col-sm-8">{{ profile.emergency_contact_number|default:"Not Provided" }}</dd>
+                </dl>
+                <hr class="my-4">
+
+                <!-- Insurance Details -->
+                <h5 class="text-primary mb-3">Insurance Details</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Provider</dt>
+                    <dd class="col-sm-8">{{ profile.insurance_provider|default:"Not Provided" }}</dd>
+
+                    <dt class="col-sm-4">Policy Number</dt>
+                    <dd class="col-sm-8">{{ profile.insurance_policy_number|default:"Not Provided" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

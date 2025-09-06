@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block title %}Edit Patient Profile{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Patient Profile Information</h4>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Non-field errors -->
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Personal Information Section -->
+            <h5 class="mb-3 text-primary">Personal Information</h5>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">{{ form.date_of_birth.label }}</label>
+                    {{ form.date_of_birth }}
+                    {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.gender.id_for_label }}" class="form-label">{{ form.gender.label }}</label>
+                    {{ form.gender }}
+                    {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.as_text }}</div>{% endif %}
+                </div>
+                 <div class="col-md-12 mb-3">
+                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">{{ form.profile_picture.label }}</label>
+                    {{ form.profile_picture }}
+                    {% if form.profile_picture.errors %}<div class="text-danger small mt-1">{{ form.profile_picture.errors.as_text }}</div>{% endif %}
+                </div>
+            </div>
+            <hr class="my-4">
+
+            <!-- Address & Medical Information Section -->
+            <h5 class="mb-3 text-primary">Address & Medical Information</h5>
+            <div class="row">
+                <div class="col-md-12 mb-3">
+                    <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.blood_group.id_for_label }}" class="form-label">{{ form.blood_group.label }}</label>
+                    {{ form.blood_group }}
+                    {% if form.blood_group.errors %}<div class="text-danger small mt-1">{{ form.blood_group.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label for="{{ form.medical_history.id_for_label }}" class="form-label">{{ form.medical_history.label }}</label>
+                    {{ form.medical_history }}
+                    {% if form.medical_history.errors %}<div class="text-danger small mt-1">{{ form.medical_history.errors.as_text }}</div>{% endif %}
+                </div>
+            </div>
+            <hr class="my-4">
+            
+             <!-- Emergency & Insurance Information Section -->
+            <h5 class="mb-3 text-primary">Emergency & Insurance</h5>
+             <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">{{ form.emergency_contact_name.label }}</gabel>
+                    {{ form.emergency_contact_name }}
+                    {% if form.emergency_contact_name.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_name.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.emergency_contact_number.id_for_label }}" class="form-label">{{ form.emergency_contact_number.label }}</gabel>
+                    {{ form.emergency_contact_number }}
+                    {% if form.emergency_contact_number.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_number.errors.as_text }}</div>{% endif %}
+                </div>
+                 <div class="col-md-6 mb-3">
+                    <label for="{{ form.insurance_provider.id_for_label }}" class="form-label">{{ form.insurance_provider.label }}</gabel>
+                    {{ form.insurance_provider }}
+                    {% if form.insurance_provider.errors %}<div class="text-danger small mt-1">{{ form.insurance_provider.errors.as_text }}</div>{% endif %}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="{{ form.insurance_policy_number.id_for_label }}" class="form-label">{{ form.insurance_policy_number.label }}</gabel>
+                    {{ form.insurance_policy_number }}
+                    {% if form.insurance_policy_number.errors %}<div class="text-danger small mt-1">{{ form.insurance_policy_number.errors.as_text }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'patients:patient_profile' %}" class="btn btn-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary-custom"><i class="fas fa-save me-2"></i>Save Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

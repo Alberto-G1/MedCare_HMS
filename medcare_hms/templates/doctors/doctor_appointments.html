@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}My Appointments{% endblock %}
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom"><h4 class="mb-0">My Appointments</h4></div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr><th>Patient</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.patient.user.get_full_name }}</td>
+                    <td>{{ appt.appointment_date|date:"F d, Y" }} at {{ appt.appointment_time|time:"g:i A" }}</td>
+                    <td>
+                        {% if appt.status == 'Approved' %}<span class="badge bg-success">{{ appt.status }}</span>
+                        {% elif appt.status == 'Pending' %}<span class="badge bg-warning">{{ appt.status }}</span>
+                        {% elif appt.status == 'Completed' %}<span class="badge bg-info">{{ appt.status }}</span>
+                        {% else %}<span class="badge bg-danger">{{ appt.status }}</span>{% endif %}
+                    </td>
+                    <td>
+                        <div class="btn-group">
+                            {% if appt.status == 'Pending' %}
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success">Approve</a>
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Rejected' %}" class="btn btn-sm btn-danger">Reject</a>
+                            {% elif appt.status == 'Approved' %}
+                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary">Add Record</a>
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Cancelled' %}" class="btn btn-sm btn-secondary">Cancel</a>
+                            {% else %}
+                                <span class="text-muted">No actions</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">You have no appointments.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

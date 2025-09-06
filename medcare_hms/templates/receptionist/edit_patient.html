@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Edit Patient Profile{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Update Profile for: {{ patient.user.get_full_name }}</h4>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'receptionist:patient_list' %}" class="btn btn-secondary me-2">Cancel</a>
+                <button type="submit" class="btn btn-primary-custom">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

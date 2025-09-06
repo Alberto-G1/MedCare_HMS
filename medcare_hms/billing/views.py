@@ -1,68 +1,98 @@
-# medcare_hms/billing/views.py
-
 from django.shortcuts import render, redirect, get_object_or_404
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.db.models import Sum
 
-from patients.models import Appointment, Bill
-from .forms import BillGenerationForm
+# Import from the correct apps
+from patients.models import Appointment
+from .models import Bill, BillItem
+from .forms import BillForm, BillItemForm # <-- IMPORT THE NEW, CORRECT FORMS
 from accounts.decorators import receptionist_required, admin_required
 
-@method_decorator(login_required, name='dispatch')
-@method_decorator(receptionist_required, name='dispatch')
+# Helper decorator for DRY code
+staff_decorators = [login_required, receptionist_required]
+
+@method_decorator(staff_decorators, name='dispatch')
 class BillListView(ListView):
     model = Bill
     template_name = 'billing/bill_list.html'
     context_object_name = 'bills'
-    queryset = Bill.objects.select_related('appointment', 'appointment__patient__user', 'appointment__doctor__user').order_by('-appointment__appointment_date')
+    # Use select_related for performance optimization
+    queryset = Bill.objects.select_related('patient__user').order_by('-bill_date')
+
+@method_decorator(staff_decorators, name='dispatch')
+class BillDetailView(DetailView):
+    model = Bill
+    template_name = 'billing/bill_detail.html'
+    context_object_name = 'bill'
 
 @login_required
 @receptionist_required
-def select_appointment_for_billing(request):
-    # Find completed appointments that do not have a bill yet
-    billed_appointment_ids = Bill.objects.values_list('appointment_id', flat=True)
-    unbilled_appointments = Appointment.objects.filter(status='Completed').exclude(id__in=billed_appointment_ids)
-    
-    context = {
-        'appointments': unbilled_appointments
-    }
-    return render(request, 'billing/select_appointment.html', context)
-
-
-@login_required
-@receptionist_required
-def create_bill_for_appointment(request, appointment_id):
-    appointment = get_object_or_404(Appointment, pk=appointment_id)
-    
+@admin_required
+def create_bill_view(request):
+    """
+    View to create a new bill for a patient.
+    Can be optionally linked to a completed appointment.
+    """
     if request.method == 'POST':
-        form = BillGenerationForm(request.POST)
+        form = BillForm(request.POST)
         if form.is_valid():
-            bill = form.save(commit=False)
-            bill.appointment = appointment
-            bill.save()
-            messages.success(request, f"Bill for appointment on {appointment.appointment_date} has been created.")
-            return redirect('bill_list')
+            bill = form.save()
+            messages.success(request, f"New bill created for {bill.patient.user.username}. You can now add items.")
+            # Redirect to the detail view to add items
+            return redirect('billing:bill_detail', pk=bill.pk)
     else:
-        form = BillGenerationForm()
+        form = BillForm()
+    
+    context = {'form': form}
+    return render(request, 'billing/create_bill.html', context)
+
+
+@login_required
+@receptionist_required
+@admin_required
+def add_bill_item_view(request, bill_id):
+    """
+    View to add a new line item to an existing bill.
+    """
+    bill = get_object_or_404(Bill, pk=bill_id)
+    if request.method == 'POST':
+        form = BillItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.bill = bill
+            item.save() # The amount is calculated automatically in the model's save method
+            
+            # --- Recalculate the bill's total amount ---
+            total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
+            bill.total_amount = total
+            bill.save()
+
+            messages.success(request, f"Item '{item.description}' added to Bill #{bill.pk}.")
+            return redirect('billing:bill_detail', pk=bill.pk)
+    else:
+        form = BillItemForm()
 
     context = {
         'form': form,
-        'appointment': appointment
+        'bill': bill
     }
-    return render(request, 'billing/generate_bill_form.html', context)
+    return render(request, 'billing/add_bill_item.html', context)
 
 
 @login_required
 @receptionist_required
+@admin_required
 def update_bill_status(request, bill_id):
     bill = get_object_or_404(Bill, pk=bill_id)
-    if bill.payment_status == 'Unpaid':
-        bill.payment_status = 'Paid'
+    # This is a simple toggle. In a real app, you'd have a form to select status and payment method.
+    if bill.status == 'Unpaid':
+        bill.status = 'Paid'
         messages.success(request, f"Bill #{bill.id} has been marked as Paid.")
     else:
-        bill.payment_status = 'Unpaid'
+        bill.status = 'Unpaid'
         messages.info(request, f"Bill #{bill.id} has been marked as Unpaid.")
     bill.save()
-    return redirect('bill_list')
+    return redirect('billing:bill_list')

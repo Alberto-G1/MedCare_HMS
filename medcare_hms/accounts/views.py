@@ -5,7 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
-from patients.models import Appointment, Patient
+from patients.models import Appointment, PatientProfile
 from doctors.models import DoctorProfile
 from django.views.generic import DetailView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin 
@@ -14,6 +14,8 @@ from .forms import RegistrationForm, StaffUpdateForm
 from .models import UserProfile
 from .decorators import admin_required, doctor_required, receptionist_required, patient_required
 from django.utils.decorators import method_decorator
+from django.utils import timezone
+from billing.models import Bill
 
 
 def register_view(request):
@@ -174,28 +176,108 @@ def reject_user(request, user_id):
 @login_required
 @doctor_required
 def doctor_dashboard(request):
-    return render(request, 'accounts/doctor_dashboard.html')
+    # Ensure a doctor profile exists, which is crucial for querying
+    doctor_profile, created = DoctorProfile.objects.get_or_create(user=request.user)
+    
+    today = date.today()
+
+    # --- Fetching data for Statistic Cards ---
+    todays_appointments = Appointment.objects.filter(doctor=doctor_profile, appointment_date=today)
+    
+    todays_appointments_count = todays_appointments.count()
+    completed_today_count = todays_appointments.filter(status='Completed').count()
+    
+    # "Waiting" could be defined as 'Approved' but not yet 'Completed'
+    waiting_patients_count = todays_appointments.filter(status='Approved').count()
+
+    # --- Fetching data for Actionable Lists ---
+    # Appointments for today's table view
+    upcoming_appointments_today = todays_appointments.order_by('appointment_time')
+
+
+    context = {
+        'todays_appointments_count': todays_appointments_count,
+        'completed_today_count': completed_today_count,
+        'waiting_patients_count': waiting_patients_count,
+        'upcoming_appointments_today': upcoming_appointments_today,
+        # Dummy data for features not yet implemented
+        'unread_messages_count': 7, 
+        'pending_lab_results_count': 4,
+        'current_time': timezone.now(),
+    }
+    return render(request, 'accounts/doctor_dashboard.html', context)
 
 
 @login_required
 @receptionist_required
 def receptionist_dashboard(request):
-    return render(request, 'accounts/receptionist_dashboard.html')
+    today = date.today()
 
+    # --- Fetching data for Statistic Cards ---
+    todays_appointments = Appointment.objects.filter(appointment_date=today)
+    todays_appointments_count = todays_appointments.count()
+    
+    new_patients_count = UserProfile.objects.filter(
+        role='PATIENT', 
+        user__date_joined__date=today
+    ).count()
+
+    available_doctors_count = DoctorProfile.objects.filter(user__is_active=True).count()
+    
+    # ADDITION: Get total number of patients
+    total_patients_count = PatientProfile.objects.count()
+
+    # --- Fetching data for Actionable Lists ---
+    upcoming_appointments_today = todays_appointments.order_by('appointment_time')[:10]
+    pending_appointments = Appointment.objects.filter(status='Pending').order_by('appointment_date', 'appointment_time')
+    pending_appointments_count = pending_appointments.count()
+
+    context = {
+        'todays_appointments_count': todays_appointments_count,
+        'new_patients_count': new_patients_count,
+        'available_doctors_count': available_doctors_count,
+        'pending_appointments_count': pending_appointments_count,
+        'upcoming_appointments_today': upcoming_appointments_today,
+        'pending_appointments': pending_appointments,
+        'total_patients_count': total_patients_count, # Pass the new variable
+        'current_time': timezone.now(),
+    }
+    return render(request, 'accounts/receptionist_dashboard.html', context)
 
 @login_required
 @patient_required
 def patient_dashboard(request):
-    patient, created = Patient.objects.get_or_create(user=request.user)
+    patient_profile, created = PatientProfile.objects.get_or_create(user=request.user)
+
+    # --- Fetching data for Statistic Cards & Lists ---
     today = date.today()
-    upcoming_appointments = Appointment.objects.filter(patient=patient, appointment_date__gte=today)
     
-    # A simple check to see if the profile has been filled out
-    profile_exists = patient.date_of_birth is not None and patient.address is not None
+    # Upcoming appointments (from today onwards)
+    upcoming_appointments = Appointment.objects.filter(
+        patient=patient_profile, 
+        appointment_date__gte=today
+    ).order_by('appointment_date', 'appointment_time')
+
+    # Count of unpaid bills
+    unpaid_bills_count = Bill.objects.filter(
+        patient=patient_profile,
+        status='Unpaid'
+    ).count()
+
+    # Check if essential profile fields are filled
+    profile_is_complete = all([
+        patient_profile.date_of_birth,
+        patient_profile.gender,
+        patient_profile.address,
+        patient_profile.emergency_contact_number,
+    ])
 
     context = {
+        'profile': patient_profile,
         'upcoming_appointments': upcoming_appointments,
-        'profile_exists': profile_exists
+        'unpaid_bills_count': unpaid_bills_count,
+        'profile_is_complete': profile_is_complete,
+        'current_time': timezone.now(),
     }
     return render(request, 'accounts/patient_dashboard.html', context)
 
