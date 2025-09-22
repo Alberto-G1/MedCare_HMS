@@ -133,6 +133,101 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
+        /* User Profile Dropdown in Navbar */
+        .user-profile-nav {
+            position: relative;
+        }
+
+        .user-profile-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-profile-toggle:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-teal);
+        }
+
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+        }
+
         /* Sidebar Styling */
         .sidebar {
             background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -147,6 +242,8 @@
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
@@ -170,6 +267,7 @@
         .sidebar-menu {
             list-style: none;
             padding: 1rem 0;
+            flex: 1;
         }
 
         .menu-section {
@@ -249,12 +347,14 @@
             opacity: 0;
         }
 
-        /* Submenu Styling with Icons */
+        /* Submenu Styling with Icons - Remove bullet points */
         .submenu {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             background-color: rgba(0, 0, 0, 0.1);
+            list-style: none;
+            padding-left: 0;
         }
 
         .submenu.show {
@@ -293,6 +393,46 @@
 
         .sidebar.collapsed .menu-toggle {
             display: none;
+        }
+
+        /* Sidebar User Profile */
+        .sidebar-user-profile {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: auto;
+        }
+
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-user-info {
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .sidebar-user-info {
+            opacity: 0;
+        }
+
+        .sidebar-user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .sidebar-user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
         }
 
         /* Main Content Area */
@@ -491,6 +631,15 @@
             .nav-link {
                 padding: 0.5rem 0.75rem !important;
             }
+            
+            .user-info {
+                display: none;
+            }
+            
+            .user-dropdown {
+                width: 200px;
+                right: -50px;
+            }
         }
 
         /* Footer Styling */
@@ -508,7 +657,17 @@
         }
 
         .footer a:hover {
+            color: var(--accent-orange);
+        }
+
+        .footer h5 {
             color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer ul li {
+            margin-bottom: 0.75rem;
         }
 
         /* Welcome Section */
@@ -600,7 +759,6 @@
                 <span class="logo-text">MedCare HMS</span>
             </div>
 
-
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
                 <i class="fas fa-bars text-white"></i>
             </button>
@@ -628,6 +786,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <!-- ADD THIS LINK -->
+                        <a class="nav-link" href="{% url 'patients:doctor_list' %}">
+                            <i class="fas fa-user-doctor me-2"></i>Find a Doctor
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat:thread_list' %}">
+                            <i class="fas fa-comments me-2"></i>My Chats
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="fas fa-phone me-2"></i>Contact
                         </a>
@@ -636,12 +805,39 @@
 
                 <div class="d-flex align-items-center flex-column flex-lg-row gap-3">
                     {% if user.is_authenticated %}
-                    <span class="navbar-text">
-                        <i class="fas fa-user me-2"></i>Welcome, {{ user.first_name }}
-                    </span>
-                    <a href="{% url 'logout' %}" class="btn btn-sky">
-                        <i class="fas fa-sign-out-alt me-2"></i>Logout
-                    </a>
+                    <div class="user-profile-nav">
+                        <div class="user-profile-toggle" id="userProfileToggle">
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                                 alt="User Avatar" class="user-avatar">
+                            <div class="user-info d-none d-md-flex">
+                                <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                                <span class="user-role">Patient</span>
+                            </div>
+                            <i class="fas fa-chevron-down ms-2"></i>
+                        </div>
+                        <div class="user-dropdown" id="userDropdown">
+                            <div class="dropdown-header">
+                                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                                     alt="User Avatar" class="user-avatar">
+                                <div>
+                                    <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                    <div class="user-role">Patient</div>
+                                </div>
+                            </div>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-user"></i>
+                                <span>My Profile</span>
+                            </a>
+                            <a href="#" class="dropdown-item">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                            <a href="{% url 'logout' %}" class="dropdown-item">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </a>
+                        </div>
+                    </div>
                     {% else %}
                     <a href="{% url 'login' %}" class="btn btn-login">
                         <i class="fas fa-sign-in-alt me-2"></i>Login
@@ -729,9 +925,9 @@
                             <i class="fas fa-chevron-down menu-toggle"></i>
                         </a>
                         <ul class="submenu collapse" id="billingSubmenu">
-                            <li><a href="{% url 'bill_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-receipt"></i></span>All Bills</a></li>
-                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>Generate Bill</a></li>
-                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-credit-card"></i></span>Payments</a></li>
+                            <li><a href="{% url 'billing:bill_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-receipt"></i></span>All Bills</a></li>
+                            <li><a href="{% url 'billing:create_bill' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>Generate Bill</a></li>
+                            <li><a href="{% url 'billing:bill_list' %}" class="menu-link"><span class="menu-icon"><i class="fas fa-credit-card"></i></span>Payments</a></li>
                         </ul>
                     </li>
                     <li class="menu-item">
@@ -810,6 +1006,20 @@
                 </ul>
             </li>
         </ul>
+
+        <!-- Sidebar User Profile -->
+        <div class="sidebar-user-profile">
+            <div class="sidebar-user">
+                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                     alt="User Avatar" class="sidebar-user-avatar">
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                    <div class="sidebar-user-role">
+                        {% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
     </aside>
 
     <!-- Admin Main Content -->
@@ -824,12 +1034,39 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <span class="d-none d-md-inline user-status">
-                    <i class="fas fa-user-shield me-2"></i>Admin: {{ user.first_name }}
-                </span>
-                <a href="{% url 'logout' %}" class="btn btn-sky btn-sm">
-                    <i class="fas fa-sign-out-alt me-1"></i>Logout
-                </a>
+                <div class="user-profile-nav">
+                    <div class="user-profile-toggle" id="userProfileToggle">
+                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                             alt="User Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                            <span class="user-role">{% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}</span>
+                        </div>
+                        <i class="fas fa-chevron-down ms-2"></i>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="dropdown-header">
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                                 alt="User Avatar" class="user-avatar">
+                            <div>
+                                <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                <div class="user-role">{% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}</div>
+                            </div>
+                        </div>
+                        <a href="{% url 'admin:auth_user_change' user.id %}" class="dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>My Profile</span>
+                        </a>
+                        <a href="{% url 'admin:index' %}" class="dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Admin Settings</span>
+                        </a>
+                        <a href="{% url 'logout' %}" class="dropdown-item">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     {% endif %}
@@ -995,6 +1232,25 @@
             const mainContent = document.getElementById('mainContent');
             const sidebarToggle = document.getElementById('sidebarToggle');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const userProfileToggle = document.getElementById('userProfileToggle');
+            const userDropdown = document.getElementById('userDropdown');
+
+            // Toggle user profile dropdown
+            if (userProfileToggle && userDropdown) {
+                userProfileToggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (userDropdown.classList.contains('show') && 
+                        !userProfileToggle.contains(e.target) && 
+                        !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
 
             // Check if sidebar elements exist before adding event listeners
             if (sidebar && mainContent && sidebarToggle && sidebarOverlay) {
@@ -1018,6 +1274,11 @@
                 const menuLinks = document.querySelectorAll('.menu-link[data-bs-toggle="collapse"]');
                 menuLinks.forEach(link => {
                     link.addEventListener('click', function (e) {
+                        // Prevent default if it's a collapse toggle
+                        if (this.getAttribute('href') === '#') {
+                            e.preventDefault();
+                        }
+                        
                         const targetId = this.getAttribute('data-bs-target');
                         const submenu = document.querySelector(targetId);
                         const isExpanded = submenu.classList.contains('show');
@@ -1025,20 +1286,24 @@
 
                         // Toggle the submenu
                         submenu.classList.toggle('show');
-                        toggleIcon.classList.toggle('rotated');
+                        if (toggleIcon) {
+                            toggleIcon.classList.toggle('rotated');
+                        }
 
                         // Collapse other open submenus in the same section
                         const parentSection = this.closest('.menu-section');
-                        const otherSubmenus = parentSection.querySelectorAll('.submenu');
-                        otherSubmenus.forEach(otherSubmenu => {
-                            if (otherSubmenu !== submenu && otherSubmenu.classList.contains('show')) {
-                                otherSubmenu.classList.remove('show');
-                                const otherToggle = otherSubmenu.previousElementSibling.querySelector('.menu-toggle');
-                                if (otherToggle) {
-                                    otherToggle.classList.remove('rotated');
+                        if (parentSection) {
+                            const otherSubmenus = parentSection.querySelectorAll('.submenu');
+                            otherSubmenus.forEach(otherSubmenu => {
+                                if (otherSubmenu !== submenu && otherSubmenu.classList.contains('show')) {
+                                    otherSubmenu.classList.remove('show');
+                                    const otherToggle = otherSubmenu.previousElementSibling.querySelector('.menu-toggle');
+                                    if (otherToggle) {
+                                        otherToggle.classList.remove('rotated');
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
                     });
                 });
 
@@ -1047,6 +1312,22 @@
                     if (window.innerWidth > 1199.98) {
                         sidebar.classList.remove('show');
                         sidebarOverlay.classList.remove('show');
+                    }
+                });
+            }
+
+            // Remember sidebar state
+            const sidebarState = localStorage.getItem('sidebarCollapsed');
+            if (sidebarState === 'true' && sidebar && mainContent) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            }
+
+            // Save sidebar state when toggled
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', function() {
+                    if (sidebar && mainContent) {
+                        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
                     }
                 });
             }

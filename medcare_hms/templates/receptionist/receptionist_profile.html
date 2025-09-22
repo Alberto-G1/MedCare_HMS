@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">My Receptionist Profile</h4>
+        <a href="{% url 'receptionist:edit_receptionist_profile' %}" class="btn btn-sky btn-sm"><i class="fas fa-edit me-2"></i>Edit Profile</a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-4 text-center border-end">
+                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                <h4 class="fw-bold text-custom-dark">{{ user.get_full_name }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                {% if user.is_active %}<span class="badge bg-success">Active</span>
+                {% else %}<span class="badge bg-warning">Pending Approval</span>{% endif %}
+            </div>
+            <div class="col-lg-8 ps-lg-5">
+                <dl class="row">
+                    <dt class="col-sm-4">Contact Number</dt>
+                    <dd class="col-sm-8">{{ user.userprofile.contact|default:"Not set" }}</dd>
+                    <dt class="col-sm-4">Department</dt>
+                    <dd class="col-sm-8">{{ profile.department.name|default:"Not set" }}</dd>
+                    <dt class="col-sm-4">Shift</dt>
+                    <dd class="col-sm-8">{{ profile.get_shift_display|default:"Not set" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

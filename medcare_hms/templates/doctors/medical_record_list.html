@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}My Medical Records{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h4 class="mb-0"><i class="fas fa-notes-medical me-2"></i>My Authored Medical Records</h4>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Record Date</th>
+                        <th>Patient</th>
+                        <th>Diagnosis</th>
+                        <th>Linked Appointment Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td>{{ record.record_date|date:"F d, Y" }}</td>
+                        <td>{{ record.patient.user.get_full_name }}</td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.appointment.appointment_date|date:"F d, Y"|default:"N/A" }}</td>
+                        <td>
+                            <!-- Future: Link to a detail view of the record -->
+                            <a href="#" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">You have not created any medical records yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

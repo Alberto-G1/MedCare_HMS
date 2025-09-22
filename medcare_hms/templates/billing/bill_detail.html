@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Bill #{{ bill.pk }} Details{% endblock %}
+{% block content %}
+<div class="card card-custom mb-4">
+    <div class="card-header card-header-custom d-flex justify-content-between">
+        <h3 class="mb-0">Bill #{{ bill.pk }} for {{ bill.patient.user.get_full_name }}</h3>
+        <h4>Total: ${{ bill.total_amount }}</h4>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr><th>Description</th><th>Quantity</th><th>Unit Price</th><th>Amount</th></tr>
+            </thead>
+            <tbody>
+                {% for item in bill.items.all %}
+                <tr>
+                    <td>{{ item.description }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>${{ item.unit_price }}</td>
+                    <td>${{ item.amount }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="text-center">No items have been added to this bill yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card card-custom">
+    <div class="card-header">
+        <h4 class="mb-0">Add Item to Bill</h4>
+    </div>
+    <div class="card-body">
+        <form action="{% url 'billing:add_bill_item' bill.pk %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }} {# You need to pass the BillItemForm to this template's context #}
+            <button type="submit" class="btn btn-sky">Add Item</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

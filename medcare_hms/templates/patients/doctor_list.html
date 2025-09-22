@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Find a Doctor{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h4 class="mb-0"><i class="fas fa-user-doctor me-2"></i>Our Specialists</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            {% for doctor in doctors %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <img src="{{ doctor.profile_picture.url }}" class="rounded-circle mb-3" alt="Dr. {{ doctor.user.get_full_name }}" style="width: 120px; height: 120px; object-fit: cover;">
+                        <h5 class="card-title">{{ doctor }}</h5>
+                        <p class="card-text text-muted">{{ doctor.specialization }}</p>
+                        <p class="card-text"><small>{{ doctor.department.name|default:"" }}</small></p>
+                        <!-- THE "START CHAT" BUTTON -->
+                        <a href="{% url 'chat:start_chat' doctor.user.id %}" class="btn btn-sky mt-2">
+                            <i class="fas fa-comments me-2"></i>Start Chat
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p class="text-center text-muted">No doctors are currently available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

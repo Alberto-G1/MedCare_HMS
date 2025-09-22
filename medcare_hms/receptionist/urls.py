@@ -1,16 +1,20 @@
-# medcare_hms/receptionist/urls.py
-
 from django.urls import path
 from . import views
 
+app_name = 'receptionist'
+
 urlpatterns = [
-    # Patient Management
-    path('add-patient/', views.add_patient_view, name='add_patient'),
-    
-    # Appointment Management
-    path('book-appointment/', views.book_appointment_view, name='book_appointment_receptionist'),
-    
-    # Profile Management
-    path('profile/', views.profile_view, name='receptionist_profile'),
+    # Profile URLs
+    path('profile/', views.receptionist_profile_view, name='receptionist_profile'),
     path('profile/edit/', views.edit_receptionist_profile_view, name='edit_receptionist_profile'),
+
+    # Patient Management URLs
+    path('patients/', views.patient_list_view, name='patient_list'),
+    path('patients/add/', views.add_patient_view, name='add_patient'),
+    path('patients/<int:pk>/edit/', views.edit_patient_view, name='edit_patient'),
+
+    # Appointment Management URLs
+    path('appointments/', views.appointment_list_view, name='appointment_list'),
+    path('appointments/book/', views.book_appointment_view, name='book_appointment'),
+    path('appointments/<int:pk>/cancel/', views.cancel_appointment_view, name='cancel_appointment'),
 ]
