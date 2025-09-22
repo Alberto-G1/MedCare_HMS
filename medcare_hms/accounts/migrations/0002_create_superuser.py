@@ -1,5 +1,3 @@
-# accounts/migrations/0002_create_superuser.py (CORRECTED VERSION)
-
 from django.db import migrations
 
 def create_superuser(apps, schema_editor):

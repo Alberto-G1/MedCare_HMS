@@ -2,10 +2,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from accounts.decorators import patient_required, receptionist_required
+from accounts.decorators import patient_required, receptionist_required, admin_required
 from .models import PatientProfile, Appointment
 from .forms import PatientProfileForm, AppointmentBookingForm
 from datetime import date
+from doctors.models import DoctorProfile
 
 # --- Profile Views ---
 @login_required
@@ -68,3 +69,11 @@ def my_appointments_view(request):
         'past_appointments': past_appointments
     }
     return render(request, 'patients/my_appointments.html', context)
+
+# patients/views.py
+
+@login_required
+def doctor_list_view(request):
+    # Get all active doctors
+    doctors = DoctorProfile.objects.filter(user__is_active=True).select_related('user', 'department')
+    return render(request, 'patients/doctor_list.html', {'doctors': doctors})

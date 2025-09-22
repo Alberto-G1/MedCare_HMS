@@ -42,8 +42,22 @@ INSTALLED_APPS = [
     'doctors',
     'management',
     'receptionist', 
-    'billing',      
+    'billing', 
+    'chat',
 ]
+
+# Set the ASGI application entry point
+ASGI_APPLICATION = 'medcare_hms.asgi.application'
+
+# Configure the channel layer to use Redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

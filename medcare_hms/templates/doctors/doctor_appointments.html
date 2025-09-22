@@ -31,6 +31,9 @@
                             {% else %}
                                 <span class="text-muted">No actions</span>
                             {% endif %}
+                            <a href="{% url 'chat:start_chat' appt.patient.user.id %}" class="btn btn-sm btn-info" title="Chat with Patient">
+                                <i class="fas fa-comments"></i>
+                            </a>                           
                         </div>
                     </td>
                 </tr>

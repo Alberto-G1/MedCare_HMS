@@ -29,8 +29,6 @@ class BillDetailView(DetailView):
     context_object_name = 'bill'
 
 @login_required
-@receptionist_required
-@admin_required
 def create_bill_view(request):
     """
     View to create a new bill for a patient.
@@ -51,8 +49,6 @@ def create_bill_view(request):
 
 
 @login_required
-@receptionist_required
-@admin_required
 def add_bill_item_view(request, bill_id):
     """
     View to add a new line item to an existing bill.

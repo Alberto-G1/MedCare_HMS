@@ -37,9 +37,15 @@
                         <td>{{ patient.user.userprofile.contact }}</td>
                         <td>{{ patient.user.email }}</td>
                         <td>
-                            <a href="{% url 'receptionist:edit_patient' patient.pk %}" class="btn btn-sm btn-info" title="Edit Patient Details">
-                                <i class="fas fa-edit"></i>
-                            </a>
+                            <div class="btn-group">
+                                <a href="{% url 'receptionist:edit_patient' patient.pk %}" class="btn btn-sm btn-info" title="Edit Patient Details">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <!-- ADD THIS CHAT BUTTON -->
+                                <a href="{% url 'chat:start_chat' patient.user.id %}" class="btn btn-sm btn-primary" title="Chat with Patient">
+                                    <i class="fas fa-comments"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}

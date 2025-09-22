@@ -786,6 +786,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <!-- ADD THIS LINK -->
+                        <a class="nav-link" href="{% url 'patients:doctor_list' %}">
+                            <i class="fas fa-user-doctor me-2"></i>Find a Doctor
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat:thread_list' %}">
+                            <i class="fas fa-comments me-2"></i>My Chats
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="#">
                             <i class="fas fa-phone me-2"></i>Contact
                         </a>
@@ -796,7 +807,7 @@
                     {% if user.is_authenticated %}
                     <div class="user-profile-nav">
                         <div class="user-profile-toggle" id="userProfileToggle">
-                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                                  alt="User Avatar" class="user-avatar">
                             <div class="user-info d-none d-md-flex">
                                 <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
@@ -806,7 +817,7 @@
                         </div>
                         <div class="user-dropdown" id="userDropdown">
                             <div class="dropdown-header">
-                                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                                      alt="User Avatar" class="user-avatar">
                                 <div>
                                     <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
@@ -999,7 +1010,7 @@
         <!-- Sidebar User Profile -->
         <div class="sidebar-user-profile">
             <div class="sidebar-user">
-                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                      alt="User Avatar" class="sidebar-user-avatar">
                 <div class="sidebar-user-info">
                     <div class="sidebar-user-name">{{ user.first_name }} {{ user.last_name }}</div>
@@ -1025,7 +1036,7 @@
             <div class="d-flex align-items-center gap-3">
                 <div class="user-profile-nav">
                     <div class="user-profile-toggle" id="userProfileToggle">
-                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                              alt="User Avatar" class="user-avatar">
                         <div class="user-info">
                             <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
@@ -1035,7 +1046,7 @@
                     </div>
                     <div class="user-dropdown" id="userDropdown">
                         <div class="dropdown-header">
-                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                                  alt="User Avatar" class="user-avatar">
                             <div>
                                 <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>

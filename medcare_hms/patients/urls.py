@@ -12,4 +12,5 @@ urlpatterns = [
     # Appointment URLs
     path('appointments/book/', views.book_appointment_view, name='book_appointment'),
     path('appointments/', views.my_appointments_view, name='my_appointments'),
+    path('find-doctor/', views.doctor_list_view, name='doctor_list'),
 ]

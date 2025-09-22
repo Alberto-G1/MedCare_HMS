@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% block title %}Doctor Profile{% endblock %}
+
 {% block content %}
-<div class.card card-custom>
+<div class="card card-custom">
     <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
         <h4 class="mb-0">My Profile</h4>
         <a href="{% url 'doctors:edit_doctor_profile' %}" class="btn btn-sky btn-sm"><i class="fas fa-edit me-2"></i>Edit Profile</a>
@@ -9,7 +10,8 @@
     <div class="card-body">
         <div class="row">
             <div class="col-lg-4 text-center border-end">
-                <img src="{{ profile.profile_picture.url }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                <!-- Corrected default image path -->
+                <img src="{{ profile.profile_picture.url|default:'/media/profile_pictures/default.png' }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                 <h4 class="fw-bold text-custom-dark">Dr. {{ user.get_full_name }}</h4>
                 <p class="text-muted">{{ user.email }}</p>
                 {% if user.is_active %}<span class="badge bg-success">Active</span>
@@ -30,6 +32,7 @@
                     <dt class="col-sm-4">Availability</dt>
                     <dd class="col-sm-8">{{ profile.availability|linebreaksbr|default:"Not set" }}</dd>
                 </dl>
+                <!-- The "Start Chat" button has been removed from here -->
             </div>
         </div>
     </div>

@@ -29,6 +29,7 @@ urlpatterns = [
     path('management/', include('management.urls')),
     path('receptionist/', include('receptionist.urls')), 
     path('billing/', include('billing.urls')),
+    path('chat/', include('chat.urls', namespace='chat')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=True)),
 ]
 
