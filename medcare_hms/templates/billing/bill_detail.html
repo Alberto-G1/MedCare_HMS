@@ -1,42 +1,65 @@
 {% extends 'base.html' %}
-{% block title %}Bill #{{ bill.pk }} Details{% endblock %}
-{% block content %}
-<div class="card card-custom mb-4">
-    <div class="card-header card-header-custom d-flex justify-content-between">
-        <h3 class="mb-0">Bill #{{ bill.pk }} for {{ bill.patient.user.get_full_name }}</h3>
-        <h4>Total: ${{ bill.total_amount }}</h4>
-    </div>
-    <div class="card-body">
-        <table class="table">
-            <thead>
-                <tr><th>Description</th><th>Quantity</th><th>Unit Price</th><th>Amount</th></tr>
-            </thead>
-            <tbody>
-                {% for item in bill.items.all %}
-                <tr>
-                    <td>{{ item.description }}</td>
-                    <td>{{ item.quantity }}</td>
-                    <td>${{ item.unit_price }}</td>
-                    <td>${{ item.amount }}</td>
-                </tr>
-                {% empty %}
-                <tr><td colspan="4" class="text-center">No items have been added to this bill yet.</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
 
-<div class="card card-custom">
-    <div class="card-header">
-        <h4 class="mb-0">Add Item to Bill</h4>
+{% load billing_extras %}
+
+{% block title %}Bill #{{ bill.pk }} Details{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Column: Bill Details and Items -->
+    <div class="col-lg-8">
+        <div class="card card-custom mb-4">
+            <div class="card-header card-header-custom d-flex justify-content-between">
+                <h4 class="mb-0">Bill #{{ bill.pk }}</h4>
+                <h4 class="mb-0">Total: {{ bill.total_amount|currency_ugx }}</h4>
+            </div>
+            <div class="card-body">
+                <p><strong>Patient:</strong> {{ bill.patient.user.get_full_name }}</p>
+                <p><strong>Bill Date:</strong> {{ bill.bill_date|date:"F d, Y" }}</p>
+                <hr>
+                <h5 class="mb-3">Bill Items</h5>
+                <table class="table">
+                    <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
+                    <tbody>
+                        {% for item in bill.items.all %}
+                        <tr><td>{{ item.description }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price|currency_ugx }}</td><td>{{ item.amount|currency_ugx }}</td></tr>
+                        {% empty %}
+                        <tr><td colspan="4" class="text-center text-muted">No items have been added.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <form action="{% url 'billing:add_bill_item' bill.pk %}" method="post">
-            {% csrf_token %}
-            {{ form.as_p }} {# You need to pass the BillItemForm to this template's context #}
-            <button type="submit" class="btn btn-sky">Add Item</button>
-        </form>
+    <!-- Right Column: Actions -->
+    <div class="col-lg-4">
+        <div class="card card-custom mb-4">
+            <div class="card-header"><h5 class="mb-0">Update Status</h5></div>
+            <div class="card-body">
+                <form action="{% url 'billing:update_bill_status' bill.pk %}" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <select name="status" class="form-select">
+                            <option value="Unpaid" {% if bill.status == 'Unpaid' %}selected{% endif %}>Unpaid</option>
+                            <option value="Paid" {% if bill.status == 'Paid' %}selected{% endif %}>Paid</option>
+                            <option value="Partially Paid" {% if bill.status == 'Partially Paid' %}selected{% endif %}>Partially Paid</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary-custom">Update</button>
+                    </div>
+                </form>
+                <a href="{% url 'billing:bill_receipt' bill.pk %}" class="btn btn-sky w-100 mt-3"><i class="fas fa-print me-2"></i>Print Receipt</a>
+            </div>
+        </div>
+        <div class="card card-custom">
+            <div class="card-header"><h5 class="mb-0">Add New Item</h5></div>
+            <div class="card-body">
+                <form action="{% url 'billing:add_bill_item' bill.pk %}" method="post">
+                    {% csrf_token %}
+                    {{ item_form.as_p }}
+                    <button type="submit" class="btn btn-success w-100">Add Item</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

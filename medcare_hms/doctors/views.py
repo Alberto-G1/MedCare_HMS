@@ -40,6 +40,29 @@ def doctor_appointments_view(request):
 
 @login_required
 @doctor_required
+def appointment_detail_view(request, pk):
+    """
+    Displays a detailed view of a single appointment.
+    """
+    # Use select_related to efficiently fetch related patient and user data in one query
+    appointment = get_object_or_404(
+        Appointment.objects.select_related('patient__user', 'patient__user__userprofile'), 
+        pk=pk
+    )
+
+    # Security check: Ensure the logged-in doctor is the one assigned to this appointment
+    if appointment.doctor.user != request.user:
+        messages.error(request, "You are not authorized to view this appointment.")
+        return redirect('doctors:doctor_appointments')
+
+    context = {
+        'appointment': appointment,
+    }
+    return render(request, 'doctors/appointment_detail.html', context)
+
+
+@login_required
+@doctor_required
 def update_appointment_status_view(request, pk, status):
     appointment = get_object_or_404(Appointment, pk=pk)
     # Security check: ensure the doctor owns this appointment

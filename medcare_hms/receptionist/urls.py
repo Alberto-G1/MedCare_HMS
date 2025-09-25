@@ -16,5 +16,6 @@ urlpatterns = [
     # Appointment Management URLs
     path('appointments/', views.appointment_list_view, name='appointment_list'),
     path('appointments/book/', views.book_appointment_view, name='book_appointment'),
+    path('appointments/<int:pk>/update_status/<str:status>/', views.update_appointment_status_view, name='update_appointment_status'),
     path('appointments/<int:pk>/cancel/', views.cancel_appointment_view, name='cancel_appointment'),
 ]

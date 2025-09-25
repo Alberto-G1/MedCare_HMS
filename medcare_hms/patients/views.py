@@ -7,6 +7,7 @@ from .models import PatientProfile, Appointment
 from .forms import PatientProfileForm, AppointmentBookingForm
 from datetime import date
 from doctors.models import DoctorProfile
+from django.utils import timezone 
 
 # --- Profile Views ---
 @login_required
@@ -32,9 +33,9 @@ def edit_patient_profile_view(request):
 # --- Appointment Views ---
 @login_required
 @patient_required
-@receptionist_required
 def book_appointment_view(request):
     patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    
     if request.method == 'POST':
         form = AppointmentBookingForm(request.POST, request.FILES)
         if form.is_valid():
@@ -43,30 +44,40 @@ def book_appointment_view(request):
             appointment.created_by = request.user
             appointment.save()
             messages.success(request, 'Your appointment has been successfully booked and is pending approval.')
-            return redirect('patients:my_appointments') # CORRECTED REDIRECT
+            return redirect('patients:my_appointments')
     else:
         form = AppointmentBookingForm()
-    return render(request, 'patients/book_appointment.html', {'form': form})
+
+    available_doctors = DoctorProfile.objects.filter(user__is_active=True).select_related('user')
+    
+    context = {
+        'form': form,
+        'doctors': available_doctors # Pass the list of doctors to the template
+    }
+    return render(request, 'patients/book_appointment.html', context)
+
+
 
 @login_required
 @patient_required
 def my_appointments_view(request):
-    patient = get_object_or_404(PatientProfile, user=request.user)
-    today = date.today()
-    
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    today = timezone.now().date()
+
+    # Get two separate querysets: one for upcoming, one for past
     upcoming_appointments = Appointment.objects.filter(
-        patient=patient, 
+        patient=patient_profile,
         appointment_date__gte=today
     ).order_by('appointment_date', 'appointment_time')
-    
+
     past_appointments = Appointment.objects.filter(
-        patient=patient, 
+        patient=patient_profile,
         appointment_date__lt=today
     ).order_by('-appointment_date', '-appointment_time')
-    
+
     context = {
         'upcoming_appointments': upcoming_appointments,
-        'past_appointments': past_appointments
+        'past_appointments': past_appointments,
     }
     return render(request, 'patients/my_appointments.html', context)
 

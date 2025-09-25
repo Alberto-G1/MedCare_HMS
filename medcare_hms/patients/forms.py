@@ -93,7 +93,8 @@ class AppointmentBookingForm(forms.ModelForm):
     # Filter to show only active doctors
     doctor = forms.ModelChoiceField(
         queryset=DoctorProfile.objects.filter(user__is_active=True),
-        widget=forms.Select(attrs={'class': 'form-select'})
+        widget=forms.HiddenInput(),
+        required=True
     )
 
     class Meta:

@@ -1,44 +1,74 @@
 {% extends 'base.html' %}
 {% block title %}My Appointments{% endblock %}
+
 {% block content %}
 <div class="card card-custom">
-    <div class="card-header card-header-custom"><h4 class="mb-0">My Appointments</h4></div>
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>My Appointments</h4>
+        <!-- Future: A filter or search bar could go here -->
+    </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-hover">
-                <thead>
-                    <tr><th>Patient</th><th>Date & Time</th><th>Status</th><th>Actions</th></tr>
+                <thead class="table-light">
+                    <tr>
+                        <th>Patient</th>
+                        <th>Date & Time</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                 {% for appt in appointments %}
                 <tr>
                     <td>{{ appt.patient.user.get_full_name }}</td>
+                    <td>
+                        <a href="{% url 'doctors:appointment_detail' appt.pk %}">
+                            {{ appt.patient.user.get_full_name }}
+                        </a>
+                    </td>
                     <td>{{ appt.appointment_date|date:"F d, Y" }} at {{ appt.appointment_time|time:"g:i A" }}</td>
                     <td>
+                        <!-- This column now correctly displays only the status badge -->
                         {% if appt.status == 'Approved' %}<span class="badge bg-success">{{ appt.status }}</span>
                         {% elif appt.status == 'Pending' %}<span class="badge bg-warning">{{ appt.status }}</span>
                         {% elif appt.status == 'Completed' %}<span class="badge bg-info">{{ appt.status }}</span>
-                        {% else %}<span class="badge bg-danger">{{ appt.status }}</span>{% endif %}
+                        {% else %}<span class="badge bg-danger">{{ appt.status }}</span>
+                        {% endif %}
                     </td>
                     <td>
+                        <!-- This column now correctly contains ALL the action buttons -->
                         <div class="btn-group">
                             {% if appt.status == 'Pending' %}
-                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success">Approve</a>
-                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Rejected' %}" class="btn btn-sm btn-danger">Reject</a>
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success" title="Approve">
+                                    <i class="fas fa-check"></i>
+                                </a>
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Rejected' %}" class="btn btn-sm btn-danger" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </a>
                             {% elif appt.status == 'Approved' %}
-                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary">Add Record</a>
-                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Cancelled' %}" class="btn btn-sm btn-secondary">Cancel</a>
+                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary" title="Add Medical Record">
+                                    <i class="fas fa-file-medical"></i>
+                                </a>
+                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Cancelled' %}" class="btn btn-sm btn-secondary" title="Cancel Appointment">
+                                    <i class="fas fa-ban"></i>
+                                </a>
                             {% else %}
-                                <span class="text-muted">No actions</span>
+                                <!-- For 'Completed', 'Rejected', or 'Cancelled' appointments -->
+                                <span class="text-muted small">No actions available</span>
                             {% endif %}
+                            
+                            <!-- The Chat button is always available, regardless of status -->
                             <a href="{% url 'chat:start_chat' appt.patient.user.id %}" class="btn btn-sm btn-info" title="Chat with Patient">
                                 <i class="fas fa-comments"></i>
-                            </a>                           
+                            </a>
                         </div>
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="4" class="text-center">You have no appointments.</td></tr>
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">You have no appointments assigned to you.</td>
+                </tr>
                 {% endfor %}
                 </tbody>
             </table>
