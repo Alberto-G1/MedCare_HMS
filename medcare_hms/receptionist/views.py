@@ -1,4 +1,5 @@
 # receptionist/views.py (FINAL VERSION)
+from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ from .models import ReceptionistProfile
 from .forms import ReceptionistProfileForm, ManualPatientRegistrationForm, AppointmentBookingForm
 from patients.forms import PatientProfileForm as PatientUpdateForm # Reuse the patient's own edit form
 from accounts.decorators import receptionist_required
+
 
 # --- Profile Views ---
 @login_required
@@ -90,8 +92,19 @@ def edit_patient_view(request, pk):
 @login_required
 @receptionist_required
 def appointment_list_view(request):
-    appointments = Appointment.objects.all().select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
-    return render(request, 'receptionist/appointment_list.html', {'appointments': appointments})
+    # This view now supports filtering
+    filter_by = request.GET.get('filter', 'all')
+    today = date.today()
+
+    if filter_by == 'pending':
+        appointments = Appointment.objects.filter(status='Pending')
+    elif filter_by == 'today':
+        appointments = Appointment.objects.filter(appointment_date=today)
+    else:
+        appointments = Appointment.objects.all()
+
+    appointments = appointments.select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
+    return render(request, 'receptionist/appointment_list.html', {'appointments': appointments, 'filter_by': filter_by})
 
 @login_required
 @receptionist_required
@@ -108,6 +121,25 @@ def book_appointment_view(request):
     else:
         form = AppointmentBookingForm()
     return render(request, 'receptionist/book_appointment.html', {'form': form})
+
+@login_required
+@receptionist_required
+def update_appointment_status_view(request, pk, status):
+    """
+    Allows a receptionist to approve or reject appointments.
+    """
+    appointment = get_object_or_404(Appointment, pk=pk)
+    
+    # Check if the new status is valid
+    valid_statuses = ['Approved', 'Rejected']
+    if status not in valid_statuses:
+        messages.error(request, "Invalid status update.")
+        return redirect('receptionist:appointment_list')
+        
+    appointment.status = status
+    appointment.save()
+    messages.success(request, f"Appointment for {appointment.patient.user.get_full_name()} has been {status.lower()}.")
+    return redirect('receptionist:appointment_list')
 
 @login_required
 @receptionist_required

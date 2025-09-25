@@ -1,0 +1,30 @@
+{% extends 'base_blank.html' %} {# Assumes a blank base template for printing #}
+
+{% load billing_extras %}
+
+{% block title %}Receipt for Bill #{{ bill.pk }}{% endblock %}
+{% block content %}
+<div class="container my-5">
+    <h2>Receipt - MedCare HMS</h2>
+    <hr>
+    <p><strong>Bill ID:</strong> #{{ bill.pk }}</p>
+    <p><strong>Patient:</strong> {{ bill.patient.user.get_full_name }}</p>
+    <p><strong>Date:</strong> {{ bill.bill_date|date:"F d, Y" }}</p>
+    <hr>
+    <table class="table">
+        <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
+        <tbody>
+            {% for item in bill.items.all %}
+            <tr><td>{{ item.description }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price|currency_ugx }}</td><td>{{ item.amount|currency_ugx }}</td></tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr><td colspan="3" class="text-end fw-bold">Total Amount:</td><td class="fw-bold">{{ bill.total_amount|currency_ugx }}</td></tr>
+            <tr><td colspan="3" class="text-end fw-bold">Status:</td><td class="fw-bold">{{ bill.status }}</td></tr>
+        </tfoot>
+    </table>
+    <hr>
+    <p class="text-center">Thank you!</p>
+</div>
+<script>window.print();</script>
+{% endblock %}

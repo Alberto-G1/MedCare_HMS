@@ -1,54 +1,49 @@
 {% extends 'base.html' %}
 
+{% load billing_extras %}
+
 {% block title %}Manage Bills{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Manage Billing</h2>
-    <a href="{% url 'select_appointment_for_billing' %}" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Generate New Bill</a>
-</div>
 <div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <h4 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>Billing Records</h4>
+        <a href="{% url 'billing:create_bill' %}" class="btn btn-sky btn-sm"><i class="fas fa-plus me-2"></i>Create New Bill</a>
+    </div>
     <div class="card-body">
+        <div class="mb-4">
+            <form method="get">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="Search by patient name or Bill ID..." value="{{ request.GET.q|default:'' }}">
+                    <button class="btn btn-primary-custom" type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        
         <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>Bill ID</th>
-                        <th>Patient</th>
-                        <th>Doctor</th>
-                        <th>Appointment Date</th>
-                        <th>Amount</th>
-                        <th>Payment Status</th>
-                        <th>Actions</th>
-                    </tr>
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr><th>Bill ID</th><th>Patient</th><th>Bill Date</th><th>Total Amount</th><th>Status</th><th>Actions</th></tr>
                 </thead>
                 <tbody>
                     {% for bill in bills %}
                     <tr>
-                        <td>{{ bill.id }}</td>
-                        <td>{{ bill.appointment.patient.user.get_full_name|default:bill.appointment.patient.user.username }}</td>
-                        <td>{{ bill.appointment.doctor }}</td>
-                        <td>{{ bill.appointment.appointment_date|date:"M d, Y" }}</td>
-                        <td>${{ bill.amount }}</td>
+                        <td>#{{ bill.pk }}</td>
+                        <td>{{ bill.patient.user.get_full_name }}</td>
+                        <td>{{ bill.bill_date|date:"F d, Y" }}</td>
+                        <td>{{ bill.total_amount|currency_ugx }}</td>
                         <td>
-                            {% if bill.payment_status == 'Paid' %}
-                                <span class="badge bg-success">Paid</span>
-                            {% else %}
-                                <span class="badge bg-danger">Unpaid</span>
+                            {% if bill.status == 'Paid' %}<span class="badge bg-success">{{ bill.status }}</span>
+                            {% elif bill.status == 'Unpaid' %}<span class="badge bg-danger">{{ bill.status }}</span>
+                            {% else %}<span class="badge bg-warning">{{ bill.status }}</span>
                             {% endif %}
                         </td>
                         <td>
-                            {% if bill.payment_status == 'Unpaid' %}
-                                <a href="{% url 'update_bill_status' bill.id %}" class="btn btn-sm btn-success">Mark as Paid</a>
-                            {% else %}
-                                <a href="{% url 'update_bill_status' bill.id %}" class="btn btn-sm btn-warning">Mark as Unpaid</a>
-                            {% endif %}
+                            <a href="{% url 'billing:bill_detail' bill.pk %}" class="btn btn-sm btn-info" title="View Details"><i class="fas fa-eye"></i></a>
                         </td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-center">No bills found.</td>
-                    </tr>
+                    <tr><td colspan="6" class="text-center text-muted py-4">No bills found.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

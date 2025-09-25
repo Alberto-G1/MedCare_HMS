@@ -10,6 +10,7 @@ urlpatterns = [
     
     # Appointment Management URLs
     path('appointments/', views.doctor_appointments_view, name='doctor_appointments'),
+    path('appointments/<int:pk>/', views.appointment_detail_view, name='appointment_detail'),
     path('appointments/<int:pk>/update_status/<str:status>/', views.update_appointment_status_view, name='update_appointment_status'),
 
     # Medical Record URLs

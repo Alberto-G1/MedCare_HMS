@@ -1,44 +1,30 @@
 {% extends 'base.html' %}
-
 {% block title %}Select Appointment for Billing{% endblock %}
 
 {% block content %}
 <div class="card card-custom">
     <div class="card-header card-header-custom">
-        <h2 class="card-title h5 mb-0"><i class="fas fa-file-invoice me-2"></i>Generate Bill: Select Appointment</h2>
+        <h4 class="mb-0">Select a Completed Appointment to Bill</h4>
     </div>
     <div class="card-body">
-        <p>The following appointments are marked as "Completed" but do not have a bill yet.</p>
-        {% if appointments %}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Patient</th>
-                            <th>Doctor</th>
-                            <th>Date & Time</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for appt in appointments %}
-                        <tr>
-                            <td>{{ appt.patient.user.get_full_name|default:appt.patient.user.username }}</td>
-                            <td>{{ appt.doctor }}</td>
-                            <td>{{ appt.appointment_date|date:"F d, Y" }} at {{ appt.appointment_time|time:"h:i A" }}</td>
-                            <td>
-                                <a href="{% url 'create_bill_for_appointment' appt.id %}" class="btn btn-sm btn-success">Generate Bill</a>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        {% else %}
-            <div class="alert alert-info">There are no completed appointments awaiting billing.</div>
-        {% endif %}
-        <div class="mt-3">
-             <a href="{% url 'bill_list' %}" class="btn btn-secondary">Back to Billing List</a>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Action</th></tr></thead>
+                <tbody>
+                    {% for appt in appointments %}
+                    <tr>
+                        <td>{{ appt.patient.user.get_full_name }}</td>
+                        <td>{{ appt.doctor }}</td>
+                        <td>{{ appt.appointment_date|date:"F d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'billing:create_bill_from_appointment' appt.pk %}" class="btn btn-sm btn-primary">Generate Bill</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted">No unbilled completed appointments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

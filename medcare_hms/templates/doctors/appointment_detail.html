@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Details{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">Appointment Details</h4>
+            <small class="text-muted">ID: APPT-00{{ appointment.pk }}</small>
+        </div>
+        <a href="{% url 'doctors:doctor_appointments' %}" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to All Appointments
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <!-- Left Column: Patient Information -->
+            <div class="col-lg-5 border-end">
+                <h5 class="text-primary mb-3"><i class="fas fa-user-injured me-2"></i>Patient Information</h5>
+                <div class="d-flex align-items-center mb-3">
+                    <img src="{{ appointment.patient.profile_picture.url }}" alt="Patient Avatar" class="rounded-circle me-3" style="width: 70px; height: 70px; object-fit: cover;">
+                    <div>
+                        <h6 class="fw-bold mb-0">{{ appointment.patient.user.get_full_name }}</h6>
+                        <span class="text-muted">{{ appointment.patient.user.username }}</span>
+                    </div>
+                </div>
+                <dl class="row">
+                    <dt class="col-sm-4">Contact:</dt>
+                    <dd class="col-sm-8">{{ appointment.patient.user.userprofile.contact|default:"N/A" }}</dd>
+
+                    <dt class="col-sm-4">Gender:</dt>
+                    <dd class="col-sm-8">{{ appointment.patient.gender|default:"N/A" }}</dd>
+
+                    <dt class="col-sm-4">Blood Group:</dt>
+                    <dd class="col-sm-8"><span class="badge bg-danger">{{ appointment.patient.blood_group|default:"N/A" }}</span></dd>
+                </dl>
+                <hr>
+                <h6 class="fw-bold">Medical History Summary</h6>
+                <p class="small text-muted">{{ appointment.patient.medical_history|truncatewords:30|default:"No medical history provided." }}</p>
+            </div>
+
+            <!-- Right Column: Appointment Details -->
+            <div class="col-lg-7 ps-lg-4">
+                <h5 class="text-primary mb-3"><i class="fas fa-calendar-check me-2"></i>Appointment Details</h5>
+                <dl class="row">
+                    <dt class="col-sm-4">Date & Time:</dt>
+                    <dd class="col-sm-8 fw-bold">{{ appointment.appointment_date|date:"l, F d, Y" }} at {{ appointment.appointment_time|time:"g:i A" }}</dd>
+
+                    <dt class="col-sm-4">Status:</dt>
+                    <dd class="col-sm-8">
+                        {% if appointment.status == 'Approved' %}<span class="badge bg-success fs-6">{{ appointment.status }}</span>
+                        {% elif appointment.status == 'Pending' %}<span class="badge bg-warning fs-6">{{ appointment.status }}</span>
+                        {% elif appointment.status == 'Completed' %}<span class="badge bg-info fs-6">{{ appointment.status }}</span>
+                        {% else %}<span class="badge bg-danger fs-6">{{ appointment.status }}</span>
+                        {% endif %}
+                    </dd>
+                    
+                    <dt class="col-sm-4">Reason for Visit:</dt>
+                    <dd class="col-sm-8">{{ appointment.reason|linebreaksbr }}</dd>
+
+                    {% if appointment.attachment %}
+                    <dt class="col-sm-4">Attachment:</dt>
+                    <dd class="col-sm-8">
+                        <a href="{{ appointment.attachment.url }}" target="_blank">
+                            <i class="fas fa-paperclip"></i> View Attached File
+                        </a>
+                    </dd>
+                    {% endif %}
+                </dl>
+
+                <hr>
+                <!-- Contextual Action Buttons -->
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'chat:start_chat' appointment.patient.user.id %}" class="btn btn-info">
+                        <i class="fas fa-comments me-2"></i>Chat with Patient
+                    </a>
+
+                    {% if appointment.status == 'Pending' %}
+                        <a href="{% url 'doctors:update_appointment_status' appointment.pk 'Approved' %}" class="btn btn-success"><i class="fas fa-check me-2"></i>Approve</a>
+                        <a href="{% url 'doctors:update_appointment_status' appointment.pk 'Rejected' %}" class="btn btn-sm btn-danger"><i class="fas fa-times me-2"></i>Reject</a>
+                    {% elif appointment.status == 'Approved' %}
+                         <a href="{% url 'doctors:add_medical_record' appointment.pk %}" class="btn btn-primary-custom">
+                            <i class="fas fa-file-medical me-2"></i>Add Medical Record
+                        </a>
+                    {% elif appointment.status == 'Completed' %}
+                         <a href="#" class="btn btn-secondary disabled">
+                            <i class="fas fa-check-circle me-2"></i>Visit Complete
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
