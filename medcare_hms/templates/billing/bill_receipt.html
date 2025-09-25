@@ -1,30 +1,145 @@
-{% extends 'base_blank.html' %} {# Assumes a blank base template for printing #}
-
+{% extends 'base_blank.html' %}
 {% load billing_extras %}
+{% load static %}
 
-{% block title %}Receipt for Bill #{{ bill.pk }}{% endblock %}
+{% block title %}Receipt - Bill #{{ bill.pk }} - MedCare HMS{% endblock %}
+
 {% block content %}
-<div class="container my-5">
-    <h2>Receipt - MedCare HMS</h2>
-    <hr>
-    <p><strong>Bill ID:</strong> #{{ bill.pk }}</p>
-    <p><strong>Patient:</strong> {{ bill.patient.user.get_full_name }}</p>
-    <p><strong>Date:</strong> {{ bill.bill_date|date:"F d, Y" }}</p>
-    <hr>
-    <table class="table">
-        <thead><tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
-        <tbody>
-            {% for item in bill.items.all %}
-            <tr><td>{{ item.description }}</td><td>{{ item.quantity }}</td><td>{{ item.unit_price|currency_ugx }}</td><td>{{ item.amount|currency_ugx }}</td></tr>
-            {% endfor %}
-        </tbody>
-        <tfoot>
-            <tr><td colspan="3" class="text-end fw-bold">Total Amount:</td><td class="fw-bold">{{ bill.total_amount|currency_ugx }}</td></tr>
-            <tr><td colspan="3" class="text-end fw-bold">Status:</td><td class="fw-bold">{{ bill.status }}</td></tr>
-        </tfoot>
-    </table>
-    <hr>
-    <p class="text-center">Thank you!</p>
+<style>
+    .receipt-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2.5rem;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.05);
+    }
+    .receipt-header {
+        border-bottom: 2px solid var(--primary-dark-teal);
+        padding-bottom: 1rem;
+    }
+    .receipt-header img.logo {
+        max-height: 60px;
+    }
+    .receipt-title {
+        color: var(--primary-dark-teal);
+        font-weight: 700;
+    }
+    .patient-avatar {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+    }
+    .table-totals th, .table-totals td {
+        border: none !important;
+    }
+    .amount-due {
+        background-color: #fff3cd;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="container my-4">
+    <div class="receipt-container">
+        <!-- Header: Logo and Title -->
+        <div class="receipt-header d-flex justify-content-between align-items-center mb-4">
+            <img src="{% static 'images/logo.png' %}" alt="MedCare HMS Logo" class="logo">
+            <h1 class="receipt-title h2 mb-0">INVOICE / RECEIPT</h1>
+        </div>
+        
+        <!-- Patient and Bill Info -->
+        <div class="row mb-4">
+            <div class="col-6">
+                <h5 class="text-primary">Billed To:</h5>
+                <div class="d-flex align-items-center">
+                    <img src="{{ bill.patient.profile_picture.url }}" alt="Patient" class="patient-avatar rounded-circle me-3">
+                    <div>
+                        <strong class="d-block">{{ bill.patient.user.get_full_name }}</strong>
+                        <span class="text-muted">{{ bill.patient.user.email }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 text-end">
+                <p class="mb-1"><strong>Invoice #:</strong> MED-{{ bill.pk|stringformat:"05d" }}</p>
+                <p class="mb-1"><strong>Date Issued:</strong> {{ bill.bill_date|date:"F d, Y" }}</p>
+                <p class="mb-1"><strong>Due Date:</strong> {{ bill.due_date|date:"F d, Y"|default:"N/A" }}</p>
+            </div>
+        </div>
+        
+        <!-- Bill Items Table -->
+        <div class="table-responsive mb-4">
+            <table class="table table-striped">
+                <thead style="background-color: var(--primary-teal); color: white;">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Description</th>
+                        <th scope="col" class="text-center">Quantity</th>
+                        <th scope="col" class="text-end">Unit Price</th>
+                        <th scope="col" class="text-end">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in bill.items.all %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ item.description }}</td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-end">{{ item.unit_price|currency_ugx }}</td>
+                        <td class="text-end">{{ item.amount|currency_ugx }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Totals Section -->
+        <div class="row justify-content-end">
+            <div class="col-md-5">
+                <table class="table table-borderless table-totals">
+                    <tbody>
+                        <tr>
+                            <th class="text-end">Subtotal:</th>
+                            <td class="text-end">{{ bill.total_amount|currency_ugx }}</td>
+                        </tr>
+                        {% if bill.status == 'Partially Paid' %}
+                        <tr>
+                            <th class="text-end text-success">Amount Paid:</th>
+                            <td class="text-end text-success">{{ bill.amount_paid|currency_ugx }}</td>
+                        </tr>
+                        <tr class="fw-bold amount-due">
+                            <th class="text-end text-danger">Amount Due:</th>
+                            <td class="text-end text-danger">{{ bill.amount_due|currency_ugx }}</td>
+                        </tr>
+                        {% endif %}
+                        <tr class="fw-bold fs-5" style="border-top: 2px solid #333;">
+                            <th class="text-end">Total Amount:</th>
+                            <td class="text-end">{{ bill.total_amount|currency_ugx }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Status and Footer -->
+        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+            <h3 class="fw-bold">
+                Status:
+                {% if bill.status == 'Paid' %}<span class="text-success">PAID</span>
+                {% elif bill.status == 'Unpaid' %}<span class="text-danger">UNPAID</span>
+                {% else %}<span class="text-warning">PARTIALLY PAID</span>
+                {% endif %}
+            </h3>
+            <div class="text-end">
+                <p class="mb-0">Thank you for your business!</p>
+                <small class="text-muted">MedCare Hospital Management System</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Button (Hidden on Print) -->
+    <div class="text-center my-4 no-print">
+        <button onclick="window.print()" class="btn btn-primary-custom"><i class="fas fa-print me-2"></i>Print Receipt</button>
+    </div>
 </div>
 <script>window.print();</script>
 {% endblock %}
