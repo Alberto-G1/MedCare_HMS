@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load billing_extras %}
+{% block title %}Edit Bill Item{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card card-custom">
+            <div class="card-header card-header-custom">
+                <h4 class="mb-0">Edit Item for Bill #{{ item.bill.pk }}</h4>
+            </div>
+            <div class="card-body">
+                <p>You are editing the item: <strong class="text-primary">"{{ item.description }}"</strong></p>
+                <hr>
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="{% url 'billing:bill_detail' item.bill.pk %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

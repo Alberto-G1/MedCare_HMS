@@ -5,12 +5,15 @@ from django.views.generic import ListView, DetailView
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.db.models import Sum, Q
-
+from django.db.models import Sum, Q, Count, DecimalField
+from decimal import Decimal, InvalidOperation
 from patients.models import Appointment, PatientProfile
 from .models import Bill, BillItem
-from .forms import BillForm, BillItemForm
+from .forms import BillForm, BillItemForm, UpdatePaymentForm
 from accounts.decorators import receptionist_required
+from django.db.models.functions import Coalesce
+from django.utils import timezone
+from datetime import date
 
 staff_decorators = [login_required, receptionist_required]
 
@@ -21,16 +24,54 @@ class BillListView(ListView):
     context_object_name = 'bills'
     
     def get_queryset(self):
-        queryset = Bill.objects.select_related('patient__user').order_by('-bill_date')
+        """
+        This method filters the list of bills based on GET parameters
+        from the search bar and status filter.
+        """
+        # Start with the base queryset, optimizing with select_related
+        queryset = Bill.objects.select_related('patient__user', 'patient__user__patientprofile').order_by('-bill_date')
+        
+        # Get the search query from the URL (e.g., ?q=john)
         query = self.request.GET.get('q')
         if query:
             queryset = queryset.filter(
                 Q(patient__user__first_name__icontains=query) |
                 Q(patient__user__last_name__icontains=query) |
                 Q(patient__user__username__icontains=query) |
-                Q(pk__icontains=query)
+                # Allow searching by Bill ID number
+                Q(pk__iexact=query.replace('#', ''))
             )
+        
+        # Get the status filter from the URL (e.g., ?status=Paid)
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+            
         return queryset
+
+     # --- THIS is the corrected get_context_data method for BillListView ---
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        today = date.today()
+        
+        # Aggregate statistics for the dashboard cards
+        paid_stats = Bill.objects.filter(status='Paid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        unpaid_stats = Bill.objects.filter(status='Unpaid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        partially_paid_stats = Bill.objects.filter(status='Partially Paid').aggregate(count=Count('id'), total=Coalesce(Sum('amount_paid'), 0, output_field=DecimalField())) # Sum amount_paid for this card
+        overdue_stats = Bill.objects.filter(status='Unpaid', due_date__lt=today).aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        
+        context['paid_bills_count'] = paid_stats['count']
+        context['paid_bills_total'] = paid_stats['total']
+        context['unpaid_bills_count'] = unpaid_stats['count']
+        context['unpaid_bills_total'] = unpaid_stats['total']
+        context['partially_paid_bills_count'] = partially_paid_stats['count']
+        context['partially_paid_bills_total'] = partially_paid_stats['total']
+        context['overdue_bills_count'] = overdue_stats['count']
+        context['overdue_bills_total'] = overdue_stats['total']
+        
+        # THE INCORRECT LINE HAS BEEN REMOVED FROM HERE
+        
+        return context
 
 @method_decorator(staff_decorators, name='dispatch')
 class BillDetailView(DetailView):
@@ -41,6 +82,8 @@ class BillDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['item_form'] = BillItemForm() # Pass the form for adding new items
+        context['item_form'] = BillItemForm()
+        context['payment_form'] = UpdatePaymentForm(instance=self.object)
         return context
 
 @login_required
@@ -82,11 +125,50 @@ def add_bill_item_view(request, bill_id):
 def update_payment_status_view(request, bill_id):
     bill = get_object_or_404(Bill, pk=bill_id)
     if request.method == 'POST':
+        form = UpdatePaymentForm(request.POST, instance=bill) # Not used, but good practice
+        
         new_status = request.POST.get('status')
-        if new_status in ['Paid', 'Unpaid', 'Partially Paid']:
-            bill.status = new_status
-            bill.save()
-            messages.success(request, f"Bill #{bill.id} status updated to {new_status}.")
+        new_payment_str = request.POST.get('new_payment_amount', '0')
+        
+        try:
+            # --- THIS IS THE FIX: Convert the input to a Decimal ---
+            new_payment = Decimal(new_payment_str if new_payment_str else '0.00')
+        except InvalidOperation:
+            messages.error(request, "Invalid payment amount entered.")
+            return redirect('billing:bill_detail', pk=bill.pk)
+
+        if new_status == 'Paid':
+            bill.amount_paid = bill.total_amount
+            bill.status = 'Paid'
+            messages.success(request, f"Bill #{bill.id} has been marked as Fully Paid.")
+        
+        elif new_status == 'Partially Paid':
+            if new_payment <= 0:
+                messages.error(request, "Please enter a payment amount greater than zero for a partial payment.")
+                return redirect('billing:bill_detail', pk=bill.pk)
+            
+            bill.amount_paid += new_payment
+            
+            if bill.amount_paid >= bill.total_amount:
+                bill.amount_paid = bill.total_amount
+                bill.status = 'Paid'
+                messages.success(request, f"Final payment of {new_payment:,.2f} received. Bill #{bill.id} is now Fully Paid.")
+            else:
+                bill.status = 'Partially Paid'
+                messages.info(request, f"Partial payment of UGX {new_payment:,.0f} recorded for Bill #{bill.id}.")
+
+        elif new_status == 'Unpaid':
+            bill.amount_paid = Decimal('0.00') # Use a Decimal for consistency
+            bill.status = 'Unpaid'
+            messages.warning(request, f"Bill #{bill.id} status has been reset to Unpaid.")
+        
+        # Only update payment_method if it was provided in the form
+        payment_method = request.POST.get('payment_method')
+        if payment_method:
+            bill.payment_method = payment_method
+        
+        bill.save()
+
     return redirect('billing:bill_detail', pk=bill.pk)
 
 @method_decorator(staff_decorators, name='dispatch')
@@ -147,3 +229,63 @@ def create_bill_from_appointment(request, appointment_id):
 
     messages.success(request, "Bill created successfully. You can now add more items.")
     return redirect('billing:bill_detail', pk=bill.pk)
+
+@login_required
+@receptionist_required
+def edit_bill_item_view(request, pk):
+    item = get_object_or_404(BillItem, pk=pk)
+    bill = item.bill
+    
+    # Prevent editing of the initial consultation fee
+    if "Consultation with" in item.description:
+        messages.error(request, "The primary consultation fee cannot be edited.")
+        return redirect('billing:bill_detail', pk=bill.pk)
+
+    if request.method == 'POST':
+        form = BillItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            # Recalculate total
+            total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
+            bill.total_amount = total
+            bill.save()
+            messages.success(request, "Bill item updated successfully.")
+            return redirect('billing:bill_detail', pk=bill.pk)
+    else:
+        form = BillItemForm(instance=item)
+    
+    return render(request, 'billing/edit_bill_item.html', {'form': form, 'item': item})
+
+@login_required
+@receptionist_required
+def delete_bill_item_view(request, pk):
+    item = get_object_or_404(BillItem, pk=pk)
+    bill = item.bill
+
+    # Prevent deleting of the initial consultation fee
+    if "Consultation with" in item.description:
+        messages.error(request, "The primary consultation fee cannot be deleted.")
+        return redirect('billing:bill_detail', pk=bill.pk)
+
+    if request.method == 'POST':
+        item.delete()
+        # Recalculate total
+        total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
+        bill.total_amount = total
+        bill.save()
+        messages.success(request, "Bill item deleted successfully.")
+        return redirect('billing:bill_detail', pk=bill.pk)
+
+    return render(request, 'billing/delete_bill_item_confirm.html', {'item': item})
+
+@login_required
+@receptionist_required
+def delete_bill_view(request, pk):
+    bill = get_object_or_404(Bill, pk=pk)
+    if request.method == 'POST':
+        patient_name = bill.patient.user.get_full_name
+        bill.delete()
+        messages.success(request, f"Bill #{pk} for {patient_name} has been successfully deleted.")
+        return redirect('billing:bill_list')
+    
+    return render(request, 'billing/delete_bill_confirm.html', {'bill': bill})

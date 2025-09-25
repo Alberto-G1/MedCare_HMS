@@ -50,7 +50,7 @@ class BillForm(forms.ModelForm):
 
 class BillItemForm(forms.ModelForm):
     """
-    Form for adding individual line items to an existing Bill. (No changes needed here)
+    Form for adding/editing individual line items to an existing Bill.
     """
     class Meta:
         model = BillItem
@@ -59,4 +59,19 @@ class BillItemForm(forms.ModelForm):
             'description': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'e.g., Consultation Fee'}),
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
             'unit_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': '0.00'}),
+        }
+
+class UpdatePaymentForm(forms.ModelForm):
+    # This field is for entering a new payment amount, it's not directly saved to the model
+    new_payment_amount = forms.DecimalField(
+        required=False,
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'e.g., 20000'})
+    )
+
+    class Meta:
+        model = Bill
+        fields = ['status', 'payment_method']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'payment_method': forms.Select(attrs={'class': 'form-select'}),
         }

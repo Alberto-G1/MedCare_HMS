@@ -1,4 +1,3 @@
-# billing/models.py
 from django.db import models
 from patients.models import PatientProfile, Appointment
 
@@ -7,20 +6,31 @@ def get_receipt_path(instance, filename):
 
 class Bill(models.Model):
     STATUS_CHOICES = (('Unpaid', 'Unpaid'), ('Paid', 'Paid'), ('Partially Paid', 'Partially Paid'))
-    PAYMENT_METHOD_CHOICES = (('Cash', 'Cash'), ('Card', 'Card'), ('Insurance', 'Insurance'))
+    PAYMENT_METHOD_CHOICES = (
+        ('Cash', 'Cash'),
+        ('Card', 'Credit/Debit Card'),
+        ('MTN Mobile Money', 'MTN Mobile Money'), # <-- NEW
+        ('Airtel Money', 'Airtel Money'),     # <-- NEW
+        ('Insurance', 'Insurance'),
+    )
 
     patient = models.ForeignKey(PatientProfile, on_delete=models.PROTECT)
     appointment = models.ForeignKey(Appointment, on_delete=models.SET_NULL, null=True, blank=True)
     
     bill_date = models.DateField(auto_now_add=True)
     due_date = models.DateField(null=True, blank=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Unpaid')
     payment_method = models.CharField(max_length=20, choices=PAYMENT_METHOD_CHOICES, null=True, blank=True)
     receipt = models.FileField(upload_to=get_receipt_path, null=True, blank=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def amount_due(self):
+        return self.total_amount - self.amount_paid
 
     def __str__(self):
         return f"Bill #{self.pk} for {self.patient.user.username}"
