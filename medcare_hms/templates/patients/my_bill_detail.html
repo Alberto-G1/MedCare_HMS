@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load billing_extras %}
+{% block title %}Bill #{{ bill.pk }} Details{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">Bill Details</h4>
+            <small>Bill ID: #{{ bill.pk }}</small>
+        </div>
+        <a href="{% url 'patients:my_bills_list' %}" class="btn btn-sm btn-secondary"><i class="fas fa-arrow-left me-2"></i>Back to My Bills</a>
+    </div>
+    <div class="card-body">
+        <div class="row mb-4">
+            <div class="col-md-3"><strong>Total:</strong><h4 class="fw-bold text-primary">{{ bill.total_amount|currency_ugx }}</h4></div>
+            <div class="col-md-3"><strong>Paid:</strong><h4 class="fw-bold text-success">{{ bill.amount_paid|currency_ugx }}</h4></div>
+            <div class="col-md-3"><strong>Due:</strong><h4 class="fw-bold text-danger">{{ bill.amount_due|currency_ugx }}</h4></div>
+            <div class="col-md-3"><strong>Status:</strong><h4>
+                {% if bill.status == 'Paid' %}<span class="badge bg-success fs-6">{{ bill.status }}</span>
+                {% elif bill.status == 'Unpaid' %}<span class="badge bg-danger fs-6">{{ bill.status }}</span>
+                {% else %}<span class="badge bg-warning fs-6">{{ bill.status }}</span>
+                {% endif %}
+            </h4></div>
+        </div>
+        <hr>
+        <h5>Bill Items</h5>
+        <table class="table">
+            <thead><tr><th>Description</th><th>Qty</th><th class="text-end">Unit Price</th><th class="text-end">Amount</th></tr></thead>
+            <tbody>
+                {% for item in bill.items.all %}
+                <tr><td>{{ item.description }}</td><td>{{ item.quantity }}</td><td class="text-end">{{ item.unit_price|currency_ugx }}</td><td class="text-end">{{ item.amount|currency_ugx }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <hr>
+        <div class="d-flex justify-content-end gap-2">
+            {% if bill.status != 'Unpaid' %}
+                <a href="{% url 'patients:my_bill_receipt' bill.pk %}" target="_blank" class="btn btn-sky"><i class="fas fa-print me-2"></i>Print Receipt</a>
+            {% endif %}
+             <!-- Future: Add a "Pay Now" button that integrates with a payment gateway -->
+        </div>
+    </div>
+</div>
+{% endblock %}

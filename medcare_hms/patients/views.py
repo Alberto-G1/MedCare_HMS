@@ -7,7 +7,9 @@ from .models import PatientProfile, Appointment
 from .forms import PatientProfileForm, AppointmentBookingForm
 from datetime import date
 from doctors.models import DoctorProfile
-from django.utils import timezone 
+from django.utils import timezone
+from billing.models import Bill 
+from django.db.models import Q
 
 # --- Profile Views ---
 @login_required
@@ -88,3 +90,33 @@ def doctor_list_view(request):
     # Get all active doctors
     doctors = DoctorProfile.objects.filter(user__is_active=True).select_related('user', 'department')
     return render(request, 'patients/doctor_list.html', {'doctors': doctors})
+
+@login_required
+@patient_required
+def my_bills_list_view(request):
+    """
+    Displays a list of only the logged-in patient's bills.
+    """
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    bills = Bill.objects.filter(patient=patient_profile).order_by('-bill_date')
+    return render(request, 'patients/my_bills_list.html', {'bills': bills})
+
+@login_required
+@patient_required
+def my_bill_detail_view(request, pk):
+    """
+    Displays the details of a single bill, ensuring it belongs to the logged-in patient.
+    """
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    bill = get_object_or_404(Bill, pk=pk, patient=patient_profile) # Security check
+    return render(request, 'patients/my_bill_detail.html', {'bill': bill})
+
+@login_required
+@patient_required
+def my_bill_receipt_view(request, pk):
+    """
+    Displays a printable receipt for a single bill, ensuring it belongs to the logged-in patient.
+    """
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    bill = get_object_or_404(Bill, pk=pk, patient=patient_profile) # Security check
+    return render(request, 'billing/bill_receipt.html', {'bill': bill}) 
