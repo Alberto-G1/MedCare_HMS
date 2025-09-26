@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Medical Record Details{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-0">Medical Record</h4>
+            <small class="text-muted">Dated: {{ record.record_date|date:"F d, Y" }}</small>
+        </div>
+        <a href="{% url 'patients:my_medical_records_list' %}" class="btn btn-sm btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to All Records
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-primary">Consultation Details</h5>
+                <dl>
+                    <dt>Doctor</dt>
+                    <dd>{{ record.doctor }}</dd>
+                    
+                    <dt>Diagnosis</dt>
+                    <dd class="fw-bold">{{ record.diagnosis }}</dd>
+                    
+                    {% if record.appointment %}
+                    <dt>Linked Appointment</dt>
+                    <dd>{{ record.appointment.appointment_date|date:"F d, Y" }} at {{ record.appointment.appointment_time|time:"g:i A" }}</dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary">Doctor's Notes</h5>
+                <p style="white-space: pre-wrap;">{{ record.notes }}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="text-primary">Prescription</h5>
+                <p style="white-space: pre-wrap;">{{ record.prescription|default:"No prescription issued." }}</p>
+            </div>
+            <div class="col-md-6">
+                <h5 class="text-primary">Attached Reports</h5>
+                {% if record.report_file %}
+                    <a href="{{ record.report_file.url }}" target="_blank" class="btn btn-sky">
+                        <i class="fas fa-download me-2"></i>Download Report
+                    </a>
+                {% else %}
+                    <p class="text-muted">No report was attached to this record.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

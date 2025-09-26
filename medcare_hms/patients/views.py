@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.decorators import patient_required, receptionist_required, admin_required
-from .models import PatientProfile, Appointment
+from .models import PatientProfile, Appointment, MedicalRecord 
 from .forms import PatientProfileForm, AppointmentBookingForm
 from datetime import date
 from doctors.models import DoctorProfile
@@ -120,3 +120,38 @@ def my_bill_receipt_view(request, pk):
     patient_profile = get_object_or_404(PatientProfile, user=request.user)
     bill = get_object_or_404(Bill, pk=pk, patient=patient_profile) # Security check
     return render(request, 'billing/bill_receipt.html', {'bill': bill}) 
+
+# --- Patient-Facing Medical Record Views ---
+@login_required
+@patient_required
+def my_medical_records_list_view(request):
+    """
+    Displays a list of all medical records for the logged-in patient.
+    """
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    
+    # Fetch all records for this patient, ordering by the most recent date.
+    # Use select_related to optimize the query by pre-fetching doctor details.
+    records = MedicalRecord.objects.filter(patient=patient_profile)\
+                                   .select_related('doctor__user')\
+                                   .order_by('-record_date')
+                                   
+    return render(request, 'patients/my_medical_records_list.html', {'records': records})
+
+
+@login_required
+@patient_required
+def my_medical_record_detail_view(request, pk):
+    """
+    Displays the details of a single medical record, ensuring it belongs to the logged-in patient.
+    """
+    patient_profile = get_object_or_404(PatientProfile, user=request.user)
+    
+    # Security check: Ensure the patient can only access their own records.
+    record = get_object_or_404(
+        MedicalRecord.objects.select_related('doctor__user', 'appointment'), 
+        pk=pk, 
+        patient=patient_profile
+    )
+    
+    return render(request, 'patients/my_medical_record_detail.html', {'record': record})
