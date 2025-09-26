@@ -60,7 +60,7 @@
                     <h5 class="card-title">Billing & Payments</h5>
                     <p class="card-text text-muted">You have <strong>{{ unpaid_bills_count }}</strong> unpaid bill(s).</p>
                     <!-- CORRECTION: Namespaced URL for BILLING app -->
-                    <a href="{% url 'billing:bill_list' %}" class="btn btn-outline-primary-custom mt-auto">View Bills</a>
+                    <a href="{% url 'patients:my_bills_list' %}" class="btn btn-outline-primary-custom mt-auto">View Bills</a>
                 </div>
             </div>
         </div>

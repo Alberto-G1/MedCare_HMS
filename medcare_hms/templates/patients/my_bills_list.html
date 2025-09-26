@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load billing_extras %}
+{% block title %}My Billing History{% endblock %}
+
+{% block content %}
+<div class="card card-custom">
+    <div class="card-header card-header-custom">
+        <h4 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>My Billing History</h4>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-light">
+                    <tr><th>Date</th><th>Total Amount</th><th>Amount Due</th><th>Status</th><th>Actions</th></tr>
+                </thead>
+                <tbody>
+                    {% for bill in bills %}
+                    <tr>
+                        <td>{{ bill.bill_date|date:"F d, Y" }}</td>
+                        <td>{{ bill.total_amount|currency_ugx }}</td>
+                        <td class="fw-bold text-danger">{{ bill.amount_due|currency_ugx }}</td>
+                        <td>
+                            {% if bill.status == 'Paid' %}<span class="badge bg-success">{{ bill.status }}</span>
+                            {% elif bill.status == 'Unpaid' %}<span class="badge bg-danger">{{ bill.status }}</span>
+                            {% else %}<span class="badge bg-warning">{{ bill.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'patients:my_bill_detail' bill.pk %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View Details</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-center text-muted py-4">You have no billing records.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
