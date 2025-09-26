@@ -18,4 +18,8 @@ urlpatterns = [
     path('billing/', views.my_bills_list_view, name='my_bills_list'),
     path('billing/<int:pk>/', views.my_bill_detail_view, name='my_bill_detail'),
     path('billing/<int:pk>/receipt/', views.my_bill_receipt_view, name='my_bill_receipt'),
+
+    # --- MEDICAL RECORD URLS ---
+    path('medical-records/', views.my_medical_records_list_view, name='my_medical_records_list'),
+    path('medical-records/<int:pk>/', views.my_medical_record_detail_view, name='my_medical_record_detail'),
 ]
