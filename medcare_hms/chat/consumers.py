@@ -3,6 +3,8 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from channels.db import database_sync_to_async
 from .models import Thread, ChatMessage
 from django.contrib.auth.models import User
+from notifications.utils import create_notification
+from django.urls import reverse
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
@@ -35,6 +37,10 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         
         # Save message to database
         new_message = await self.save_message(message)
+
+        # --- NOTIFICATION LOGIC ---
+        await self.notify_other_participants(new_message)
+        # --- END NOTIFICATION LOGIC ---
         
         # Send message to room group
         await self.channel_layer.group_send(
@@ -66,3 +72,16 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
     def save_message(self, message_text):
         thread = Thread.objects.get(pk=self.thread_id)
         return ChatMessage.objects.create(thread=thread, sender=self.user, message=message_text)
+    
+    # --- NEW ASYNC HELPER METHOD ---
+    @database_sync_to_async
+    def notify_other_participants(self, new_message):
+        thread = new_message.thread
+        sender = new_message.sender
+        
+        # Get all participants in the thread except the sender
+        for participant in thread.participants.all():
+            if participant != sender:
+                message = f"You have a new message from {sender.get_full_name()}."
+                link = reverse('chat:thread_detail', kwargs={'thread_id': thread.id})
+                create_notification(recipient=participant, message=message, link=link)

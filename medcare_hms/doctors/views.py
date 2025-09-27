@@ -1,4 +1,3 @@
-# doctors/views.py (FINAL VERSION)
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -7,6 +6,8 @@ from .models import DoctorProfile
 from .forms import DoctorProfileForm
 from patients.models import Appointment, MedicalRecord
 from patients.forms import MedicalRecordForm
+from django.urls import reverse
+from notifications.utils import create_notification
 
 # --- Profile Views ---
 @login_required
@@ -73,6 +74,11 @@ def update_appointment_status_view(request, pk, status):
     # Update status and provide feedback
     appointment.status = status
     appointment.save()
+    # --- NOTIFICATION LOGIC ---
+    patient_user = appointment.patient.user
+    message = f"Your appointment with Dr. {request.user.get_full_name()} on {appointment.appointment_date} has been {status.lower()}."
+    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_appointments'))
+    # --- END NOTIFICATION LOGIC ---
     messages.success(request, f"Appointment status updated to '{status}'.")
     return redirect('doctors:doctor_appointments')
 
