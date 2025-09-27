@@ -14,6 +14,8 @@ from accounts.decorators import receptionist_required
 from django.db.models.functions import Coalesce
 from django.utils import timezone
 from datetime import date
+from django.urls import reverse
+from notifications.utils import create_notification 
 
 staff_decorators = [login_required, receptionist_required]
 
@@ -93,6 +95,13 @@ def create_bill_view(request):
         form = BillForm(request.POST)
         if form.is_valid():
             bill = form.save()
+
+            # --- NOTIFICATION LOGIC ---
+            patient_user = bill.patient.user
+            message = f"A new miscellaneous bill (ID: #{bill.pk}) has been generated for you."
+            create_notification(recipient=patient_user, message=message, link=reverse('patients:my_bills_list'))
+            # --- END NOTIFICATION LOGIC ---
+
             messages.success(request, f"New bill created for {bill.patient.user.username}. You can now add items.")
             return redirect('billing:bill_detail', pk=bill.pk)
     else:
@@ -226,6 +235,12 @@ def create_bill_from_appointment(request, appointment_id):
     total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
     bill.total_amount = total
     bill.save()
+
+    # --- NOTIFICATION LOGIC ---
+    patient_user = bill.patient.user
+    message = f"A new bill (ID: #{bill.pk}) has been generated for you."
+    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_bills_list'))
+    # --- END NOTIFICATION LOGIC ---
 
     messages.success(request, "Bill created successfully. You can now add more items.")
     return redirect('billing:bill_detail', pk=bill.pk)

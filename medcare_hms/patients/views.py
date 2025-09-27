@@ -10,6 +10,9 @@ from doctors.models import DoctorProfile
 from django.utils import timezone
 from billing.models import Bill 
 from django.db.models import Q
+from django.urls import reverse
+from notifications.utils import create_notification
+from accounts.models import UserProfile as AccountUserProfile
 
 # --- Profile Views ---
 @login_required
@@ -45,6 +48,12 @@ def book_appointment_view(request):
             appointment.patient = patient_profile
             appointment.created_by = request.user
             appointment.save()
+            # --- NOTIFICATION LOGIC ---
+            receptionists = AccountUserProfile.objects.filter(role='RECEPTIONIST', user__is_active=True)
+            message = f"New appointment request from {request.user.get_full_name()} for Dr. {appointment.doctor.user.get_full_name()}."
+            for profile in receptionists:
+                create_notification(recipient=profile.user, message=message, link=reverse('receptionist:appointment_list'))
+            # --- END NOTIFICATION LOGIC ---
             messages.success(request, 'Your appointment has been successfully booked and is pending approval.')
             return redirect('patients:my_appointments')
     else:

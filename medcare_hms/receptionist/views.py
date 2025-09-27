@@ -11,6 +11,8 @@ from .models import ReceptionistProfile
 from .forms import ReceptionistProfileForm, ManualPatientRegistrationForm, AppointmentBookingForm
 from patients.forms import PatientProfileForm as PatientUpdateForm # Reuse the patient's own edit form
 from accounts.decorators import receptionist_required
+from django.urls import reverse
+from notifications.utils import create_notification
 
 
 # --- Profile Views ---
@@ -138,6 +140,11 @@ def update_appointment_status_view(request, pk, status):
         
     appointment.status = status
     appointment.save()
+    # --- NOTIFICATION LOGIC ---
+    patient_user = appointment.patient.user
+    message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been {status.lower()} by our staff."
+    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_appointments'))
+    # --- END NOTIFICATION LOGIC ---
     messages.success(request, f"Appointment for {appointment.patient.user.get_full_name()} has been {status.lower()}.")
     return redirect('receptionist:appointment_list')
 
@@ -147,5 +154,10 @@ def cancel_appointment_view(request, pk):
     appointment = get_object_or_404(Appointment, pk=pk)
     appointment.status = 'Cancelled'
     appointment.save()
+    # --- NOTIFICATION LOGIC ---
+    patient_user = appointment.patient.user
+    message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been cancelled by our staff."
+    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_appointments'))
+    # --- END NOTIFICATION LOGIC ---
     messages.info(request, 'The appointment has been cancelled.')
     return redirect('receptionist:appointment_list')

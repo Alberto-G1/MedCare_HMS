@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block title %}My Notifications{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom styles for the notification page */
+    .notification-container {
+        background: var(--background-white);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px var(--shadow-light);
+        overflow: hidden;
+    }
+    .notification-header {
+        background: linear-gradient(135deg, var(--sky-blue) 0%, var(--primary-teal) 100%);
+        color: white;
+        padding: 2rem 1.5rem;
+    }
+    .notification-header h2 {
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    .notification-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    .notification-item {
+        display: flex;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: background-color 0.3s ease;
+        text-decoration: none;
+        color: var(--text-dark);
+    }
+    .notification-item:hover {
+        background-color: var(--background-light);
+    }
+    .notification-item.unread {
+        background-color: #e7f5ff; /* A light blue for unread messages */
+        font-weight: 500;
+    }
+    .notification-icon {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+        border-radius: 50%;
+        background-color: var(--sky-blue);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+    }
+    .notification-content {
+        flex-grow: 1;
+    }
+    .notification-time {
+        font-size: 0.85rem;
+        color: #6c757d;
+        white-space: nowrap;
+        margin-left: 1rem;
+    }
+</style>
+
+<div class="notification-container">
+    <div class="notification-header">
+        <h2>My Notifications</h2>
+    </div>
+    <div class="list-group list-group-flush">
+        {% for notification in notifications %}
+        <a href="{{ notification.link|default:'#' }}" class="notification-item {% if not notification.is_read %}unread{% endif %}">
+            <div class="notification-icon">
+                <i class="fas fa-bell"></i>
+            </div>
+            <div class="notification-content">
+                {{ notification.message }}
+            </div>
+            <div class="notification-time">
+                {{ notification.timestamp|timesince }} ago
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center p-5 text-muted">
+            <i class="fas fa-bell-slash fa-3x mb-3"></i>
+            <h5>You have no notifications</h5>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

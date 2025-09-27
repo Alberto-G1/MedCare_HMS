@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'receptionist', 
     'billing', 
     'chat',
+    'notifications',
 ]
 
 # Set the ASGI application entry point
@@ -81,6 +82,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'notifications.context_processors.unread_notifications',
             ],
         },
     },

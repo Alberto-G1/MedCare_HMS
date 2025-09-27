@@ -16,6 +16,9 @@ from .decorators import admin_required, doctor_required, receptionist_required, 
 from django.utils.decorators import method_decorator
 from django.utils import timezone
 from billing.models import Bill
+from django.urls import reverse
+from notifications.utils import create_notification 
+from .models import UserProfile as AccountUserProfile
 
 
 def register_view(request):
@@ -41,6 +44,14 @@ def register_view(request):
 
             # Create profile
             UserProfile.objects.create(user=user, role=role, contact=contact)
+
+            # --- NOTIFICATION LOGIC for pending staff ---
+            if not user.is_active: # This means they are a Doctor or Receptionist
+                message = f"New staff registration: {user.username} ({role}) is awaiting approval."
+                admins = AccountUserProfile.objects.filter(role='ADMIN', user__is_active=True)
+                for admin_profile in admins:
+                    create_notification(recipient=admin_profile.user, message=message, link=reverse('pending_staff_list'))
+            # --- END NOTIFICATION LOGIC ---
 
             messages.success(request, 'Registration successful!')
 
@@ -146,13 +157,19 @@ def admin_dashboard(request):
     return render(request, 'accounts/admin_dashboard.html', context)
 
 
-@login_required
 @admin_required
 def approve_user(request, user_id):
     try:
         user = User.objects.get(pk=user_id)
         user.is_active = True
         user.save()
+
+        # --- NOTIFICATION LOGIC ---
+        message = "Welcome to MedCare HMS! Your staff account has been approved by an administrator."
+        # The link can just go to their own dashboard
+        create_notification(recipient=user, message=message, link=reverse('dashboard_redirect'))
+        # --- END NOTIFICATION LOGIC ---
+        
         messages.success(request, f"User '{user.username}' has been approved.")
     except User.DoesNotExist:
         messages.error(request, "User not found.")
