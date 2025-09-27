@@ -36,8 +36,21 @@ def edit_doctor_profile_view(request):
 @doctor_required
 def doctor_appointments_view(request):
     doctor_profile = DoctorProfile.objects.get(user=request.user)
-    appointments = Appointment.objects.filter(doctor=doctor_profile).order_by('appointment_date', 'appointment_time')
-    return render(request, 'doctors/doctor_appointments.html', {'appointments': appointments})
+    
+    # Get the status from the URL, default to showing all
+    status_filter = request.GET.get('status', '')
+    
+    appointment_list = Appointment.objects.filter(doctor=doctor_profile)
+    
+    if status_filter in ['Pending', 'Approved', 'Completed', 'Cancelled', 'Rejected']:
+        appointment_list = appointment_list.filter(status=status_filter)
+        
+    appointments = appointment_list.order_by('appointment_date', 'appointment_time')
+    
+    return render(request, 'doctors/doctor_appointments.html', {
+        'appointments': appointments,
+        'status_filter': status_filter
+    })
 
 @login_required
 @doctor_required

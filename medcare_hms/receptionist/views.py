@@ -13,6 +13,8 @@ from patients.forms import PatientProfileForm as PatientUpdateForm # Reuse the p
 from accounts.decorators import receptionist_required
 from django.urls import reverse
 from notifications.utils import create_notification
+from .filters import AppointmentFilter
+
 
 
 # --- Profile Views ---
@@ -94,19 +96,18 @@ def edit_patient_view(request, pk):
 @login_required
 @receptionist_required
 def appointment_list_view(request):
-    # This view now supports filtering
-    filter_by = request.GET.get('filter', 'all')
-    today = date.today()
-
-    if filter_by == 'pending':
-        appointments = Appointment.objects.filter(status='Pending')
-    elif filter_by == 'today':
-        appointments = Appointment.objects.filter(appointment_date=today)
-    else:
-        appointments = Appointment.objects.all()
-
-    appointments = appointments.select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
-    return render(request, 'receptionist/appointment_list.html', {'appointments': appointments, 'filter_by': filter_by})
+    # Start with the base queryset
+    appointment_list = Appointment.objects.all().select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
+    
+    # Apply the filter
+    appointment_filter = AppointmentFilter(request.GET, queryset=appointment_list)
+    
+    context = {
+        'filter': appointment_filter,
+        # Use the filtered queryset for the template
+        'appointments': appointment_filter.qs,
+    }
+    return render(request, 'receptionist/appointment_list.html', context)
 
 @login_required
 @receptionist_required

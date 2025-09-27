@@ -5,7 +5,11 @@
 <div class="card card-custom">
     <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
         <h4 class="mb-0"><i class="fas fa-calendar-check me-2"></i>My Appointments</h4>
-        <!-- Future: A filter or search bar could go here -->
+        <div>
+            <a href="{% url 'doctors:doctor_appointments' %}" class="btn btn-sm {% if not status_filter %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">All</a>
+            <a href="?status=Pending" class="btn btn-sm {% if status_filter == 'Pending' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">Pending</a>
+            <a href="?status=Approved" class="btn btn-sm {% if status_filter == 'Approved' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">Approved</a>
+        </div>
     </div>
     <div class="card-body">
         <div class="table-responsive">

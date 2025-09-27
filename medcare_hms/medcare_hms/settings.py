@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'billing', 
     'chat',
     'notifications',
+    'django_filters',
 ]
 
 # Set the ASGI application entry point
