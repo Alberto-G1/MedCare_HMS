@@ -3,60 +3,33 @@
 
 {% block content %}
 <style>
-    .doctor-card {
-        border: 2px solid transparent;
-        border-radius: 0.75rem;
-        transition: all 0.3s ease;
-        cursor: pointer;
-    }
-    .doctor-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px var(--shadow-light);
-    }
-    .doctor-card.selected {
-        border-color: var(--primary-dark-teal);
-        box-shadow: 0 8px 20px var(--shadow-light);
-        background-color: #f0f8ff; /* A light blue to indicate selection */
-    }
-    .doctor-card-img {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-    }
+    .doctor-card { border: 2px solid transparent; border-radius: 0.75rem; transition: all 0.3s ease; cursor: pointer; }
+    .doctor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .doctor-card.selected { border-color: var(--primary-dark-teal); box-shadow: 0 8px 20px rgba(0,0,0,0.1); background-color: #f0f8ff; }
+    .doctor-card-img { width: 80px; height: 80px; object-fit: cover; }
+    #time-slot-loader { display: none; }
 </style>
 
 <div class="row justify-content-center">
     <div class="col-lg-10">
         <div class="card card-custom">
-            <div class="card-header card-header-custom">
-                <h4 class="mb-0"><i class="fas fa-calendar-plus me-2"></i>Schedule a New Appointment</h4>
-            </div>
+            <div class="card-header card-header-custom"><h4 class="mb-0">Schedule an Appointment</h4></div>
             <div class="card-body p-4">
-                <p class="text-muted">Please select a doctor and fill out the details below to request an appointment.</p>
-                <hr>
-                
-                <form method="post" enctype="multipart/form-data" novalidate>
+                <form id="appointment-form" method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
-                    
-                    <!-- This hidden input will store the ID of the selected doctor -->
-                    {{ form.doctor }}
+                    {{ form.doctor }} <!-- The hidden doctor input -->
 
-                    <!-- Display any form-wide errors -->
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">{{ form.non_field_errors }}</div>
-                    {% endif %}
-
-                    <!-- Step 1: Doctor Selection Cards -->
+                    <!-- Step 1: Doctor Selection -->
                     <div class="mb-4">
                         <label class="form-label fw-bold">Step 1: Choose a Doctor</label>
                         <div id="doctor-selection-container" class="row">
-                            {% for doctor in doctors %}
+                            {% for doc in doctors %}
                             <div class="col-md-4 mb-3">
-                                <div class="card doctor-card h-100" data-doctor-id="{{ doctor.id }}">
-                                    <div class="card-body text-center">
-                                        <img src="{{ doctor.profile_picture.url }}" class="rounded-circle doctor-card-img mb-2" alt="Dr. {{ doctor.user.get_full_name }}">
-                                        <h6 class="card-title mb-1">{{ doctor }}</h6>
-                                        <p class="card-text text-muted small">{{ doctor.specialization }}</p>
+                                <div class="card doctor-card h-100" data-doctor-id="{{ doc.id }}">
+                                    <div class="card-body text-center d-flex flex-column">
+                                        <img src="{{ doc.profile_picture.url }}" class="rounded-circle doctor-card-img mb-2 mx-auto" alt="{{ doc }}">
+                                        <h6 class="card-title mb-1">{{ doc }}</h6>
+                                        <p class="card-text text-muted small">{{ doc.specialization }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -65,43 +38,38 @@
                         {% if form.doctor.errors %}<div id="doctor-error" class="text-danger small mt-1">{{ form.doctor.errors.as_text }}</div>{% endif %}
                     </div>
                     
-                    <!-- Step 2: Appointment Details -->
-                    <div id="appointment-details-section" style="display: none;">
+                    <!-- Step 2 & 3: Details (Initially hidden) -->
+                    <div id="appointment-details-section" class="d-none">
                         <hr class="my-4">
-                        <label class="form-label fw-bold">Step 2: Provide Appointment Details</label>
-                        
-                        <!-- Date and Time -->
+                        <label class="form-label fw-bold">Step 2: Select Date & Time</label>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.appointment_date.id_for_label }}" class="form-label">{{ form.appointment_date.label }}</label>
+                                <label for="{{ form.appointment_date.id_for_label }}">{{ form.appointment_date.label }}</label>
                                 {{ form.appointment_date }}
-                                {% if form.appointment_date.errors %}<div class="text-danger small mt-1">{{ form.appointment_date.errors.as_text }}</div>{% endif %}
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label for="{{ form.appointment_time.id_for_label }}" class="form-label">{{ form.appointment_time.label }}</label>
+                                <label for="{{ form.appointment_time.id_for_label }}">{{ form.appointment_time.label }}</label>
                                 {{ form.appointment_time }}
-                                {% if form.appointment_time.errors %}<div class="text-danger small mt-1">{{ form.appointment_time.errors.as_text }}</div>{% endif %}
+                                <div id="time-slot-loader" class="spinner-border spinner-border-sm mt-2" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- Reason for Visit -->
+                        <hr class="my-4">
+                        <label class="form-label fw-bold">Step 3: Provide Appointment Details</label>
                         <div class="mb-3">
-                            <label for="{{ form.reason.id_for_label }}" class="form-label">{{ form.reason.label }}</label>
+                            <label for="{{ form.reason.id_for_label }}">{{ form.reason.label }}</label>
                             {{ form.reason }}
-                            {% if form.reason.errors %}<div class="text-danger small mt-1">{{ form.reason.errors.as_text }}</div>{% endif %}
                         </div>
-                        
-                        <!-- Optional Attachment -->
                         <div class="mb-4">
-                            <label for="{{ form.attachment.id_for_label }}" class="form-label">{{ form.attachment.label }}</gabel>
+                            <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }}</label>
                             {{ form.attachment }}
-                            {% if form.attachment.errors %}<div class="text-danger small mt-1">{{ form.attachment.errors.as_text }}</div>{% endif %}
                         </div>
                         
-                        <!-- Form Actions -->
                         <div class="d-flex justify-content-end gap-2 pt-3 border-top">
                             <a href="{% url 'patients:my_appointments' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary-custom"><i class="fas fa-paper-plane me-2"></i>Submit Request</button>
+                            <button type="submit" class="btn btn-primary-custom">Submit Request</button>
                         </div>
                     </div>
                 </form>
@@ -115,28 +83,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const doctorCards = document.querySelectorAll('.doctor-card');
     const hiddenDoctorInput = document.getElementById('{{ form.doctor.id_for_label }}');
     const detailsSection = document.getElementById('appointment-details-section');
-    const doctorError = document.getElementById('doctor-error');
+    const dateInput = document.getElementById('{{ form.appointment_date.id_for_label }}');
+    const timeSelect = document.getElementById('{{ form.appointment_time.id_for_label }}');
+    const timeLoader = document.getElementById('time-slot-loader');
+
+    let selectedDoctorId = null;
 
     doctorCards.forEach(card => {
         card.addEventListener('click', function() {
-            // Remove 'selected' class from all other cards
             doctorCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add 'selected' class to the clicked card
             this.classList.add('selected');
+            selectedDoctorId = this.dataset.doctorId;
+            hiddenDoctorInput.value = selectedDoctorId;
             
-            // Set the value of the hidden input field to the doctor's ID
-            hiddenDoctorInput.value = this.dataset.doctorId;
+            detailsSection.classList.remove('d-none');
             
-            // Show the rest of the form
-            detailsSection.style.display = 'block';
-
-            // Hide the doctor error message if it was visible
-            if (doctorError) {
-                doctorError.style.display = 'none';
+            if (dateInput.value) {
+                fetchAvailableTimes();
             }
         });
     });
+
+    dateInput.addEventListener('change', fetchAvailableTimes);
+
+    function fetchAvailableTimes() {
+        const selectedDate = dateInput.value;
+        if (!selectedDoctorId || !selectedDate) {
+            return;
+        }
+
+        timeLoader.style.display = 'block';
+        timeSelect.disabled = true;
+        timeSelect.innerHTML = '<option>Loading times...</option>';
+
+        const apiUrl = `{% url 'doctors:api_get_doctor_availability' %}?doctor_id=${selectedDoctorId}&date=${selectedDate}`;
+
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                timeSelect.innerHTML = '';
+                if (data.available_slots && data.available_slots.length > 0) {
+                    timeSelect.innerHTML = '<option value="">--- Select a time ---</option>';
+                    data.available_slots.forEach(slot => {
+                        timeSelect.innerHTML += `<option value="${slot.value}">${slot.display}</option>`;
+                    });
+                    timeSelect.disabled = false;
+                } else {
+                    timeSelect.innerHTML = '<option value="">No available slots on this day</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching availability:', error);
+                timeSelect.innerHTML = '<option value="">Could not load times</option>';
+            })
+            .finally(() => {
+                timeLoader.style.display = 'none';
+            });
+    }
 });
 </script>
 {% endblock %}

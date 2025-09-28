@@ -47,6 +47,8 @@ Bash
 pip install channels
 pip install channels-redis
 pip install daphne
+pip install django-filter  
+pip install django-htmx
 ```
 **channels:** The core library for adding WebSocket support to Django.
 ### channels-redis: `The recommended channel layer for production. It uses Redis to allow different parts of your application to communicate.`

@@ -16,6 +16,7 @@ from django.utils import timezone
 from datetime import date
 from django.urls import reverse
 from notifications.utils import create_notification 
+from .filters import BillFilter
 
 staff_decorators = [login_required, receptionist_required]
 
@@ -27,36 +28,29 @@ class BillListView(ListView):
     
     def get_queryset(self):
         """
-        This method filters the list of bills based on GET parameters
-        from the search bar and status filter.
+        This method now handles the filtering directly.
         """
-        # Start with the base queryset, optimizing with select_related
+        # Start with the base queryset
         queryset = Bill.objects.select_related('patient__user', 'patient__user__patientprofile').order_by('-bill_date')
         
-        # Get the search query from the URL (e.g., ?q=john)
-        query = self.request.GET.get('q')
-        if query:
-            queryset = queryset.filter(
-                Q(patient__user__first_name__icontains=query) |
-                Q(patient__user__last_name__icontains=query) |
-                Q(patient__user__username__icontains=query) |
-                # Allow searching by Bill ID number
-                Q(pk__iexact=query.replace('#', ''))
-            )
+        # Apply the django-filter FilterSet
+        self.filterset = BillFilter(self.request.GET, queryset=queryset)
         
-        # Get the status filter from the URL (e.g., ?status=Paid)
-        status_filter = self.request.GET.get('status')
-        if status_filter:
-            queryset = queryset.filter(status=status_filter)
-            
-        return queryset
+        # Return the filtered queryset
+        return self.filterset.qs
 
-     # --- THIS is the corrected get_context_data method for BillListView ---
     def get_context_data(self, **kwargs):
+        """
+        This method adds the filter form and statistics to the context.
+        """
         context = super().get_context_data(**kwargs)
         today = date.today()
         
-        # Aggregate statistics for the dashboard cards
+        # Add the filter form to the context
+        context['filter'] = self.filterset
+        context['bills'] = self.filterset.qs
+        
+        # # Aggregate statistics for the dashboard cards
         paid_stats = Bill.objects.filter(status='Paid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
         unpaid_stats = Bill.objects.filter(status='Unpaid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
         partially_paid_stats = Bill.objects.filter(status='Partially Paid').aggregate(count=Count('id'), total=Coalesce(Sum('amount_paid'), 0, output_field=DecimalField())) # Sum amount_paid for this card
@@ -71,9 +65,33 @@ class BillListView(ListView):
         context['overdue_bills_count'] = overdue_stats['count']
         context['overdue_bills_total'] = overdue_stats['total']
         
-        # THE INCORRECT LINE HAS BEEN REMOVED FROM HERE
-        
         return context
+    
+        # context = super().get_context_data(**kwargs)
+        # today = date.today()
+        
+        # # Apply the filter to the queryset
+        # bill_filter = BillFilter(self.request.GET, queryset=self.get_queryset())
+        # context['filter'] = bill_filter
+        # context['bills'] = bill_filter.qs
+        # # Aggregate statistics for the dashboard cards
+        # paid_stats = Bill.objects.filter(status='Paid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        # unpaid_stats = Bill.objects.filter(status='Unpaid').aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        # partially_paid_stats = Bill.objects.filter(status='Partially Paid').aggregate(count=Count('id'), total=Coalesce(Sum('amount_paid'), 0, output_field=DecimalField())) # Sum amount_paid for this card
+        # overdue_stats = Bill.objects.filter(status='Unpaid', due_date__lt=today).aggregate(count=Count('id'), total=Coalesce(Sum('total_amount'), 0, output_field=DecimalField()))
+        
+        # context['paid_bills_count'] = paid_stats['count']
+        # context['paid_bills_total'] = paid_stats['total']
+        # context['unpaid_bills_count'] = unpaid_stats['count']
+        # context['unpaid_bills_total'] = unpaid_stats['total']
+        # context['partially_paid_bills_count'] = partially_paid_stats['count']
+        # context['partially_paid_bills_total'] = partially_paid_stats['total']
+        # context['overdue_bills_count'] = overdue_stats['count']
+        # context['overdue_bills_total'] = overdue_stats['total']
+        
+        # # THE INCORRECT LINE HAS BEEN REMOVED FROM HERE
+        
+        # return context
 
 @method_decorator(staff_decorators, name='dispatch')
 class BillDetailView(DetailView):

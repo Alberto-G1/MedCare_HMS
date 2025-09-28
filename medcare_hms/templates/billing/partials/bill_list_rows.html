@@ -1,0 +1,33 @@
+<!-- templates/billing/partials/bill_list_rows.html -->
+
+{% for bill in bills %}
+<tr>
+    <td>
+        <div class="d-flex align-items-center">
+            <img src="{{ bill.patient.profile_picture.url }}" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+            {{ bill.patient.user.get_full_name }}
+        </div>
+    </td>
+    <td>{{ bill.bill_date|date:"F d, Y" }}</td>
+    <td class="fw-bold text-danger">{{ bill.amount_due|currency_ugx }}</td>
+    <td>{{ bill.total_amount|currency_ugx }}</td>
+    <td>
+        {% if bill.status == 'Paid' %}<span class="badge bg-success">{{ bill.status }}</span>
+        {% elif bill.status == 'Unpaid' %}<span class="badge bg-danger">{{ bill.status }}</span>
+        {% else %}<span class="badge bg-warning">{{ bill.status }}</span>
+        {% endif %}
+    </td>
+    <td>
+        <div class="btn-group">
+            <a href="{% url 'billing:bill_detail' bill.pk %}" class="btn btn-sm btn-info" title="View & Edit Details"><i class="fas fa-eye"></i></a>
+            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBillModal-{{ bill.pk }}" title="Delete Bill">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+        </div>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="6" class="text-center text-muted py-4">No bills found matching your criteria.</td>
+</tr>
+{% endfor %}

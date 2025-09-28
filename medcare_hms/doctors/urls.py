@@ -16,4 +16,10 @@ urlpatterns = [
     # Medical Record URLs
     path('appointments/<int:appointment_pk>/add-record/', views.add_medical_record_view, name='add_medical_record'),
     path('medical-records/', views.medical_record_list_view, name='medical_record_list'),
+
+    # Availability Management URLs
+    path('availability/', views.manage_availability_view, name='manage_availability'),
+    path('api/get-availability/', views.get_doctor_availability_api, name='api_get_doctor_availability'),
+    path('availability/<int:pk>/edit/', views.edit_availability_view, name='edit_availability'),
+    path('availability/<int:pk>/delete/', views.delete_availability_view, name='delete_availability'),
 ]

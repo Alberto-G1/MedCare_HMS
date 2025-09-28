@@ -13,6 +13,9 @@ from patients.forms import PatientProfileForm as PatientUpdateForm # Reuse the p
 from accounts.decorators import receptionist_required
 from django.urls import reverse
 from notifications.utils import create_notification
+from .filters import AppointmentFilter
+from doctors.models import DoctorProfile
+
 
 
 # --- Profile Views ---
@@ -94,35 +97,66 @@ def edit_patient_view(request, pk):
 @login_required
 @receptionist_required
 def appointment_list_view(request):
-    # This view now supports filtering
-    filter_by = request.GET.get('filter', 'all')
-    today = date.today()
-
-    if filter_by == 'pending':
-        appointments = Appointment.objects.filter(status='Pending')
-    elif filter_by == 'today':
-        appointments = Appointment.objects.filter(appointment_date=today)
-    else:
-        appointments = Appointment.objects.all()
-
-    appointments = appointments.select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
-    return render(request, 'receptionist/appointment_list.html', {'appointments': appointments, 'filter_by': filter_by})
+    # Start with the base queryset
+    appointment_list = Appointment.objects.all().select_related('patient__user', 'doctor__user').order_by('-appointment_date', '-appointment_time')
+    
+    # Apply the filter
+    appointment_filter = AppointmentFilter(request.GET, queryset=appointment_list)
+    
+    context = {
+        'filter': appointment_filter,
+        # Use the filtered queryset for the template
+        'appointments': appointment_filter.qs,
+    }
+    return render(request, 'receptionist/appointment_list.html', context)
 
 @login_required
 @receptionist_required
 def book_appointment_view(request):
     if request.method == 'POST':
+        # The form now needs to be instantiated without the patient argument initially
         form = AppointmentBookingForm(request.POST)
         if form.is_valid():
             appointment = form.save(commit=False)
             appointment.created_by = request.user
             appointment.status = 'Approved' # Receptionist bookings are auto-approved
             appointment.save()
-            messages.success(request, 'Appointment successfully booked and confirmed.')
+
+            # --- START OF NEW NOTIFICATION LOGIC ---
+
+            # 1. Notify the Patient
+            patient_user = appointment.patient.user
+            patient_message = f"An appointment has been booked for you with {appointment.doctor} on {appointment.appointment_date} at {appointment.appointment_time.strftime('%I:%M %p')}."
+            create_notification(
+                recipient=patient_user,
+                message=patient_message,
+                link=reverse('patients:my_appointments')
+            )
+
+            # 2. Notify the Doctor
+            doctor_user = appointment.doctor.user
+            doctor_message = f"A new appointment has been scheduled for you with patient {appointment.patient.user.get_full_name()} on {appointment.appointment_date}."
+            create_notification(
+                recipient=doctor_user,
+                message=doctor_message,
+                link=reverse('doctors:doctor_appointments')
+            )
+
+            # --- END OF NEW NOTIFICATION LOGIC ---
+
+            messages.success(request, f"Appointment for {appointment.patient.user.get_full_name()} successfully booked and confirmed.")
             return redirect('receptionist:appointment_list')
     else:
         form = AppointmentBookingForm()
-    return render(request, 'receptionist/book_appointment.html', {'form': form})
+
+    # Get all active doctors to display as cards
+    available_doctors = DoctorProfile.objects.filter(user__is_active=True).select_related('user')
+    
+    context = {
+        'form': form,
+        'doctors': available_doctors
+    }
+    return render(request, 'receptionist/book_appointment.html', context)
 
 @login_required
 @receptionist_required
