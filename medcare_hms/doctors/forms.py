@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import DoctorProfile
 from management.models import Department
+from .models import DoctorAvailability
+from django.core.exceptions import ValidationError
+
 
 class DoctorProfileForm(forms.ModelForm):
     # --- Fields from the User model ---
@@ -43,3 +46,13 @@ class DoctorProfileForm(forms.ModelForm):
             user.save()
             profile.save()
         return profile
+
+class DoctorAvailabilityForm(forms.ModelForm):
+    class Meta:
+        model = DoctorAvailability
+        fields = ['day_of_week', 'start_time', 'end_time']
+        widgets = {
+            'day_of_week': forms.Select(attrs={'class': 'form-select'}),
+            'start_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+            'end_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        }

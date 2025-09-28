@@ -90,10 +90,16 @@ class PatientProfileForm(forms.ModelForm):
 
 
 class AppointmentBookingForm(forms.ModelForm):
-    # Filter to show only active doctors
     doctor = forms.ModelChoiceField(
         queryset=DoctorProfile.objects.filter(user__is_active=True),
         widget=forms.HiddenInput(),
+        required=True
+    )
+
+    # Time field starts as an empty dropdown, to be populated by JS
+    appointment_time = forms.ChoiceField(
+        choices=[], 
+        widget=forms.Select(attrs={'class': 'form-select'}),
         required=True
     )
 
@@ -101,9 +107,19 @@ class AppointmentBookingForm(forms.ModelForm):
         model = Appointment
         fields = ['doctor', 'appointment_date', 'appointment_time', 'reason', 'attachment']
         widgets = {
-            'appointment_date': forms.DateInput(attrs={'type': 'date'}),
-            'appointment_time': forms.TimeInput(attrs={'type': 'time'}),
+            'appointment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'attachment': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # This is important for when the form is re-rendered with errors.
+        # We need to re-populate the choices for the selected time.
+        if 'appointment_time' in self.data:
+            self.fields['appointment_time'].choices = [
+                (self.data.get('appointment_time'), self.data.get('appointment_time'))
+            ]
 
     def clean_appointment_date(self):
         appointment_date = self.cleaned_data.get('appointment_date')

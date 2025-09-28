@@ -55,14 +55,37 @@ class ManualPatientRegistrationForm(forms.ModelForm):
         return username
 
 class AppointmentBookingForm(forms.ModelForm):
-    patient = forms.ModelChoiceField(queryset=PatientProfile.objects.all(), widget=forms.Select(attrs={'class': 'form-select'}))
-    doctor = forms.ModelChoiceField(queryset=DoctorProfile.objects.filter(user__is_active=True), widget=forms.Select(attrs={'class': 'form-select'}))
+    # Patient is now a searchable dropdown
+    patient = forms.ModelChoiceField(
+        queryset=PatientProfile.objects.all().select_related('user'),
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )
+    # Doctor is now a hidden input, selected via cards
+    doctor = forms.ModelChoiceField(
+        queryset=DoctorProfile.objects.filter(user__is_active=True),
+        widget=forms.HiddenInput(),
+        required=True
+    )
+    # Time is an empty dropdown, populated by JavaScript
+    appointment_time = forms.ChoiceField(
+        choices=[],
+        widget=forms.Select(attrs={'class': 'form-select'}),
+        required=True
+    )
 
     class Meta:
         model = Appointment
+        # Order the fields for a logical workflow
         fields = ['patient', 'doctor', 'appointment_date', 'appointment_time', 'reason', 'attachment']
         widgets = {
             'appointment_date': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
-            'appointment_time': forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
             'reason': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
+            'attachment': forms.FileInput(attrs={'class': 'form-control'}),
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'appointment_time' in self.data:
+            self.fields['appointment_time'].choices = [
+                (self.data.get('appointment_time'), self.data.get('appointment_time'))
+            ]

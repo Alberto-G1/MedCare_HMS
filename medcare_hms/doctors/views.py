@@ -8,6 +8,13 @@ from patients.models import Appointment, MedicalRecord
 from patients.forms import MedicalRecordForm
 from django.urls import reverse
 from notifications.utils import create_notification
+from .forms import DoctorAvailabilityForm
+from .models import DoctorAvailability
+from django.core.exceptions import ValidationError
+from django.http import JsonResponse
+from datetime import datetime, timedelta
+from django.db import IntegrityError
+
 
 # --- Profile Views ---
 @login_required
@@ -142,3 +149,137 @@ def add_medical_record_view(request, appointment_pk):
         form = MedicalRecordForm()
 
     return render(request, 'doctors/add_medical_record.html', {'form': form, 'appointment': appointment})
+
+# --- Doctor Availability Views ---
+@login_required
+@doctor_required
+def manage_availability_view(request):
+    doctor_profile = get_object_or_404(DoctorProfile, user=request.user)
+    
+    if request.method == 'POST':
+        form = DoctorAvailabilityForm(request.POST)
+        if form.is_valid():
+            day_of_week = form.cleaned_data['day_of_week']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
+
+            # --- EXPLICIT VALIDATION ---
+            if start_time >= end_time:
+                messages.error(request, "Validation Error: End time must be after start time.")
+            else:
+                overlapping_slots = DoctorAvailability.objects.filter(
+                    doctor=doctor_profile, day_of_week=day_of_week,
+                    start_time__lt=end_time, end_time__gt=start_time
+                )
+                if overlapping_slots.exists():
+                    messages.error(request, "Validation Error: This time slot overlaps with an existing slot.")
+                else:
+                    try:
+                        DoctorAvailability.objects.create(
+                            doctor=doctor_profile, day_of_week=day_of_week,
+                            start_time=start_time, end_time=end_time
+                        )
+                        messages.success(request, "New time slot added successfully.")
+                    except IntegrityError:
+                        messages.error(request, "Validation Error: This exact start time already exists for this day.")
+            
+            return redirect('doctors:manage_availability')
+
+    else: # GET request
+        form = DoctorAvailabilityForm()
+        
+    slots = DoctorAvailability.objects.filter(doctor=doctor_profile).order_by('day_of_week', 'start_time')
+    
+    context = {'form': form, 'slots': slots}
+    return render(request, 'doctors/manage_availability.html', context)
+
+
+
+
+# --- NEW API VIEW ---
+@login_required
+def get_doctor_availability_api(request):
+    doctor_id = request.GET.get('doctor_id')
+    selected_date_str = request.GET.get('date')
+
+    if not doctor_id or not selected_date_str:
+        return JsonResponse({'error': 'Missing doctor ID or date'}, status=400)
+
+    try:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        doctor = DoctorProfile.objects.get(pk=doctor_id)
+    except (ValueError, DoctorProfile.DoesNotExist):
+        return JsonResponse({'error': 'Invalid doctor ID or date format'}, status=400)
+
+    day_of_week = selected_date.weekday()
+    
+    # Get the doctor's general availability for that day
+    availability_slots = DoctorAvailability.objects.filter(doctor=doctor, day_of_week=day_of_week)
+    
+    # Get all appointments already booked for this doctor on this day
+    booked_appointments = Appointment.objects.filter(doctor=doctor, appointment_date=selected_date)
+    booked_times = [appt.appointment_time for appt in booked_appointments]
+
+    available_time_slots = []
+    appointment_duration = timedelta(minutes=30)
+
+    for slot in availability_slots:
+        current_time = datetime.combine(selected_date, slot.start_time)
+        end_time = datetime.combine(selected_date, slot.end_time)
+        
+        while current_time + appointment_duration <= end_time:
+            time_slot = current_time.time()
+            # Check if this specific time slot is NOT already booked
+            if time_slot not in booked_times:
+                available_time_slots.append({
+                    'value': time_slot.strftime('%H:%M:%S'), # Use H:M:S for consistency
+                    'display': time_slot.strftime('%I:%M %p')
+                })
+            current_time += appointment_duration
+    
+    return JsonResponse({'available_slots': available_time_slots})
+
+# --- VIEW for editing a slot ---
+@login_required
+@doctor_required
+def edit_availability_view(request, pk):
+    doctor_profile = get_object_or_404(DoctorProfile, user=request.user)
+    slot = get_object_or_404(DoctorAvailability, pk=pk, doctor=doctor_profile)
+    
+    if request.method == 'POST':
+        form = DoctorAvailabilityForm(request.POST, instance=slot)
+        if form.is_valid():
+            day_of_week = form.cleaned_data['day_of_week']
+            start_time = form.cleaned_data['start_time']
+            end_time = form.cleaned_data['end_time']
+
+            # --- EXPLICIT VALIDATION FOR EDIT ---
+            if start_time >= end_time:
+                messages.error(request, "Validation Error: End time must be after start time.")
+            else:
+                overlapping_slots = DoctorAvailability.objects.filter(
+                    doctor=doctor_profile, day_of_week=day_of_week,
+                    start_time__lt=end_time, end_time__gt=start_time
+                ).exclude(pk=pk) # Exclude the current slot from the check
+
+                if overlapping_slots.exists():
+                    messages.error(request, "Validation Error: This time slot overlaps with another slot.")
+                else:
+                    # If all checks pass, save the form changes
+                    form.save()
+                    messages.success(request, "Time slot updated successfully.")
+            
+    return redirect('doctors:manage_availability')
+
+# --- VIEW for deleting a slot ---
+@login_required
+@doctor_required
+def delete_availability_view(request, pk):
+    doctor_profile = get_object_or_404(DoctorProfile, user=request.user)
+    slot = get_object_or_404(DoctorAvailability, pk=pk, doctor=doctor_profile) # Security check
+    
+    if request.method == 'POST':
+        slot.delete()
+        messages.success(request, "Time slot deleted successfully.")
+    
+    return redirect('doctors:manage_availability')
