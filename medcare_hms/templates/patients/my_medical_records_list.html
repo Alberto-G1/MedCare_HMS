@@ -14,21 +14,31 @@
                         <th>Date</th>
                         <th>Doctor</th>
                         <th>Diagnosis</th>
+                        <th>Prescription</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in records %}
-                    <tr>
-                        <td>{{ record.record_date|date:"F d, Y" }}</td>
-                        <td>{{ record.doctor }}</td>
-                        <td>{{ record.diagnosis }}</td>
-                        <td>
-                            <a href="{% url 'patients:my_medical_record_detail' record.pk %}" class="btn btn-sm btn-info">
-                                <i class="fas fa-eye"></i> View Details
-                            </a>
-                        </td>
-                    </tr>
+                                        <tr>
+                                                <td>{{ record.record_date|date:"F d, Y" }}</td>
+                                                <td>{{ record.doctor }}</td>
+                                                <td>{{ record.diagnosis }}</td>
+                                                <td>
+                                                    {% with prescription=record.linked_prescriptions.first %}
+                                                        {% if prescription %}
+                                                            <a class="badge bg-success text-decoration-none" href="{% url 'prescriptions:patient_prescription_detail' prescription.id %}">#{{ prescription.id }} {{ prescription.status|title }}</a>
+                                                        {% else %}
+                                                            <span class="badge bg-secondary">None</span>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                </td>
+                                                <td>
+                                                        <a href="{% url 'patients:my_medical_record_detail' record.pk %}" class="btn btn-sm btn-info">
+                                                                <i class="fas fa-eye"></i> View Details
+                                                        </a>
+                                                </td>
+                                        </tr>
                     {% empty %}
                     <tr>
                         <td colspan="4" class="text-center text-muted py-4">You have no medical records on file.</td>

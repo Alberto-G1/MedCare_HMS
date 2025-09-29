@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}My Prescriptions{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2>My Prescriptions</h2>
+  <div class="mb-3">
+    <a href="?" class="btn btn-sm {% if not status_filter %}btn-primary{% else %}btn-outline-primary{% endif %}">All</a>
+    <a href="?status=ACTIVE" class="btn btn-sm {% if status_filter == 'ACTIVE' %}btn-primary{% else %}btn-outline-primary{% endif %}">Active</a>
+    <a href="?status=COMPLETED" class="btn btn-sm {% if status_filter == 'COMPLETED' %}btn-primary{% else %}btn-outline-primary{% endif %}">Completed</a>
+    <a href="?status=CANCELLED" class="btn btn-sm {% if status_filter == 'CANCELLED' %}btn-primary{% else %}btn-outline-primary{% endif %}">Cancelled</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-striped align-middle">
+      <thead><tr><th>ID</th><th>Doctor</th><th>Status</th><th>Created</th><th></th></tr></thead>
+      <tbody>
+      {% for p in prescriptions %}
+        <tr>
+          <td>#{{ p.id }}</td>
+          <td>{{ p.doctor.user.get_full_name }}</td>
+          <td>{{ p.get_status_display }}</td>
+          <td>{{ p.created_at|date:'Y-m-d H:i' }}</td>
+          <td>
+            <div class="btn-group btn-group-sm">
+              <a class="btn btn-outline-secondary" href="{% url 'prescriptions:patient_prescription_detail' p.id %}">View</a>
+              <a class="btn btn-outline-primary" href="{% url 'prescriptions:prescription_download' p.id %}" title="Download PDF"><i class="fas fa-download"></i></a>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="text-center">No prescriptions found.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

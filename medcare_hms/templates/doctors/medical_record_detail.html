@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block title %}Medical Record Detail{% endblock %}
+{% block content %}
+<div class="card card-custom">
+  <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-0">Medical Record</h4>
+      <small class="text-muted">Dated: {{ record.record_date|date:"F d, Y" }}</small>
+    </div>
+    <div>
+      <a href="{% url 'doctors:medical_record_list' %}" class="btn btn-sm btn-secondary me-2"><i class="fas fa-arrow-left me-1"></i>Back</a>
+      {% if can_create_structured %}
+        <a href="{% url 'prescriptions:create_prescription' record.patient.id %}?medical_record={{ record.id }}" class="btn btn-sm btn-primary">
+          <i class="fas fa-prescription me-1"></i>Create Prescription
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="text-primary">Consultation Details</h5>
+        <dl>
+          <dt>Patient</dt>
+          <dd>{{ record.patient.user.get_full_name }}</dd>
+          <dt>Doctor</dt>
+          <dd>{{ record.doctor }}</dd>
+          <dt>Diagnosis</dt>
+          <dd class="fw-bold">{{ record.diagnosis }}</dd>
+          {% if record.appointment %}
+          <dt>Linked Appointment</dt>
+          <dd>{{ record.appointment.appointment_date|date:"F d, Y" }} at {{ record.appointment.appointment_time|time:"g:i A" }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+      <div class="col-md-6">
+        <h5 class="text-primary">Doctor's Notes</h5>
+        <p style="white-space: pre-wrap;">{{ record.notes }}</p>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <h5 class="text-primary">Legacy Text Prescription</h5>
+        <p style="white-space: pre-wrap;">{{ record.prescription|default:"No legacy prescription text." }}</p>
+      </div>
+      <div class="col-md-6 mb-3">
+        <h5 class="text-primary d-flex align-items-center">Structured Prescriptions{% if linked_prescriptions %}<span class="badge bg-success ms-2">{{ linked_prescriptions|length }}</span>{% endif %}</h5>
+        {% if linked_prescriptions %}
+          <ul class="list-group">
+            {% for p in linked_prescriptions %}
+              <li class="list-group-item d-flex justify-content-between align-items-start">
+                <div>
+                  <strong>#{{ p.id }}</strong> – {{ p.get_status_display }}<br>
+                  Created {{ p.created_at|date:"Y-m-d H:i" }}
+                </div>
+                <div class="btn-group btn-group-sm">
+                  <a href="{% url 'prescriptions:doctor_prescription_detail' p.id %}" class="btn btn-outline-secondary">View</a>
+                  <a href="{% url 'prescriptions:prescription_download' p.id %}" class="btn btn-outline-secondary" title="Download PDF"><i class="fas fa-download"></i></a>
+                  <a href="{% url 'prescriptions:prescription_batch_download' %}?ids={{ p.id }}" class="btn btn-outline-primary" title="Batch (Single)"><i class="fas fa-layer-group"></i></a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No structured prescription has been created yet.</p>
+          <p><a class="btn btn-sm btn-primary" href="{% url 'prescriptions:create_prescription' record.patient.id %}?medical_record={{ record.id }}"><i class="fas fa-plus me-1"></i>Create Now</a></p>
+        {% endif %}
+      </div>
+    </div>
+    {% if not can_create_structured and linked_prescriptions|length == 1 %}
+      <div class="alert alert-info mt-3">Only one structured prescription is usually needed per encounter; create more only if clinically necessary.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

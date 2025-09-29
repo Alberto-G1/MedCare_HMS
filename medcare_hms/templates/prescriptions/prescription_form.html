@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% block title %}New Prescription{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2>Create Prescription for {{ patient.user.get_full_name }}</h2>
+  {% if linked_record %}
+  <div class="alert alert-info">
+    Linked to Medical Record #{{ linked_record.id }} ({{ linked_record.record_date|date:'Y-m-d' }}){% if linked_record.appointment %} – Appointment {{ linked_record.appointment.appointment_date|date:'Y-m-d' }}{% endif %}.<br>
+    {% if linked_record.prescription %}<strong>Legacy Text Found:</strong> Pre-filled into notes; you can edit or remove it.{% endif %}
+  </div>
+  {% endif %}
+  <form method="post" id="prescription-form">
+    {% csrf_token %}
+    <div class="card mb-3">
+      <div class="card-header">Prescription Details</div>
+      <div class="card-body">{{ form.as_p }}</div>
+    </div>
+    <div class="card mb-3">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Medications</span>
+        <small class="text-muted">Leave unused rows blank</small>
+      </div>
+      <div class="card-body">
+        {{ formset.management_form }}
+        <div id="medication-forms">
+        {% for f in formset %}
+          <div class="medication-form border rounded p-3 mb-3">
+            <div class="row g-2">
+              <div class="col-md-3">{{ f.medication_name.label_tag }} {{ f.medication_name }}</div>
+              <div class="col-md-2">{{ f.dosage.label_tag }} {{ f.dosage }}</div>
+              <div class="col-md-2">{{ f.frequency.label_tag }} {{ f.frequency }}</div>
+              <div class="col-md-2">{{ f.duration_days.label_tag }} {{ f.duration_days }}</div>
+              <div class="col-md-3">{{ f.instructions.label_tag }} {{ f.instructions }}</div>
+            </div>
+            {% if f.DELETE %}<div class="form-check mt-2">{{ f.DELETE }} <label class="form-check-label">Remove</label></div>{% endif %}
+          </div>
+        {% endfor %}
+        </div>
+        <button type="button" id="add-medication" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus"></i> Add Medication</button>
+      </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Save Prescription</button>
+  </form>
+</div>
+<template id="empty-form-template">
+  <div class="medication-form border rounded p-3 mb-3">
+    <div class="row g-2">
+      <div class="col-md-3">__medication_name__</div>
+      <div class="col-md-2">__dosage__</div>
+      <div class="col-md-2">__frequency__</div>
+      <div class="col-md-2">__duration_days__</div>
+      <div class="col-md-3">__instructions__</div>
+    </div>
+  </div>
+</template>
+<script>
+  (function(){
+    const addBtn = document.getElementById('add-medication');
+    if(!addBtn) return;
+    const container = document.getElementById('medication-forms');
+    const totalFormsInput = document.querySelector('#id_medications-TOTAL_FORMS');
+    // Django inline formset default prefix: modelname lowercase plural - our formset uses model related_name 'medications'
+    // Confirm by inspecting management_form html if different adjust below.
+    const template = document.getElementById('empty-form-template').innerHTML;
+
+    addBtn.addEventListener('click', function(){
+      const currentCount = parseInt(totalFormsInput.value, 10);
+      const newIndex = currentCount;
+      // Build blank inputs mimicking existing ones (simpler than cloning hidden empty form since we didn't render one)
+      // We recreate the widgets manually for brevity; could alternatively render an extra empty form server-side.
+      const html = template
+        .replace('__medication_name__', `<label for="id_medications-${newIndex}-medication_name" class="form-label">Medication name:</label><input type="text" name="medications-${newIndex}-medication_name" class="form-control" id="id_medications-${newIndex}-medication_name">`)
+        .replace('__dosage__', `<label for="id_medications-${newIndex}-dosage" class="form-label">Dosage:</label><input type="text" name="medications-${newIndex}-dosage" class="form-control" id="id_medications-${newIndex}-dosage">`)
+        .replace('__frequency__', `<label for="id_medications-${newIndex}-frequency" class="form-label">Frequency:</label><input type="text" name="medications-${newIndex}-frequency" class="form-control" id="id_medications-${newIndex}-frequency">`)
+        .replace('__duration_days__', `<label for="id_medications-${newIndex}-duration_days" class="form-label">Duration days:</label><input type="number" name="medications-${newIndex}-duration_days" min="1" class="form-control" id="id_medications-${newIndex}-duration_days">`)
+        .replace('__instructions__', `<label for="id_medications-${newIndex}-instructions" class="form-label">Instructions:</label><textarea name="medications-${newIndex}-instructions" rows="2" class="form-control" id="id_medications-${newIndex}-instructions"></textarea>`);
+      container.insertAdjacentHTML('beforeend', html);
+      totalFormsInput.value = newIndex + 1;
+    });
+  })();
+</script>
+{% endblock %}

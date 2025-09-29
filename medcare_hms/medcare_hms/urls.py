@@ -31,6 +31,8 @@ urlpatterns = [
     path('billing/', include('billing.urls')),
     path('chat/', include('chat.urls', namespace='chat')),
     path('notifications/', include('notifications.urls', namespace='notifications')),
+    path('reports/', include('reports.urls', namespace='reports')),
+    path('prescriptions/', include('prescriptions.urls', namespace='prescriptions')),
     path('', RedirectView.as_view(url='/accounts/login/', permanent=True)),
 ]
 

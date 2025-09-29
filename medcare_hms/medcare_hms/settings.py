@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'chat',
     'notifications',
     'django_filters',
+    'reports',
+    'prescriptions',
 ]
 
 # Set the ASGI application entry point

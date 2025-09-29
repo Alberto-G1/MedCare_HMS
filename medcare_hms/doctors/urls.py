@@ -16,6 +16,7 @@ urlpatterns = [
     # Medical Record URLs
     path('appointments/<int:appointment_pk>/add-record/', views.add_medical_record_view, name='add_medical_record'),
     path('medical-records/', views.medical_record_list_view, name='medical_record_list'),
+    path('medical-records/<int:pk>/', views.medical_record_detail_view, name='medical_record_detail'),
 
     # Availability Management URLs
     path('availability/', views.manage_availability_view, name='manage_availability'),

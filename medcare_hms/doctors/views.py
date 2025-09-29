@@ -5,6 +5,7 @@ from accounts.decorators import doctor_required
 from .models import DoctorProfile
 from .forms import DoctorProfileForm
 from patients.models import Appointment, MedicalRecord
+from prescriptions.models import Prescription  # linkage for existing prescriptions
 from patients.forms import MedicalRecordForm
 from django.urls import reverse
 from notifications.utils import create_notification
@@ -125,6 +126,28 @@ def medical_record_list_view(request):
 
 @login_required
 @doctor_required
+def medical_record_detail_view(request, pk):
+    """Detailed view of a single medical record for the authoring doctor.
+
+    Shows legacy text prescription and any structured prescription(s) linked.
+    Provides a button to create a structured prescription if none exist yet.
+    """
+    record = get_object_or_404(
+        MedicalRecord.objects.select_related('patient__user', 'doctor__user', 'appointment'),
+        pk=pk,
+        doctor__user=request.user
+    )
+    linked_prescriptions = record.linked_prescriptions.all().select_related('doctor__user', 'patient__user')
+    can_create_structured = not linked_prescriptions.exists()
+    return render(request, 'doctors/medical_record_detail.html', {
+        'record': record,
+        'linked_prescriptions': linked_prescriptions,
+        'can_create_structured': can_create_structured,
+    })
+
+
+@login_required
+@doctor_required
 def add_medical_record_view(request, appointment_pk):
     appointment = get_object_or_404(Appointment, pk=appointment_pk)
     # Security check
@@ -144,7 +167,8 @@ def add_medical_record_view(request, appointment_pk):
             appointment.status = 'Completed'
             appointment.save()
             messages.success(request, "Medical record added and appointment marked as completed.")
-            return redirect('doctors:doctor_appointments')
+            # Redirect doctor straight into structured prescription creation, passing medical_record id
+            return redirect(reverse('prescriptions:create_prescription', args=[appointment.patient.id]) + f"?medical_record={record.id}")
     else:
         form = MedicalRecordForm()
 

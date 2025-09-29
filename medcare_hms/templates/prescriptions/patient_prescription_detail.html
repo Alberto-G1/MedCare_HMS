@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Prescription #{{ prescription.id }}{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Prescription #{{ prescription.id }}</h2>
+  <a href="{% url 'prescriptions:prescription_download' prescription.id %}" class="btn btn-outline-secondary"><i class="fas fa-download me-1"></i>Download PDF</a>
+  </div>
+  <div class="card mb-3">
+    <div class="card-body">
+      <p><strong>Doctor:</strong> {{ prescription.doctor.user.get_full_name }}</p>
+      <p><strong>Status:</strong> {{ prescription.get_status_display }}</p>
+      <p><strong>Issued:</strong> {{ prescription.created_at|date:'Y-m-d H:i' }}</p>
+      {% if prescription.notes %}<p><strong>Notes:</strong><br>{{ prescription.notes|linebreaks }}</p>{% endif %}
+    </div>
+  </div>
+  <h4>Medications</h4>
+  <ul class="list-group mb-4">
+    {% for m in prescription.medications.all %}
+      <li class="list-group-item">
+        <strong>{{ m.medication_name }}</strong> – {{ m.dosage }} – {{ m.frequency }} for {{ m.duration_days }} day(s)
+        {% if m.instructions %}<br><small class="text-muted">{{ m.instructions }}</small>{% endif %}
+      </li>
+    {% empty %}
+      <li class="list-group-item text-muted">No medications recorded.</li>
+    {% endfor %}
+  </ul>
+  <a href="{% url 'prescriptions:patient_prescriptions' %}" class="btn btn-secondary">Back</a>
+</div>
+{% endblock %}
