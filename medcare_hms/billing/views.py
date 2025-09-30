@@ -17,6 +17,8 @@ from datetime import date
 from django.urls import reverse
 from notifications.utils import create_notification 
 from .filters import BillFilter
+from django.http import HttpResponse
+import io
 
 staff_decorators = [login_required, receptionist_required]
 
@@ -203,6 +205,301 @@ class BillReceiptView(DetailView):
     model = Bill
     template_name = 'billing/bill_receipt.html'
     context_object_name = 'bill'
+
+
+@login_required
+@receptionist_required
+def bill_pdf_view(request, pk):
+    """Generate a downloadable PDF invoice/receipt for a single bill."""
+    bill = get_object_or_404(Bill.objects.select_related('patient__user'), pk=pk)
+    try:
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.utils import ImageReader
+        from reportlab.lib import colors
+        from reportlab.lib.units import mm
+    except ImportError:
+        response = HttpResponse(content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename="bill_{bill.pk}.txt"'
+        lines = [
+            f"Bill #{bill.pk}",
+            f"Patient: {bill.patient.user.get_full_name()}",
+            f"Status: {bill.status}",
+            f"Total: {bill.total_amount}",
+            f"Paid: {bill.amount_paid}",
+            f"Due: {bill.amount_due}",
+            "Items:",
+        ]
+        for item in bill.items.all():
+            lines.append(f" - {item.description} x{item.quantity} @ {item.unit_price} = {item.amount}")
+        response.write("\n".join(lines))
+        return response
+    buffer = io.BytesIO()
+    p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+    margin_x = 40
+    y = height - 50
+
+    # Utility draw line with auto page break
+    def draw_text(text, x, font=('Helvetica', 10), leading=16):
+        nonlocal y
+        if y < 70:
+            p.showPage(); y = height - 50
+        p.setFont(*font)
+        p.drawString(x, y, text)
+        y -= leading
+
+    # Load assets (logo + patient profile picture)
+    logo_path = None
+    patient_photo_path = None
+    try:
+        from django.conf import settings
+        from pathlib import Path
+        static_logo = Path(settings.BASE_DIR) / 'static' / 'images' / 'logo.png'
+        if static_logo.exists():
+            logo_path = str(static_logo)
+        # Patient picture (if stored via ImageField with relative path)
+        if bill.patient.profile_picture and bill.patient.profile_picture.name:
+            # If already an absolute path-like, else join with MEDIA_ROOT
+            media_candidate = Path(settings.BASE_DIR) / bill.patient.profile_picture.name
+            if media_candidate.exists():
+                patient_photo_path = str(media_candidate)
+    except Exception:
+        pass
+
+    # Header band
+    header_height = 60
+    p.setFillColorRGB(0.95, 0.95, 0.98)
+    p.rect(0, y - header_height + 20, width, header_height, fill=1, stroke=0)
+    p.setFillColorRGB(0,0,0)
+
+    if logo_path:
+        try:
+            p.drawImage(ImageReader(logo_path), margin_x, y - 40, width=55, height=55, preserveAspectRatio=True, mask='auto')
+        except Exception:
+            pass
+
+    # Title
+    p.setFont('Helvetica-Bold', 20)
+    p.drawString(margin_x + (65 if logo_path else 0), y - 5, 'MedCare Hospital')
+    p.setFont('Helvetica', 9)
+    p.drawString(margin_x + (65 if logo_path else 0), y - 20, 'Patient Billing Statement')
+    y -= 70
+
+    # Patient info section with optional photo box
+    info_top = y
+    photo_box_w = 80
+    if patient_photo_path:
+        try:
+            p.drawImage(ImageReader(patient_photo_path), width - margin_x - photo_box_w, y - 10, width=photo_box_w, height=photo_box_w, preserveAspectRatio=True, mask='auto')
+        except Exception:
+            # Fallback silent
+            pass
+    p.setFont('Helvetica-Bold', 12)
+    p.drawString(margin_x, y, bill.patient.user.get_full_name() or bill.patient.user.username)
+    y -= 18
+    p.setFont('Helvetica', 10)
+    draw_text(f"Bill Date: {bill.bill_date.strftime('%Y-%m-%d')}", margin_x)
+    if bill.due_date:
+        draw_text(f"Due Date: {bill.due_date.strftime('%Y-%m-%d')}", margin_x)
+    draw_text(f"Status: {bill.status}", margin_x)
+    draw_text(f"Payment Method: {bill.payment_method or 'N/A'}", margin_x)
+
+    # Divider
+    p.setStrokeColorRGB(0.75,0.75,0.85)
+    p.setLineWidth(0.6)
+    p.line(margin_x, y, width - margin_x, y)
+    y -= 20
+
+    # Items table header
+    p.setFont('Helvetica-Bold', 11)
+    p.drawString(margin_x, y, 'Description')
+    p.drawString(margin_x + 250, y, 'Qty')
+    p.drawString(margin_x + 300, y, 'Unit Price')
+    p.drawString(margin_x + 400, y, 'Amount')
+    y -= 14
+    p.setLineWidth(0.4)
+    p.line(margin_x, y, width - margin_x, y)
+    y -= 10
+
+    p.setFont('Helvetica', 10)
+    for item in bill.items.all():
+        if y < 100:
+            p.showPage(); y = height - 60
+            p.setFont('Helvetica-Bold', 11)
+            p.drawString(margin_x, y, 'Description')
+            p.drawString(margin_x + 250, y, 'Qty')
+            p.drawString(margin_x + 300, y, 'Unit Price')
+            p.drawString(margin_x + 400, y, 'Amount')
+            y -= 14
+            p.setFont('Helvetica', 10)
+        p.drawString(margin_x, y, item.description[:45])
+        p.drawRightString(margin_x + 280, y, str(item.quantity))
+        p.drawRightString(margin_x + 380, y, f"{item.unit_price}")
+        p.drawRightString(width - margin_x, y, f"{item.amount}")
+        y -= 16
+
+    # Summary box
+    y -= 5
+    p.setLineWidth(0.8)
+    p.setStrokeColorRGB(0.3,0.3,0.5)
+    box_height = 70
+    box_y = y - box_height + 15
+    p.roundRect(margin_x, box_y, 220, box_height, 6, stroke=1, fill=0)
+    p.setFont('Helvetica-Bold',11)
+    p.drawString(margin_x + 10, box_y + box_height - 20, 'Summary')
+    p.setFont('Helvetica',10)
+    p.drawString(margin_x + 10, box_y + box_height - 38, f"Total: {bill.total_amount}")
+    p.drawString(margin_x + 10, box_y + box_height - 54, f"Paid: {bill.amount_paid}")
+    p.drawString(margin_x + 10, box_y + box_height - 70, f"Due: {bill.amount_due}")
+
+    # Signature line
+    p.setFont('Helvetica',10)
+    p.drawString(width - margin_x - 180, box_y + box_height - 20, 'Authorized Signature: ______________________')
+    p.drawString(width - margin_x - 180, box_y + box_height - 38, f"Date: {timezone.now().strftime('%Y-%m-%d')}")
+
+    # Footer
+    p.setFont('Helvetica-Oblique',8)
+    p.setFillColorRGB(0.4,0.4,0.4)
+    p.drawString(margin_x, 30, 'Generated by MedCare HMS — Confidential')
+
+    p.showPage(); p.save()
+    pdf = buffer.getvalue(); buffer.close()
+
+    # Build friendly filename: "<FirstName>'s Bill.pdf"
+    first_name = bill.patient.user.first_name or bill.patient.user.username
+    safe_first = first_name.replace(' ', '_')
+    filename = f"{safe_first}'s Bill.pdf" if not safe_first.endswith("'s") else f"{safe_first} Bill.pdf"
+
+    resp = HttpResponse(pdf, content_type='application/pdf')
+    resp['Content-Disposition'] = f"attachment; filename=\"{filename}\""
+    return resp
+
+@login_required
+@receptionist_required
+def bill_batch_pdf_view(request):
+    """Generate a merged PDF for multiple bills (?ids=1,2,3)."""
+    ids_param = request.GET.get('ids','')
+    id_list = [int(p.strip()) for p in ids_param.split(',') if p.strip().isdigit()]
+    qs = Bill.objects.filter(pk__in=id_list).select_related('patient__user')
+    if not qs.exists():
+        messages.error(request,'No bills selected for batch export.')
+        return redirect('billing:bill_list')
+    try:
+        from reportlab.pdfgen import canvas
+        from reportlab.lib.pagesizes import A4
+        from reportlab.lib.utils import ImageReader
+    except ImportError:
+        return HttpResponse('ReportLab not installed', status=500)
+    buffer = io.BytesIO(); p = canvas.Canvas(buffer, pagesize=A4)
+    width, height = A4
+
+    # Preload logo if available
+    logo_path = None
+    try:
+        from django.conf import settings
+        from pathlib import Path
+        static_logo = Path(settings.BASE_DIR) / 'static' / 'images' / 'logo.png'
+        if static_logo.exists():
+            logo_path = str(static_logo)
+    except Exception:
+        pass
+
+    for bill in qs.order_by('pk'):
+        margin_x = 40
+        y = height - 50
+
+        # Header band
+        header_height = 55
+        p.setFillColorRGB(0.95, 0.95, 0.98)
+        p.rect(0, y - header_height + 15, width, header_height, fill=1, stroke=0)
+        p.setFillColorRGB(0,0,0)
+        if logo_path:
+            try:
+                p.drawImage(ImageReader(logo_path), margin_x, y - 38, width=50, height=50, preserveAspectRatio=True, mask='auto')
+            except Exception:
+                pass
+        p.setFont('Helvetica-Bold', 18)
+        p.drawString(margin_x + (60 if logo_path else 0), y - 5, 'MedCare Hospital')
+        p.setFont('Helvetica', 9)
+        p.drawString(margin_x + (60 if logo_path else 0), y - 20, 'Batch Billing Statement')
+        y -= 65
+
+        # Patient / Bill meta (without explicit Bill # label to keep professional tone)
+        p.setFont('Helvetica-Bold', 12)
+        full_name = bill.patient.user.get_full_name() or bill.patient.user.username
+        p.drawString(margin_x, y, full_name)
+        y -= 18
+        p.setFont('Helvetica', 10)
+        p.drawString(margin_x, y, f"Bill Date: {bill.bill_date.strftime('%Y-%m-%d')}")
+        y -= 14
+        if bill.due_date:
+            p.drawString(margin_x, y, f"Due Date: {bill.due_date.strftime('%Y-%m-%d')}")
+            y -= 14
+        p.drawString(margin_x, y, f"Status: {bill.status}")
+        y -= 14
+        p.drawString(margin_x, y, f"Payment Method: {bill.payment_method or 'N/A'}")
+        y -= 20
+
+        # Items table header
+        p.setStrokeColorRGB(0.75,0.75,0.85); p.setLineWidth(0.6)
+        p.line(margin_x, y, width - margin_x, y)
+        y -= 16
+        p.setFont('Helvetica-Bold', 10)
+        p.drawString(margin_x, y, 'Description')
+        p.drawString(margin_x + 250, y, 'Qty')
+        p.drawString(margin_x + 300, y, 'Unit Price')
+        p.drawString(margin_x + 400, y, 'Amount')
+        y -= 14
+        p.setLineWidth(0.4)
+        p.line(margin_x, y, width - margin_x, y)
+        y -= 10
+
+        p.setFont('Helvetica', 10)
+        for item in bill.items.all():
+            if y < 90:
+                p.showPage(); y = height - 60
+                # Re-draw table header on new page
+                p.setFont('Helvetica-Bold', 10)
+                p.drawString(margin_x, y, 'Description')
+                p.drawString(margin_x + 250, y, 'Qty')
+                p.drawString(margin_x + 300, y, 'Unit Price')
+                p.drawString(margin_x + 400, y, 'Amount')
+                y -= 14
+                p.line(margin_x, y, width - margin_x, y)
+                y -= 10
+                p.setFont('Helvetica', 10)
+            p.drawString(margin_x, y, item.description[:45])
+            p.drawRightString(margin_x + 280, y, str(item.quantity))
+            p.drawRightString(margin_x + 380, y, f"{item.unit_price}")
+            p.drawRightString(width - margin_x, y, f"{item.amount}")
+            y -= 16
+
+        # Summary line
+        y -= 8
+        p.setFont('Helvetica-Bold', 10)
+        p.drawString(margin_x, y, f"Total: {bill.total_amount}   Paid: {bill.amount_paid}   Due: {bill.amount_due}")
+        y -= 30
+        p.setFont('Helvetica-Oblique',8)
+        p.setFillColorRGB(0.4,0.4,0.4)
+        p.drawString(margin_x, y, 'Generated by MedCare HMS')
+        p.showPage()
+
+    p.save(); pdf = buffer.getvalue(); buffer.close()
+
+    # Friendly filename logic for batch: If one bill, mimic single; if multiple, use first name + count.
+    if qs.count() == 1:
+        first = qs.first().patient.user.first_name or qs.first().patient.user.username
+        safe_first = first.replace(' ', '_')
+        filename = f"{safe_first}'s Bill.pdf" if not safe_first.endswith("'s") else f"{safe_first} Bill.pdf"
+    else:
+        first = qs.first().patient.user.first_name or qs.first().patient.user.username
+        safe_first = first.replace(' ', '_')
+        filename = f"{safe_first}_and_{qs.count()-1}_others_Bills.pdf"
+
+    resp = HttpResponse(pdf, content_type='application/pdf')
+    resp['Content-Disposition'] = f'attachment; filename="{filename}"'
+    return resp
 
 
 @login_required

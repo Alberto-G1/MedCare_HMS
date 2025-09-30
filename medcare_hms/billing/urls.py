@@ -16,6 +16,8 @@ urlpatterns = [
     
     # --- Bill Management ---
     path('<int:pk>/', views.BillDetailView.as_view(), name='bill_detail'),
+    path('<int:pk>/download/', views.bill_pdf_view, name='bill_download'),
+    path('batch/download/', views.bill_batch_pdf_view, name='bill_batch_download'),
     path('<int:bill_id>/add-item/', views.add_bill_item_view, name='add_bill_item'),
     path('<int:bill_id>/update-status/', views.update_payment_status_view, name='update_bill_status'),
     path('<int:pk>/receipt/', views.BillReceiptView.as_view(), name='bill_receipt'),
