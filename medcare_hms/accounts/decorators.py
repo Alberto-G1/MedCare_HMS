@@ -20,18 +20,23 @@ def role_required(allowed_roles=[]):
             if not request.user.is_authenticated:
                 return redirect('login') # Or your login URL
 
-            # 2. Check if the user has a UserProfile
-            # The hasattr check is crucial for newly created users or superusers
+            # 2. Superusers always allowed (admin override)
+            if request.user.is_superuser:
+                # Optionally ensure a profile exists for consistency
+                from accounts.models import UserProfile
+                if not hasattr(request.user, 'userprofile'):
+                    # Create a synthetic ADMIN profile so role-based UI works
+                    UserProfile.objects.create(user=request.user, role='ADMIN')
+                return view_func(request, *args, **kwargs)
+
+            # 3. Ensure profile exists; if not, deny
             if not hasattr(request.user, 'userprofile'):
                 raise PermissionDenied("You do not have a role assigned.")
-            
-            # 3. Check if the user's role is in the allowed list
+
+            # 4. Check role membership
             if request.user.userprofile.role in allowed_roles:
-                # If they have the role, let them access the view
                 return view_func(request, *args, **kwargs)
-            else:
-                # If they are logged in but have the wrong role, deny permission
-                raise PermissionDenied("You do not have permission to access this page.")
+            raise PermissionDenied("You do not have permission to access this page.")
         
         return _wrapped_view
     return decorator

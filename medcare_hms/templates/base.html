@@ -806,16 +806,27 @@
                     </li>
                 </ul>
 
-                                <!-- Notification Bell -->
-                <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-light position-relative">
-                    <i class="fas fa-bell"></i>
-                    {% if unread_notifications_count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <!-- Notification Dropdown (Public/Patient Navbar) -->
+                <div class="dropdown" id="notifDropdownPrimary">
+                    <button class="btn btn-outline-light position-relative dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span id="notifBadgePrimary" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if unread_notifications_count == 0 %}d-none{% endif %}">
                             {{ unread_notifications_count }}
-                            <span class="visually-hidden">unread notifications</span>
                         </span>
-                    {% endif %}
-                </a>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="min-width:320px; max-height:420px; overflow-y:auto;">
+                        <div class="d-flex justify-content-between align-items-center border-bottom px-3 py-2">
+                            <strong>Notifications</strong>
+                            <button class="btn btn-sm btn-link" id="markAllReadPrimary">Mark all</button>
+                        </div>
+                        <div id="notifListPrimary" class="list-group list-group-flush small">
+                            <div class="p-3 text-center text-muted" id="notifLoadingPrimary">Loading...</div>
+                        </div>
+                        <div class="text-center border-top py-2 small">
+                            <a href="{% url 'notifications:notification_list' %}">View all</a>
+                        </div>
+                    </div>
+                </div>
 
                 <div class="d-flex align-items-center flex-column flex-lg-row gap-3">
                     {% if user.is_authenticated %}
@@ -1053,16 +1064,27 @@
             </div>
 
             <div class="d-flex align-items-center gap-3">
-                <!-- Notification Bell -->
-                <a href="{% url 'notifications:notification_list' %}" class="btn btn-outline-light position-relative">
-                    <i class="fas fa-bell"></i>
-                    {% if unread_notifications_count > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                <!-- Notification Dropdown (Admin Topbar) -->
+                <div class="dropdown" id="notifDropdownAdmin">
+                    <button class="btn btn-outline-light position-relative dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell"></i>
+                        <span id="notifBadgeAdmin" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if unread_notifications_count == 0 %}d-none{% endif %}">
                             {{ unread_notifications_count }}
-                            <span class="visually-hidden">unread notifications</span>
                         </span>
-                    {% endif %}
-                </a>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end p-0 shadow" style="min-width:320px; max-height:420px; overflow-y:auto;">
+                        <div class="d-flex justify-content-between align-items-center border-bottom px-3 py-2">
+                            <strong>Notifications</strong>
+                            <button class="btn btn-sm btn-link" id="markAllReadAdmin">Mark all</button>
+                        </div>
+                        <div id="notifListAdmin" class="list-group list-group-flush small">
+                            <div class="p-3 text-center text-muted" id="notifLoadingAdmin">Loading...</div>
+                        </div>
+                        <div class="text-center border-top py-2 small">
+                            <a href="{% url 'notifications:notification_list' %}">View all</a>
+                        </div>
+                    </div>
+                </div>
                 <div class="user-profile-nav">
                     <div class="user-profile-toggle" id="userProfileToggle">
                         <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
@@ -1363,4 +1385,118 @@
         });
     </script>
 </body>
+<script>
+// Notifications Dropdown Logic
+(function(){
+    const endpoints = {
+        data: '{% url "notifications:notification_dropdown_data" %}',
+        markAll: '{% url "notifications:mark_all_notifications_read" %}',
+        markOne: (id) => '{% url "notifications:mark_notification_read" 0 %}'.replace('/0/','/'+id+'/')
+    };
+    const primaryList = document.getElementById('notifListPrimary');
+    const adminList = document.getElementById('notifListAdmin');
+    const badgePrimary = document.getElementById('notifBadgePrimary');
+    const badgeAdmin = document.getElementById('notifBadgeAdmin');
+    const markAllPrimary = document.getElementById('markAllReadPrimary');
+    const markAllAdmin = document.getElementById('markAllReadAdmin');
+
+    function renderList(container, data){
+        if(!container) return;
+        container.innerHTML='';
+        const makeItem = (n)=>{
+            const a = document.createElement('a');
+            a.href = n.link || '#';
+            a.className = 'list-group-item list-group-item-action d-flex justify-content-between align-items-start';
+            if(!n.is_read) a.classList.add('fw-semibold');
+            a.innerHTML = `<div class="me-2"><div>${n.message}</div><small class="text-muted">${n.timestamp}</small></div>`+
+                          `<button type="button" data-id="${n.id}" class="btn btn-sm btn-outline-secondary mark-one">✓</button>`;
+            return a;
+        };
+        if(data.unread.length===0 && data.recent_read.length===0){
+            container.innerHTML = '<div class="p-3 text-center text-muted">No notifications</div>';
+            return;
+        }
+        data.unread.forEach(n=>container.appendChild(makeItem(n)));
+        if(data.recent_read.length){
+            const sep = document.createElement('div');
+            sep.className='text-center text-muted small py-1 border-top';
+            sep.textContent='Recent';
+            container.appendChild(sep);
+            data.recent_read.forEach(n=>container.appendChild(makeItem(n)));
+        }
+    }
+
+    function updateBadges(count){
+        [badgePrimary, badgeAdmin].forEach(b=>{
+            if(!b) return;
+            if(count>0){ b.textContent = count; b.classList.remove('d-none'); }
+            else { b.classList.add('d-none'); }
+        });
+    }
+
+    async function fetchData(){
+        try{
+            const resp = await fetch(endpoints.data, {credentials:'same-origin'});
+            if(!resp.ok) return;
+            const data = await resp.json();
+            renderList(primaryList, data);
+            renderList(adminList, data);
+            updateBadges(data.unread_count);
+        }catch(e){/* silent */}
+    }
+
+    async function post(url){
+        const csrftoken = getCookie('csrftoken');
+        return fetch(url,{method:'POST', headers:{'X-CSRFToken':csrftoken}});
+    }
+
+    function getCookie(name){
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function delegateMark(container){
+        if(!container) return;
+        container.addEventListener('click', async (e)=>{
+            const btn = e.target.closest('.mark-one');
+            if(!btn) return;
+            e.preventDefault();
+            const id = btn.getAttribute('data-id');
+            const resp = await post(endpoints.markOne(id));
+            if(resp.ok){ fetchData(); }
+        });
+    }
+
+    [markAllPrimary, markAllAdmin].forEach(btn=>{
+        if(btn){
+            btn.addEventListener('click', async (e)=>{
+                e.preventDefault();
+                const resp = await post(endpoints.markAll);
+                if(resp.ok){ fetchData(); }
+            });
+        }
+    });
+
+    delegateMark(primaryList);
+    delegateMark(adminList);
+
+    // Fetch upon opening dropdown
+    document.querySelectorAll('#notifDropdownPrimary button,[data-bs-toggle="dropdown"], #notifDropdownAdmin button').forEach(el=>{
+        el.addEventListener('click', ()=>{ fetchData(); });
+    });
+
+    // Periodic refresh every 60s
+    setInterval(fetchData, 60000);
+})();
+</script>
 </html>

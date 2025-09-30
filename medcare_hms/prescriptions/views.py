@@ -9,7 +9,7 @@ from patients.models import MedicalRecord
 from .forms import PrescriptionForm, MedicationFormSet
 from notifications.utils import create_notification
 from django.urls import reverse
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, JsonResponse
 from django.db import models
 import io
 
@@ -299,3 +299,46 @@ def prescription_batch_download_view(request):
     response = HttpResponse(pdf, content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="prescriptions_batch.pdf"'
     return response
+
+
+@login_required
+@doctor_required
+def update_prescription_status_view(request, pk):
+    """Allow doctor to mark a prescription as COMPLETED or CANCELLED.
+
+    Accepts POST with 'status' field. Returns JSON if AJAX, else redirects back.
+    Sends notification to patient (and optionally to doctor for confirmation)."""
+    prescription = get_object_or_404(Prescription.objects.select_related('patient__user', 'doctor__user'), pk=pk)
+    if prescription.doctor is None or prescription.doctor.user != request.user:
+        return JsonResponse({'error': 'Not authorized'}, status=403)
+    new_status = (request.POST.get('status') or '').upper()
+    allowed = {'COMPLETED', 'CANCELLED'}
+    if new_status not in allowed:
+        return JsonResponse({'error': 'Invalid status'}, status=400)
+    if prescription.status == new_status:
+        return JsonResponse({'ok': True, 'status': prescription.status, 'message': 'No change'})
+    old_status = prescription.status
+    prescription.status = new_status
+    prescription.save(update_fields=['status', 'updated_at'])
+    # Notify patient of change
+    try:
+        create_notification(
+            recipient=prescription.patient.user,
+            message=f"Your prescription #{prescription.pk} status changed from {old_status.title()} to {new_status.title()}.",
+            link=reverse('prescriptions:patient_prescription_detail', args=[prescription.pk])
+        )
+    except Exception:
+        pass
+    # Optional: self notification for audit clarity
+    try:
+        create_notification(
+            recipient=prescription.doctor.user,
+            message=f"Prescription #{prescription.pk} marked as {new_status.title()}.",
+            link=reverse('prescriptions:doctor_prescription_detail', args=[prescription.pk])
+        )
+    except Exception:
+        pass
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': True, 'status': new_status})
+    messages.success(request, f'Prescription status updated to {new_status.title()}')
+    return redirect('prescriptions:doctor_prescription_detail', pk=prescription.pk)

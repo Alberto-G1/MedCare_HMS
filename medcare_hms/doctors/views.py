@@ -166,6 +166,20 @@ def add_medical_record_view(request, appointment_pk):
             # Mark the appointment as Completed
             appointment.status = 'Completed'
             appointment.save()
+            # Notifications: patient gets informed of new medical record; doctor gets confirmation
+            try:
+                create_notification(
+                    recipient=record.patient.user,
+                    message=f"A new medical record from Dr. {record.doctor.user.get_full_name()} has been added (Appointment {appointment.appointment_date}).",
+                    link=reverse('patients:my_medical_record_detail', args=[record.id])
+                )
+                create_notification(
+                    recipient=record.doctor.user,
+                    message=f"Medical record saved for patient {record.patient.user.get_full_name()}.",
+                    link=reverse('doctors:medical_record_detail', args=[record.id])
+                )
+            except Exception:
+                pass
             messages.success(request, "Medical record added and appointment marked as completed.")
             # Redirect doctor straight into structured prescription creation, passing medical_record id
             return redirect(reverse('prescriptions:create_prescription', args=[appointment.patient.id]) + f"?medical_record={record.id}")

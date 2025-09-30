@@ -10,12 +10,15 @@
     </div>
 </div>
 
-<!-- KPI Stat Cards -->
-<div class="row mb-4">
-    <div class="col-md-3"><div class="card card-custom"><div class="card-body"><h6>Total Appointments</h6><h4 class="fw-bold">{{ total_appointments }}</h4></div></div></div>
-    <div class="col-md-3"><div class="card card-custom"><div class="card-body"><h6>Completed Appointments</h6><h4 class="fw-bold">{{ completed_appointments }}</h4></div></div></div>
-    <div class="col-md-3"><div class="card card-custom"><div class="card-body"><h6>Total Revenue</h6><h4 class="fw-bold">{{ total_revenue|currency_ugx }}</h4></div></div></div>
-    <div class="col-md-3"><div class="card card-custom"><div class="card-body"><h6>Outstanding Revenue</h6><h4 class="fw-bold">{{ outstanding_revenue|currency_ugx }}</h4></div></div></div>
+<!-- KPI Stat Cards (AJAX populated) -->
+<div class="row mb-4" id="kpi-cards">
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Total Appts</h6><h4 class="fw-bold" id="kpi-total-appts">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Completed</h6><h4 class="fw-bold" id="kpi-completed-appts">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Cancelled</h6><h4 class="fw-bold" id="kpi-cancelled-appts">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Active Rx</h6><h4 class="fw-bold" id="kpi-active-rx">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>New Patients</h6><h4 class="fw-bold" id="kpi-new-patients">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Total Revenue</h6><h4 class="fw-bold" id="kpi-total-revenue">—</h4></div></div></div>
+    <div class="col-md-2 mb-3"><div class="card card-custom h-100"><div class="card-body"><h6>Outstanding</h6><h4 class="fw-bold" id="kpi-outstanding-revenue">—</h4></div></div></div>
 </div>
 
 <!-- Charts Row -->
@@ -42,16 +45,23 @@
     <div class="col-lg-6 mb-4">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom"><h5 class="mb-0">Revenue per Month (Paid Bills)</h5></div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-                {% if rev_month_data != "[]" %}
-                    <canvas id="revenueChart"></canvas>
-                {% else %}
-                    <div class="text-center text-muted">
-                        <i class="fas fa-dollar-sign fa-3x mb-3"></i>
-                        <p>No revenue data available to generate a chart.</p>
-                    </div>
-                {% endif %}
-            </div>
+            <div class="card-body"><canvas id="revenueChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+<!-- Second Row of Charts -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header card-header-custom"><h5 class="mb-0">Revenue by Doctor (Top 10)</h5></div>
+            <div class="card-body"><canvas id="revenueDoctorChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header card-header-custom"><h5 class="mb-0">Prescription Activity</h5></div>
+            <div class="card-body"><canvas id="prescriptionsChart"></canvas></div>
         </div>
     </div>
 </div>
@@ -59,73 +69,75 @@
 
 {% block extra_js %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    
-    // --- Appointments Chart ---
-    const apptCtx = document.getElementById('appointmentsChart');
-    if (apptCtx) {
-        const appointmentsChart = new Chart(apptCtx, {
-            type: 'bar',
-            data: {
-                labels: {{ appt_month_labels|safe }},
-                datasets: [{
-                    label: '# of Appointments',
-                    data: {{ appt_month_data|safe }},
-                    backgroundColor: 'rgba(3, 169, 244, 0.7)', // Your --sky-blue color
-                    borderColor: 'rgba(3, 169, 244, 1)',
-                    borderWidth: 1
-                }]
-            }, // <-- Comma added here
-            options: { // <-- Moved to the correct level
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            // Ensure Y-axis only shows whole numbers for appointments
-                            stepSize: 1 
-                        }
-                    }
-                },
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
+document.addEventListener('DOMContentLoaded', async function() {
+    const formatCurrency = (v) => 'UGX ' + new Intl.NumberFormat().format(v);
 
-    // --- Revenue Chart ---
-    const revCtx = document.getElementById('revenueChart');
-    if (revCtx) {
-        const revenueChart = new Chart(revCtx, {
-            type: 'line',
-            data: {
-                labels: {{ rev_month_labels|safe }},
-                datasets: [{
-                    label: 'Revenue (UGX)',
-                    data: {{ rev_month_data|safe }},
-                    backgroundColor: 'rgba(0, 121, 107, 0.2)', // Your --primary-teal
-                    borderColor: 'rgba(0, 121, 107, 1)',
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }]
-            }, // <-- Comma added here
-            options: { // <-- Moved to the correct level
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            // Format Y-axis labels as currency
-                            callback: function(value, index, values) {
-                                return 'UGX ' + new Intl.NumberFormat().format(value);
-                            }
-                        }
-                    }
-                },
-                responsive: true,
-                maintainAspectRatio: false
-            }
-        });
-    }
+    // Fetch KPIs
+    fetch('{% url "reports:kpi_summary_api" %}')
+        .then(r=>{ if(!r.ok) throw new Error('KPI fetch failed'); return r.json(); })
+        .then(data => {
+            document.getElementById('kpi-total-appts').textContent = data.totalAppointments;
+            document.getElementById('kpi-completed-appts').textContent = data.completedAppointments;
+            document.getElementById('kpi-cancelled-appts').textContent = data.cancelledAppointments;
+            document.getElementById('kpi-active-rx').textContent = data.activePrescriptions;
+            document.getElementById('kpi-new-patients').textContent = data.newPatients30Days;
+            document.getElementById('kpi-total-revenue').textContent = formatCurrency(data.totalRevenue);
+            document.getElementById('kpi-outstanding-revenue').textContent = formatCurrency(data.outstandingRevenue);
+        })
+        .catch(e=>console.warn(e));
+
+    // Appointments over time
+    fetch('{% url "reports:appointments_over_time_api" %}')
+        .then(r=>{ if(!r.ok) throw new Error('Appt chart fetch failed'); return r.json(); })
+        .then(({labels, data}) => {
+            const ctx = document.getElementById('appointmentsChart');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'bar',
+                data: { labels, datasets: [{ label: '# of Appointments', data, backgroundColor: 'rgba(3,169,244,0.7)', borderColor: 'rgba(3,169,244,1)', borderWidth: 1 }]},
+                options: { scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }, responsive:true, maintainAspectRatio:false }
+            });
+        })
+        .catch(e=>console.warn(e));
+
+    // Revenue over time
+    fetch('{% url "reports:revenue_over_time_api" %}')
+        .then(r=>{ if(!r.ok) throw new Error('Revenue chart fetch failed'); return r.json(); })
+        .then(({labels, data}) => {
+            const ctx = document.getElementById('revenueChart'); if(!ctx) return;
+            new Chart(ctx, {
+                type: 'line',
+                data: { labels, datasets:[{ label:'Revenue (UGX)', data, backgroundColor:'rgba(0,121,107,0.2)', borderColor:'rgba(0,121,107,1)', borderWidth:2, tension:0.3, fill:true }]},
+                options: { scales:{ y:{ beginAtZero:true, ticks:{ callback:(v)=> formatCurrency(v) } } }, responsive:true, maintainAspectRatio:false }
+            });
+        })
+        .catch(e=>console.warn(e));
+
+    // Revenue by doctor
+    fetch('{% url "reports:revenue_by_doctor_api" %}')
+        .then(r=>{ if(!r.ok) throw new Error('Revenue by doctor fetch failed'); return r.json(); })
+        .then(({labels, data}) => {
+            const ctx = document.getElementById('revenueDoctorChart'); if(!ctx) return;
+            new Chart(ctx, {
+                type: 'horizontalBar' in Chart.controllers ? 'horizontalBar' : 'bar',
+                data: { labels, datasets:[{ label:'Revenue (UGX)', data, backgroundColor:'rgba(63,81,181,0.6)', borderColor:'rgba(63,81,181,1)', borderWidth:1 }]},
+                options: { indexAxis: 'y', scales:{ x:{ beginAtZero:true, ticks:{ callback:(v)=> formatCurrency(v) } } }, responsive:true, maintainAspectRatio:false }
+            });
+        })
+        .catch(e=>console.warn(e));
+
+    // Prescription activity
+    fetch('{% url "reports:prescriptions_activity_api" %}')
+        .then(r=>{ if(!r.ok) throw new Error('Prescription activity fetch failed'); return r.json(); })
+        .then(({labels, data}) => {
+            const ctx = document.getElementById('prescriptionsChart'); if(!ctx) return;
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: { labels, datasets:[{ data, backgroundColor:['#039be5','#00796b','#d32f2f'] }]},
+                options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom' } } }
+            });
+        })
+        .catch(e=>console.warn(e));
 });
 </script>
 {% endblock %}

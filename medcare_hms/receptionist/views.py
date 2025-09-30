@@ -176,8 +176,13 @@ def update_appointment_status_view(request, pk, status):
     appointment.save()
     # --- NOTIFICATION LOGIC ---
     patient_user = appointment.patient.user
-    message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been {status.lower()} by our staff."
-    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_appointments'))
+    patient_message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been {status.lower()} by our staff."
+    create_notification(recipient=patient_user, message=patient_message, link=reverse('patients:my_appointments'))
+    # Notify doctor only on rejection to reduce noise for approvals (already informed on booking)
+    if status == 'Rejected':
+        doctor_user = appointment.doctor.user
+        doctor_message = f"Appointment with patient {appointment.patient.user.get_full_name()} on {appointment.appointment_date} was rejected by reception."  # Could include time if needed
+        create_notification(recipient=doctor_user, message=doctor_message, link=reverse('doctors:doctor_appointments'))
     # --- END NOTIFICATION LOGIC ---
     messages.success(request, f"Appointment for {appointment.patient.user.get_full_name()} has been {status.lower()}.")
     return redirect('receptionist:appointment_list')
@@ -190,8 +195,12 @@ def cancel_appointment_view(request, pk):
     appointment.save()
     # --- NOTIFICATION LOGIC ---
     patient_user = appointment.patient.user
-    message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been cancelled by our staff."
-    create_notification(recipient=patient_user, message=message, link=reverse('patients:my_appointments'))
+    patient_message = f"Your appointment for {appointment.appointment_date} with Dr. {appointment.doctor.user.get_full_name()} has been cancelled by our staff."
+    create_notification(recipient=patient_user, message=patient_message, link=reverse('patients:my_appointments'))
+    # Notify doctor of cancellation (they were expecting the patient)
+    doctor_user = appointment.doctor.user
+    doctor_message = f"Appointment with patient {appointment.patient.user.get_full_name()} on {appointment.appointment_date} has been cancelled by reception."  # Include time if needed
+    create_notification(recipient=doctor_user, message=doctor_message, link=reverse('doctors:doctor_appointments'))
     # --- END NOTIFICATION LOGIC ---
     messages.info(request, 'The appointment has been cancelled.')
     return redirect('receptionist:appointment_list')

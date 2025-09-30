@@ -73,11 +73,12 @@
             </table>
         </div>
         <hr>
-        <div class="d-flex justify-content-end gap-2">
-            {% if bill.status != 'Unpaid' %}
-                <a href="{% url 'billing:bill_receipt' bill.pk %}" target="_blank" class="btn btn-sky"><i class="fas fa-print me-2"></i>Print Receipt</a>
-            {% endif %}
-        </div>
+    <div class="d-flex justify-content-end gap-2">
+      {% if bill.status != 'Unpaid' %}
+      <a href="{% url 'billing:bill_download' bill.pk %}" class="btn btn-outline-secondary"><i class="fas fa-download me-2"></i>Download PDF</a>
+      <a href="{% url 'billing:bill_batch_download' %}?ids={{ bill.pk }}" class="btn btn-outline-primary"><i class="fas fa-layer-group me-2"></i>Batch (Single)</a>
+      {% endif %}
+    </div>
     </div>
 </div>
 
