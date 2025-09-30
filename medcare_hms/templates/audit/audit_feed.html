@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Audit Feed | MedCare HMS{% endblock %}
+{% block content %}
+<div class="container-fluid fade-in-up">
+  <h2 class="mb-3 d-flex justify-content-between align-items-center">Audit Feed
+    <a class="btn btn-sm btn-outline-success" href="?action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}&export=csv">Export CSV</a>
+  </h2>
+  <form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-2">
+      <label class="form-label">Action</label>
+      <select name="action" class="form-select">
+        <option value="">All</option>
+        {% for a in actions %}
+          <option value="{{ a }}" {% if a == selected_action %}selected{% endif %}>{{ a }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Actor (partial)</label>
+      <input type="text" name="actor" value="{{ actor_search }}" class="form-control" placeholder="username or name" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Start Date</label>
+      <input type="date" name="start_date" value="{{ start_date }}" class="form-control" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">End Date</label>
+      <input type="date" name="end_date" value="{{ end_date }}" class="form-control" />
+    </div>
+    <div class="col-md-2">
+      <label class="form-label">Correlation ID</label>
+      <input type="text" name="correlation" value="{{ selected_correlation_id }}" class="form-control" placeholder="partial ok" />
+    </div>
+    <div class="col-md-1">
+      <label class="form-label">Page Size</label>
+      <select name="page_size" class="form-select">
+        {% if page_sizes %}
+          {% for size in page_sizes %}
+            <option value="{{ size }}" {% if page_size == size %}selected{% endif %}>{{ size }}</option>
+          {% endfor %}
+        {% else %}
+          <option value="5" {% if page_size == 5 %}selected{% endif %}>5</option>
+          <option value="10" {% if page_size == 10 %}selected{% endif %}>10</option>
+          <option value="15" {% if page_size == 15 %}selected{% endif %}>15</option>
+          <option value="20" {% if page_size == 20 %}selected{% endif %}>20</option>
+          <option value="25" {% if page_size == 25 %}selected{% endif %}>25</option>
+          <option value="50" {% if page_size == 50 %}selected{% endif %}>50</option>
+          <option value="100" {% if page_size == 100 %}selected{% endif %}>100</option>
+          <option value="200" {% if page_size == 200 %}selected{% endif %}>200</option>
+        {% endif %}
+      </select>
+    </div>
+    <div class="col-md-1 d-grid">
+      <label class="form-label" style="visibility:hidden;">Apply</label>
+      <button class="btn btn-sky" type="submit">Apply</button>
+    </div>
+    <div class="col-md-1 d-grid">
+      <label class="form-label" style="visibility:hidden;">Reset</label>
+      <a href="{% url 'audit:audit_feed' %}" class="btn btn-outline-secondary">Reset</a>
+    </div>
+  </form>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Time</th>
+          <th>Actor</th>
+          <th>Action</th>
+          <th>Target</th>
+          <th>Summary</th>
+          <th>Correlation</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in page_obj.object_list %}
+          <tr>
+            <td><small>{{ log.created_at|date:'Y-m-d H:i:s' }}</small></td>
+            <td>{% if log.actor %}{{ log.actor.username }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
+            <td><span class="badge bg-primary">{{ log.action }}</span></td>
+            <td>{{ log.target_model }}#{{ log.target_id }}</td>
+            <td style="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ log.summary }}">{{ log.summary }}</td>
+            <td>
+              {% if log.correlation_id %}
+                <a href="{% url 'audit:correlation_detail' log.correlation_id %}"><code style="font-size:0.7rem;">{{ log.correlation_id|slice:':8' }}…</code></a>
+              {% endif %}
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No audit events found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}
+  <nav aria-label="Audit pagination">
+    <ul class="pagination pagination-sm">
+      {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">«</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">«</span></li>
+      {% endif %}
+      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
+      {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">»</a></li>
+      {% else %}
+        <li class="page-item disabled"><span class="page-link">»</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+{% endblock %}

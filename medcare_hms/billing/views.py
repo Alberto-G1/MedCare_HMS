@@ -19,6 +19,7 @@ from notifications.utils import create_notification
 from .filters import BillFilter
 from django.http import HttpResponse
 import io
+from audit.utils import audit_log
 
 staff_decorators = [login_required, receptionist_required]
 
@@ -115,6 +116,7 @@ def create_bill_view(request):
         form = BillForm(request.POST)
         if form.is_valid():
             bill = form.save()
+            audit_log(actor=request.user, action='CREATE', target=bill, summary=f"Created bill for {bill.patient.user.username}")
 
             # --- NOTIFICATION LOGIC ---
             patient_user = bill.patient.user
@@ -140,6 +142,7 @@ def add_bill_item_view(request, bill_id):
             item = form.save(commit=False)
             item.bill = bill
             item.save()
+            audit_log(actor=request.user, action='CREATE', target=item, summary=f"Added item {item.description} to bill {bill.pk}")
             
             # Recalculate the bill's total amount
             total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
@@ -197,6 +200,7 @@ def update_payment_status_view(request, bill_id):
             bill.payment_method = payment_method
         
         bill.save()
+    audit_log(actor=request.user, action='UPDATE', target=bill, summary=f"Payment status updated to {bill.status}", details={'fields': ['status','amount_paid']})
 
     return redirect('billing:bill_detail', pk=bill.pk)
 
@@ -598,6 +602,7 @@ def delete_bill_item_view(request, pk):
         return redirect('billing:bill_detail', pk=bill.pk)
 
     if request.method == 'POST':
+        audit_log(actor=request.user, action='DELETE', target=item, summary=f"Deleted item {item.description} from bill {bill.pk}")
         item.delete()
         # Recalculate total
         total = bill.items.aggregate(total=Sum('amount'))['total'] or 0.00
@@ -614,6 +619,7 @@ def delete_bill_view(request, pk):
     bill = get_object_or_404(Bill, pk=pk)
     if request.method == 'POST':
         patient_name = bill.patient.user.get_full_name
+        audit_log(actor=request.user, action='DELETE', target=bill, summary=f"Deleted bill {bill.pk}")
         bill.delete()
         messages.success(request, f"Bill #{pk} for {patient_name} has been successfully deleted.")
         return redirect('billing:bill_list')
