@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.http import HttpResponse, QueryDict, JsonResponse
 from django.db import models
 import io
+from audit.utils import audit_log
 
 
 @login_required
@@ -46,6 +47,7 @@ def create_prescription_view(request, patient_id):
             prescription.save()
             med_formset.instance = prescription
             med_formset.save()
+            audit_log(actor=request.user, action='CREATE', target=prescription, summary='Created prescription', details={'fields': ['notes']})
             create_notification(
                 recipient=patient_profile.user,
                 message=f"A new prescription (#{prescription.pk}) has been issued to you.",
@@ -320,6 +322,7 @@ def update_prescription_status_view(request, pk):
     old_status = prescription.status
     prescription.status = new_status
     prescription.save(update_fields=['status', 'updated_at'])
+    audit_log(actor=request.user, action='STATUS', target=prescription, summary=f'Status change {old_status} -> {new_status}', details={'before': old_status, 'after': new_status})
     # Notify patient of change
     try:
         create_notification(

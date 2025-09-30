@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django_filters',
     'reports',
     'prescriptions',
+    'audit',
 ]
 
 # Set the ASGI application entry point
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'audit.middleware.CorrelationIdMiddleware',
 ]
 
 ROOT_URLCONF = 'medcare_hms.urls'

@@ -64,11 +64,14 @@ def create_sample_data(apps, schema_editor):
                 status='Paid',
                 bill_date=appt_date + timedelta(days=1)
             )
+            # Historical model in migrations won't have the BillItem.save override, so
+            # we must explicitly set the computed "amount" to avoid NOT NULL errors.
             BillItem.objects.create(
                 bill=bill,
                 description='Consultation Fee',
                 quantity=1,
-                unit_price=total_amount
+                unit_price=total_amount,
+                amount=total_amount  # quantity * unit_price
             )
 
 class Migration(migrations.Migration):
