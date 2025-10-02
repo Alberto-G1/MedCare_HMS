@@ -1,0 +1,41 @@
+{% load static %}
+<div class="profile-image-container" style="position: relative; display: inline-block;">
+    <img src="{{ image_url }}" 
+         alt="{{ user.get_full_name|default:user.username }}" 
+         class="{{ css_class }}"
+         style="width: {{ size }}px; height: {{ size }}px; border-radius: {% if 'rounded' in css_class %}50%{% else %}8px{% endif %}; object-fit: cover; background: {{ role_color }};"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+    
+    {% if show_fallback %}
+    <div class="profile-initials-fallback" 
+         style="display: none; width: {{ size }}px; height: {{ size }}px; background: {{ role_color }}; border-radius: {% if 'rounded' in css_class %}50%{% else %}8px{% endif %}; color: white; font-weight: bold; align-items: center; justify-content: center; font-size: {% widthratio size 2 1 %}px; font-family: 'Poppins', sans-serif;">
+        {{ initials }}
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced error handling for profile images
+    const profileImages = document.querySelectorAll('.{{ css_class }}');
+    profileImages.forEach(function(img) {
+        img.addEventListener('error', function() {
+            // Hide the image and show the fallback
+            this.style.display = 'none';
+            const fallback = this.nextElementSibling;
+            if (fallback && fallback.classList.contains('profile-initials-fallback')) {
+                fallback.style.display = 'flex';
+            }
+        });
+        
+        img.addEventListener('load', function() {
+            // If image loads successfully, hide fallback
+            const fallback = this.nextElementSibling;
+            if (fallback && fallback.classList.contains('profile-initials-fallback')) {
+                fallback.style.display = 'none';
+            }
+            this.style.display = 'block';
+        });
+    });
+});
+</script>

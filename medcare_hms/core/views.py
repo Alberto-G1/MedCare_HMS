@@ -18,6 +18,10 @@ def team_view(request):
 def team_detail_view(request):
     return render(request, 'public/team-detail.html')
 
+def message_test_view(request):
+    """Test page for the enhanced message system"""
+    return render(request, 'message_test.html')
+
 
 def contact_view(request):
     if request.method == 'POST':
