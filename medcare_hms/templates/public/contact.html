@@ -4,81 +4,349 @@
 {% block title %}Contact Us - MedCare HMS{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <div class="text-center mb-5">
-                <h1 class="fw-bold">Contact Us</h1>
-                <p class="lead">Get in touch with our team for any questions or support.</p>
-            </div>
-
-            <!-- === MESSAGE DISPLAY BLOCK === -->
-            <!-- This will show success or error messages after form submission -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-            <!-- === END MESSAGE BLOCK === -->
-
-            <div class="card card-custom border-0 shadow-lg">
-                <div class="card-body p-4 p-md-5">
-                    <form method="post" novalidate>
-                        {% csrf_token %}
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control form-control-lg" id="name" name="name" required>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control form-control-lg" id="email" name="email" required>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Subject</label>
-                            <input type="text" class="form-control form-control-lg" id="subject" name="subject" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Message</label>
-                            <textarea class="form-control form-control-lg" id="message" name="message" rows="5" required></textarea>
-                        </div>
-                        <div class="d-grid">
-                            <button type="submit" class="btn btn-primary-custom btn-lg">
-                                <i class="fas fa-paper-plane me-2"></i>Send Message
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <div class="row mt-5 pt-4">
-                <div class="col-md-4 text-center mb-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </div>
-                    <h5>Visit Us</h5>
-                    <p class="text-muted">123 Health Street<br>Medical City, MC 12345</p>
-                </div>
-                <div class="col-md-4 text-center mb-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-phone"></i>
-                    </div>
-                    <h5>Call Us</h5>
-                    <p class="text-muted">+1 (555) 123-4567<br>Mon-Fri, 9AM-5PM</p>
-                </div>
-                <div class="col-md-4 text-center mb-4">
-                    <div class="feature-icon mb-3">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h5>Email Us</h5>
-                    <p class="text-muted">support@medcarehms.com<br>help@medcarehms.com</p>
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 60vh; background: var(--gradient-primary); color: white; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">Get in Touch</h1>
+                <p class="hero-subtitle" style="font-size: 1.3rem; margin-bottom: 2rem;">
+                    Have questions or need support? We're here to help you with MedCare HMS
+                </p>
+                <div class="hero-cta">
+                    <a href="#contact-form" class="btn btn-hero-primary">
+                        <i class="fas fa-envelope me-2"></i>Send Message
+                    </a>
+                    <a href="#contact-info" class="btn btn-hero-secondary">
+                        <i class="fas fa-info-circle me-2"></i>Contact Info
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact-form" style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-8" data-aos="fade-right">
+                <div class="feature-card" style="padding: 3rem; border: none;">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Send us a Message</h2>
+                    
+                    <!-- === MESSAGE DISPLAY BLOCK === -->
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="border-radius: 12px; margin-bottom: 2rem;">
+                                <i class="fas fa-check-circle me-2"></i>{{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <!-- === END MESSAGE BLOCK === -->
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="name" class="form-label" style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required 
+                                       style="padding: 0.875rem 1rem; border-radius: 10px; border: 2px solid var(--border-light); font-size: 1rem; transition: border-color 0.3s ease;"
+                                       onfocus="this.style.borderColor='var(--primary-teal)'" 
+                                       onblur="this.style.borderColor='var(--border-light)'">
+                            </div>
+                            <div class="col-md-6 mb-4">
+                                <label for="email" class="form-label" style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" required 
+                                       style="padding: 0.875rem 1rem; border-radius: 10px; border: 2px solid var(--border-light); font-size: 1rem; transition: border-color 0.3s ease;"
+                                       onfocus="this.style.borderColor='var(--primary-teal)'" 
+                                       onblur="this.style.borderColor='var(--border-light)'">
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="subject" class="form-label" style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required 
+                                   style="padding: 0.875rem 1rem; border-radius: 10px; border: 2px solid var(--border-light); font-size: 1rem; transition: border-color 0.3s ease;"
+                                   onfocus="this.style.borderColor='var(--primary-teal)'" 
+                                   onblur="this.style.borderColor='var(--border-light)'">
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label" style="font-weight: 600; color: var(--text-dark); margin-bottom: 0.5rem;">Message</label>
+                            <textarea class="form-control" id="message" name="message" rows="6" required 
+                                      style="padding: 0.875rem 1rem; border-radius: 10px; border: 2px solid var(--border-light); font-size: 1rem; resize: vertical; transition: border-color 0.3s ease;"
+                                      onfocus="this.style.borderColor='var(--primary-teal)'" 
+                                      onblur="this.style.borderColor='var(--border-light)'"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-hero-primary" style="padding: 0.875rem 2rem; font-size: 1.1rem;">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="col-lg-4" data-aos="fade-left">
+                <div class="feature-card" style="padding: 3rem; border: none; background: white; height: fit-content;">
+                    <h3 style="font-weight: 700; margin-bottom: 2rem; color: var(--text-dark);">Contact Information</h3>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding: 1rem; border-radius: 12px; background: var(--background-light); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin-right: 1rem; flex-shrink: 0;">
+                                <i class="fas fa-envelope" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <div>
+                                <h6 style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark);">Email</h6>
+                                <p style="color: var(--text-light); margin: 0;">info@medcarehms.com</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem; padding: 1rem; border-radius: 12px; background: var(--background-light); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; margin-right: 1rem; flex-shrink: 0;">
+                                <i class="fas fa-phone" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <div>
+                                <h6 style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark);">Phone</h6>
+                                <p style="color: var(--text-light); margin: 0;">+1 (555) 123-4567</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 2rem; padding: 1rem; border-radius: 12px; background: var(--background-light); transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <div style="width: 50px; height: 50px; border-radius: 12px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin-right: 1rem; flex-shrink: 0;">
+                                <i class="fas fa-map-marker-alt" style="color: white; font-size: 1.2rem;"></i>
+                            </div>
+                            <div>
+                                <h6 style="font-weight: 600; margin-bottom: 0.25rem; color: var(--text-dark);">Location</h6>
+                                <p style="color: var(--text-light); margin: 0;">University Campus<br>Computer Science Department</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr style="border-color: var(--border-light); margin: 2rem 0;">
+                    
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Follow Us</h4>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 10px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 10px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 10px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="#" style="width: 45px; height: 45px; border-radius: 10px; background: linear-gradient(135deg, var(--text-dark) 0%, var(--text-light) 100%); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: transform 0.3s ease;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links Card -->
+                <div class="feature-card" style="padding: 2rem; border: none; background: var(--gradient-primary); color: white; margin-top: 2rem;">
+                    <h4 style="font-weight: 600; margin-bottom: 1.5rem;">Quick Access</h4>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <a href="{% url 'login' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                            <i class="fas fa-sign-in-alt me-2"></i>Login to System
+                        </a>
+                        <a href="{% url 'about' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                            <i class="fas fa-info-circle me-2"></i>About Us
+                        </a>
+                        <a href="{% url 'team' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                            <i class="fas fa-users me-2"></i>Meet Our Team
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Details Section -->
+<section id="contact-info" style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Get in Touch with THE WONAs</h2>
+            <p class="section-subtitle">
+                Multiple ways to reach our talented development team
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card text-center" style="height: 100%; padding: 2.5rem;">
+                    <div style="width: 70px; height: 70px; border-radius: 16px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.8rem;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Email Support</h4>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Get professional support via email</p>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">info@medcarehms.com</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">General inquiries</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">support@medcarehms.com</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Technical support</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card text-center" style="height: 100%; padding: 2.5rem;">
+                    <div style="width: 70px; height: 70px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.8rem;">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Phone Support</h4>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Speak directly with our team</p>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">+1 (555) 123-4567</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Main line</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">Mon-Fri, 9AM-5PM</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Business hours</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card text-center" style="height: 100%; padding: 2.5rem;">
+                    <div style="width: 70px; height: 70px; border-radius: 16px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.8rem;">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Visit Us</h4>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">Find us on campus</p>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">University Campus</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Computer Science Department</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">Building CSE-101</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Room 205</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card text-center" style="height: 100%; padding: 2.5rem;">
+                    <div style="width: 70px; height: 70px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-coral) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.8rem;">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <h4 style="font-weight: 600; margin-bottom: 1rem; color: var(--text-dark);">Office Hours</h4>
+                    <p style="color: var(--text-light); margin-bottom: 1.5rem;">When we're available</p>
+                    <div style="margin-bottom: 1rem;">
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">Monday - Friday</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">9:00 AM - 5:00 PM</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-dark); font-weight: 500; margin: 0;">Response Time</p>
+                        <p style="color: var(--text-light); font-size: 0.9rem; margin: 0;">Within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Frequently Asked Questions</h2>
+            <p class="section-subtitle">
+                Find quick answers to common questions about MedCare HMS
+            </p>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="accordion" id="faqAccordion">
+                    <div class="accordion-item" style="border: none; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow-light);" data-aos="fade-up" data-aos-delay="200">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1" style="font-weight: 600; padding: 1.5rem; background: white; border: none; color: var(--text-dark);">
+                                How do I access the MedCare HMS system?
+                            </button>
+                        </h2>
+                        <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="padding: 1.5rem; background: white; color: var(--text-light);">
+                                You can access MedCare HMS through our secure login portal. Different user types (patients, doctors, administrators, receptionists) have their own dedicated dashboards with role-specific features.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: none; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow-light);" data-aos="fade-up" data-aos-delay="300">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2" style="font-weight: 600; padding: 1.5rem; background: white; border: none; color: var(--text-dark);">
+                                Is my medical data secure?
+                            </button>
+                        </h2>
+                        <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="padding: 1.5rem; background: white; color: var(--text-light);">
+                                Yes, MedCare HMS implements robust security measures including data encryption, secure authentication, and HIPAA compliance standards to protect all medical information and ensure patient privacy.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: none; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow-light);" data-aos="fade-up" data-aos-delay="400">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3" style="font-weight: 600; padding: 1.5rem; background: white; border: none; color: var(--text-dark);">
+                                Can I book appointments online?
+                            </button>
+                        </h2>
+                        <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="padding: 1.5rem; background: white; color: var(--text-light);">
+                                Absolutely! Our system allows patients to book, reschedule, and cancel appointments online. You'll also receive automatic reminders and can view your appointment history.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: none; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow-light);" data-aos="fade-up" data-aos-delay="500">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4" style="font-weight: 600; padding: 1.5rem; background: white; border: none; color: var(--text-dark);">
+                                How can I contact support?
+                            </button>
+                        </h2>
+                        <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="padding: 1.5rem; background: white; color: var(--text-light);">
+                                You can reach our support team through this contact form, email us at info@medcarehms.com, or call us at +1 (555) 123-4567. We're here to help with any questions or technical issues.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: none; margin-bottom: 1rem; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px var(--shadow-light);" data-aos="fade-up" data-aos-delay="600">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5" style="font-weight: 600; padding: 1.5rem; background: white; border: none; color: var(--text-dark);">
+                                Who developed MedCare HMS?
+                            </button>
+                        </h2>
+                        <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body" style="padding: 1.5rem; background: white; color: var(--text-light);">
+                                MedCare HMS was developed by THE WONAs, a team of passionate Computer Science Engineering finalists. Our team consists of Albert Nuwarinda, Okwi Yakub, Annet Katushabe, and Wilfred Katswamba.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container text-center">
+        <div data-aos="fade-up">
+            <h2 class="section-title">Ready to Experience MedCare HMS?</h2>
+            <p class="section-subtitle" style="margin-bottom: 3rem;">
+                Join us in revolutionizing healthcare management through technology
+            </p>
+            <div class="hero-cta">
+                <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                    <i class="fas fa-rocket me-2"></i>Access the System
+                </a>
+                <a href="{% url 'about' %}" class="btn btn-hero-secondary">
+                    <i class="fas fa-info-circle me-2"></i>Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

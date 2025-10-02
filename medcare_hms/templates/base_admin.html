@@ -4,132 +4,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MedCare HMS - Admin{% endblock %}</title>
+    <title>{% block title %}Admin Panel | MedCare HMS{% endblock %}</title>
     
-    <!-- Poppins Font from Google Fonts -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Bootstrap CSS -->
+    
+    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+    
+    {% block extra_head %}{% endblock %}
+    
     <style>
         :root {
             --primary-teal: #0E7490;
             --primary-dark-teal: #0C4A6E;
             --sky-blue: #0284C7;
             --light-sky-blue: #38BDF8;
+            --accent-blue: #14B8A6;
+            --accent-green: #22C55E;
+            --accent-orange: #F97316;
             --background-light: #F1F5F9;
             --background-white: #FFFFFF;
-            --accent-blue: #14B8A6;
             --text-dark: #1E293B;
-            --shadow-light: rgba(15, 23, 42, 0.05);
-            --shadow-medium: rgba(15, 23, 42, 0.15);
+            --text-light: #64748B;
             --sidebar-width: 280px;
-            --sidebar-collapsed: 70px;
-            --accent-green: #22C55E;
-            --accent-tan: #D9A466;
-            --accent-orange: #F97316;
-            --accent-green-light: #BBF7D0;
-            --accent-tan-light: #FDE68A;
-            --accent-orange-light: #FED7AA;
+            --sidebar-collapsed: 75px;
+            --header-height: 70px;
+            --shadow-light: rgba(15, 23, 42, 0.08);
+            --shadow-medium: rgba(15, 23, 42, 0.15);
+            --shadow-strong: rgba(15, 23, 42, 0.25);
         }
 
         * {
             font-family: 'Poppins', sans-serif;
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
         }
 
         body {
-            background-color: var(--background-light);
+            background: var(--background-light);
             color: var(--text-dark);
-            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
-        /* Admin Layout Styles */
-        .smooth-transform {
-            transform: translate3d(0, 0, 0);
-            backface-visibility: hidden;
-            will-change: transform;
-        }
-
-        /* Sidebar Styling */
+        /* Professional Sidebar */
         .sidebar {
+            width: var(--sidebar-width);
             background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
-            color: white;
-            height: 100vh;
+            color: #fff;
             position: fixed;
             top: 0;
             left: 0;
-            width: var(--sidebar-width);
-            z-index: 1020;
-            box-shadow: 4px 0 12px var(--shadow-medium);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            bottom: 0;
             overflow-y: auto;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar.collapsed {
             width: var(--sidebar-collapsed);
         }
 
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 2px;
+        }
+
         .sidebar-brand {
-            padding: 1.5rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 1.25rem 1rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            white-space: nowrap;
+            gap: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
         }
 
-        .navbar-logo {
-            height: 60px;
-            width: 60px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px var(--shadow-light);
+        .sidebar-brand img {
+            height: 52px;
+            width: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
         }
 
-        .logo-text {
-            font-size: 1.5rem;
+        .brand-text {
+            font-size: 1.35rem;
             font-weight: 700;
-            color: white;
-            transition: opacity 0.3s ease;
+            letter-spacing: -0.5px;
+            transition: all 0.3s ease;
         }
 
-        .sidebar.collapsed .logo-text {
+        .sidebar.collapsed .brand-text {
             opacity: 0;
+            width: 0;
+            overflow: hidden;
         }
 
-        /* Sidebar Menu Styles */
-        .sidebar-menu {
-            list-style: none;
-            padding: 1rem 0;
-            flex: 1;
+        .nav-section {
+            margin: 1.5rem 0;
         }
 
-        .menu-section {
-            margin-bottom: 2rem;
-        }
-
-        .menu-section-title {
-            padding: 0.75rem 1.5rem 0.5rem;
-            font-size: 0.75rem;
+        .nav-section-title {
+            font-size: 0.7rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.6);
+            letter-spacing: 1.2px;
+            opacity: 0.65;
+            padding: 0.5rem 1.25rem;
             font-weight: 600;
-            transition: opacity 0.3s ease;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
         }
 
-        .sidebar.collapsed .menu-section-title {
+        .sidebar.collapsed .nav-section-title {
             opacity: 0;
             height: 0;
             padding: 0;
@@ -139,243 +141,614 @@
 
         .menu-link {
             color: rgba(255, 255, 255, 0.9);
-            padding: 0.875rem 1.5rem;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            white-space: nowrap;
+            gap: 1rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 0.75rem 0.35rem;
         }
 
         .menu-link:hover {
-            background-color: rgba(135, 206, 235, 0.15);
-            color: white;
-            padding-left: 2rem;
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: translateX(6px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .menu-link.active {
-            background: linear-gradient(90deg, var(--accent-green) 0%, rgba(34, 197, 94, 0.7) 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            color: #fff;
             font-weight: 600;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .menu-link.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: var(--accent-orange);
+            border-radius: 2px;
         }
 
         .menu-icon {
-            width: 20px;
-            margin-right: 1rem;
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
             flex-shrink: 0;
         }
 
         .menu-text {
-            transition: opacity 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .sidebar.collapsed .menu-text {
             opacity: 0;
+            width: 0;
+            overflow: hidden;
+            margin: 0;
         }
 
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            min-height: 100vh;
-            transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        .sidebar.collapsed .menu-link {
+            justify-content: center;
+            padding: 0.85rem;
+        }
+
+        /* Professional Top Bar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 20px var(--shadow-light);
+            height: var(--header-height);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 10px;
+            transition: all 0.25s;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .topbar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--accent-orange);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        .user-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
             display: flex;
             flex-direction: column;
+            text-align: left;
         }
 
-        .main-content.expanded {
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            line-height: 1;
+        }
+
+        .user-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            min-width: 240px;
+            background: #fff;
+            color: var(--text-dark);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+        }
+
+        .user-menu::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 2px;
+            transform: rotate(45deg);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .user-menu a {
+            text-decoration: none;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            transition: all 0.2s;
+            margin: 0.2rem 0;
+        }
+
+        .user-menu a:hover {
+            background: #f8fafc;
+            color: var(--primary-teal);
+            transform: translateX(4px);
+        }
+
+        .user-menu .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 0.5rem 0;
+        }
+
+        /* Main Content Area */
+        .content-wrapper {
+            margin-left: var(--sidebar-width);
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed ~ .content-wrapper {
             margin-left: var(--sidebar-collapsed);
         }
 
-        .content-area {
+        .main-content {
             flex: 1;
             padding: 2rem;
         }
 
-        /* Admin Topbar */
-        .admin-topbar {
+        /* Professional Footer */
+        footer {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
-            color: white;
-            padding: 1rem;
-            box-shadow: 0 2px 8px var(--shadow-light);
+            color: #fff;
+            padding: 1.5rem 2rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Dashboard Components */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px var(--shadow-light);
+            border-left: 4px solid var(--accent-green);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-medium);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1010;
-        }
-
-        .sidebar-toggle {
-            background: none;
-            border: none;
-            color: white;
+            justify-content: center;
             font-size: 1.2rem;
-            padding: 0.5rem;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-blue) 100%);
+            color: #fff;
         }
 
-        .sidebar-toggle:hover {
-            background-color: rgba(135, 206, 235, 0.2);
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin-bottom: 0.25rem;
         }
 
-        /* Responsive */
-        @media (max-width: 1199.98px) {
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
             .sidebar {
                 transform: translateX(-100%);
             }
+
             .sidebar.show {
                 transform: translateX(0);
             }
-            .main-content, .main-content.expanded {
+
+            .content-wrapper,
+            .sidebar.collapsed ~ .content-wrapper {
                 margin-left: 0;
+            }
+
+            .topbar-title {
+                font-size: 1rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .topbar {
+                padding: 0.75rem 1rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Admin Sidebar -->
-    <aside class="sidebar smooth-transform" id="sidebar">
+    <!-- Professional Sidebar -->
+    <nav class="sidebar" id="adminSidebar">
         <div class="sidebar-brand">
-            <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
-            <span class="logo-text">MedCare HMS</span>
+            <img src="{% static 'images/logo.png' %}" alt="MedCare Logo">
+            <span class="brand-text">MedCare HMS</span>
         </div>
 
-        <ul class="sidebar-menu">
-            <!-- Dashboard Section -->
-            <li class="menu-section">
-                <div class="menu-section-title">Dashboard</div>
-                <ul class="list-unstyled">
-                    <li class="menu-item">
-                        <a href="{% url 'admin_dashboard' %}" class="menu-link active">
-                            <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
-                            <span class="menu-text">Overview</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-chart-bar"></i></span>
-                            <span class="menu-text">Analytics</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+        <!-- Dashboard Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Dashboard</div>
+            <a href="{% url 'admin_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                <span class="menu-text">Overview</span>
+            </a>
+            <a href="{% url 'reports:reports_dashboard' %}" class="menu-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="menu-text">Analytics & Reports</span>
+            </a>
+        </div>
 
-            <!-- Patient Management Section -->
-            <li class="menu-section">
-                <div class="menu-section-title">Patient Management</div>
-                <ul class="list-unstyled">
-                    <li class="menu-item">
-                        <a href="#" class="menu-link" data-bs-toggle="collapse" data-bs-target="#patientSubmenu">
-                            <span class="menu-icon"><i class="fas fa-procedures"></i></span>
-                            <span class="menu-text">Patients</span>
-                            <i class="fas fa-chevron-down menu-toggle"></i>
-                        </a>
-                        <ul class="submenu collapse" id="patientSubmenu">
-                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-list"></i></span>All Patients</a></li>
-                            <li><a href="#" class="menu-link"><span class="menu-icon"><i class="fas fa-user-plus"></i></span>New Registrations</a></li>
-                        </ul>
-                    </li>
-                    <li class="menu-item">
-                        <a href="#" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-calendar-check"></i></span>
-                            <span class="menu-text">Appointments</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+        <!-- User Management Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">User Management</div>
+            <a href="{% url 'staff_management_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-users"></i></span>
+                <span class="menu-text">All Staff</span>
+            </a>
+            <a href="{% url 'pending_staff_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-user-clock"></i></span>
+                <span class="menu-text">Pending Approvals</span>
+            </a>
+            <a href="{% url 'deactivated_staff_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-user-slash"></i></span>
+                <span class="menu-text">Deactivated Staff</span>
+            </a>
+        </div>
 
-            <!-- Staff Management Section -->
-            <li class="menu-section">
-                <div class="menu-section-title">Staff Management</div>
-                <ul class="list-unstyled">
-                    <li class="menu-item">
-                        <a href="{% url 'staff_management_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-users"></i></span>
-                            <span class="menu-text">Staff</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{% url 'department_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-building"></i></span>
-                            <span class="menu-text">Departments</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
+        <!-- Hospital Management Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Hospital Management</div>
+            <a href="{% url 'department_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-sitemap"></i></span>
+                <span class="menu-text">Departments</span>
+            </a>
+            <a href="{% url 'room_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-bed"></i></span>
+                <span class="menu-text">Rooms</span>
+            </a>
+            <a href="{% url 'patients:doctor_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-user-md"></i></span>
+                <span class="menu-text">Doctors</span>
+            </a>
+        </div>
 
-            <!-- System Section -->
-            <li class="menu-section">
-                <div class="menu-section-title">System</div>
-                <ul class="list-unstyled">
-                    <li class="menu-item">
-                        <a href="{% url 'reports:reports_dashboard' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
-                            <span class="menu-text">Reports</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="{% url 'audit:audit_feed' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-shield-alt"></i></span>
-                            <span class="menu-text">Audit Logs</span>
-                        </a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </aside>
+        <!-- Financial Management Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Financial</div>
+            <a href="{% url 'billing:bill_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                <span class="menu-text">Billing</span>
+            </a>
+            <a href="{% url 'billing:select_appointment' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-plus-circle"></i></span>
+                <span class="menu-text">Create Bill</span>
+            </a>
+        </div>
 
-    <!-- Admin Main Content -->
-    <div class="main-content smooth-transform" id="mainContent">
-        <!-- Admin Topbar -->
-        <div class="admin-topbar">
-            <div class="d-flex align-items-center">
-                <button class="sidebar-toggle me-3" id="sidebarToggle">
+        <!-- Communication Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Communication</div>
+            <a href="{% url 'chat:thread_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-comments"></i></span>
+                <span class="menu-text">Messages</span>
+            </a>
+            <a href="{% url 'notifications:notification_list' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-bell"></i></span>
+                <span class="menu-text">Notifications</span>
+            </a>
+        </div>
+
+        <!-- System Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">System</div>
+            <a href="{% url 'audit:audit_feed' %}" class="menu-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-shield-halved"></i></span>
+                <span class="menu-text">Audit Logs</span>
+            </a>
+            <a href="{% url 'admin:index' %}" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-cogs"></i></span>
+                <span class="menu-text">Django Admin</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper" id="adminContent">
+        <!-- Professional Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h5 class="mb-0">Admin Dashboard</h5>
+                <h6 class="topbar-title mb-0">Admin Dashboard</h6>
             </div>
-
-            <div class="d-flex align-items-center gap-3">
-                <!-- User Profile -->
-                <div class="user-profile-nav">
-                    <div class="user-profile-toggle" id="userProfileToggle">
-                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+            
+            <div class="topbar-right">
+                <!-- Notifications -->
+                <a href="{% url 'notifications:notification_list' %}" class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </a>
+                
+                <!-- User Menu -->
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userMenuToggle">
+                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
                              alt="User Avatar" class="user-avatar">
                         <div class="user-info">
-                            <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
-                            <span class="user-role">Admin</span>
+                            <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                            <span class="user-role">{% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}</span>
                         </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-menu-header">
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
+                                 alt="User Avatar" class="user-menu-avatar">
+                            <div>
+                                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="user-role">{% if user.is_superuser %}Super Admin{% else %}Admin{% endif %}</div>
+                            </div>
+                        </div>
+                        <a href="{% url 'admin:auth_user_change' user.id %}">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                        <a href="{% url 'admin:index' %}">
+                            <i class="fas fa-toolbox"></i> Django Admin
+                        </a>
+                        <div class="divider"></div>
+                        <a href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Content Area -->
-        <div class="content-area">
+        <!-- Main Content -->
+        <div class="main-content">
             {% block content %}
-            <!-- Admin specific content goes here -->
+            <!-- Default Dashboard Content -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ total_staff|default:"--" }}</div>
+                    <div class="stat-label">Total Staff Members</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div class="stat-value">{{ pending_staff|default:"--" }}</div>
+                    <div class="stat-label">Pending Approvals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-value">{{ total_departments|default:"--" }}</div>
+                    <div class="stat-label">Departments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bed"></i>
+                    </div>
+                    <div class="stat-value">{{ total_rooms|default:"--" }}</div>
+                    <div class="stat-label">Hospital Rooms</div>
+                </div>
+            </div>
             {% endblock %}
         </div>
 
-        <!-- Footer -->
-        <footer class="footer mt-auto">
-            <div class="container text-center py-3">
-                <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS | Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
-            </div>
+        <!-- Professional Footer -->
+        <footer>
+            <p class="mb-0">© 2025 MedCare HMS | Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
         </footer>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
     <script>
         // Sidebar toggle functionality
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-            document.getElementById('mainContent').classList.toggle('expanded');
+        const sidebar = document.getElementById('adminSidebar');
+        const content = document.getElementById('adminContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('adminSidebarCollapsed', sidebar.classList.contains('collapsed'));
         });
+
+        // Restore sidebar state
+        if (localStorage.getItem('adminSidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // User menu toggle
+        const userToggle = document.getElementById('userMenuToggle');
+        const userMenu = document.getElementById('userMenu');
+
+        userToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
+                userMenu.style.display = 'none';
+            }
+        });
+
+        // Mobile sidebar toggle
+        if (window.innerWidth <= 991.98) {
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
     </script>
+    {% block extra_js %}{% endblock %}
 </body>
 </html>

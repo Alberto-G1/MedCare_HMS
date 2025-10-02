@@ -1,0 +1,381 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}Features - MedCare HMS{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 60vh; background: var(--gradient-primary); color: white; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">Comprehensive Healthcare Features</h1>
+                <p class="hero-subtitle" style="font-size: 1.3rem; margin-bottom: 2rem;">
+                    Discover the powerful capabilities of MedCare HMS designed for modern healthcare management
+                </p>
+                <div class="hero-cta">
+                    <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                        <i class="fas fa-play me-2"></i>Try Now
+                    </a>
+                    <a href="#core-features" class="btn btn-hero-secondary">
+                        <i class="fas fa-arrow-down me-2"></i>Explore Features
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Core Features Section -->
+<section id="core-features" style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Core System Features</h2>
+            <p class="section-subtitle">
+                Complete healthcare solutions for all stakeholders in the medical ecosystem
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div class="feature-icon admin" style="margin: 0 auto;">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <h4 class="feature-title">Admin Dashboard</h4>
+                    <p class="feature-description">
+                        Complete hospital administration with staff management, 
+                        department oversight, and comprehensive analytics.
+                    </p>
+                    <ul style="text-align: left; color: var(--text-light); line-height: 1.8;">
+                        <li>User Management</li>
+                        <li>System Analytics</li>
+                        <li>Department Control</li>
+                        <li>Audit Logs</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div class="feature-icon doctor" style="margin: 0 auto;">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h4 class="feature-title">Doctor Portal</h4>
+                    <p class="feature-description">
+                        Patient management, appointment scheduling, medical records, 
+                        and prescription management all in one place.
+                    </p>
+                    <ul style="text-align: left; color: var(--text-light); line-height: 1.8;">
+                        <li>Patient Records</li>
+                        <li>Appointment Management</li>
+                        <li>Prescription Writing</li>
+                        <li>Medical Reports</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div class="feature-icon patient" style="margin: 0 auto;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <h4 class="feature-title">Patient Portal</h4>
+                    <p class="feature-description">
+                        Easy appointment booking, medical history access, 
+                        billing management, and direct communication with doctors.
+                    </p>
+                    <ul style="text-align: left; color: var(--text-light); line-height: 1.8;">
+                        <li>Online Appointments</li>
+                        <li>Medical History</li>
+                        <li>Billing & Payments</li>
+                        <li>Secure Messaging</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div class="feature-icon receptionist" style="margin: 0 auto;">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <h4 class="feature-title">Reception Desk</h4>
+                    <p class="feature-description">
+                        Patient registration, appointment management, 
+                        billing assistance, and front desk operations.
+                    </p>
+                    <ul style="text-align: left; color: var(--text-light); line-height: 1.8;">
+                        <li>Patient Registration</li>
+                        <li>Appointment Scheduling</li>
+                        <li>Billing Support</li>
+                        <li>Check-in/Check-out</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Advanced Features Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Advanced Healthcare Solutions</h2>
+            <p class="section-subtitle">
+                Cutting-edge features that set MedCare HMS apart from traditional systems
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: var(--gradient-primary);">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h4 class="feature-title">Smart Analytics</h4>
+                    <p class="feature-description">
+                        Advanced data analytics and reporting tools that provide insights into 
+                        hospital operations, patient trends, and performance metrics.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(14, 116, 144, 0.1); color: var(--primary-teal); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Dashboard</span>
+                        <span style="background: rgba(14, 116, 144, 0.1); color: var(--primary-teal); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Reports</span>
+                        <span style="background: rgba(14, 116, 144, 0.1); color: var(--primary-teal); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Insights</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h4 class="feature-title">Real-time Communication</h4>
+                    <p class="feature-description">
+                        Secure messaging system with real-time chat capabilities between 
+                        patients, doctors, and staff with full HIPAA compliance.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(34, 197, 94, 0.1); color: var(--accent-green); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Secure Chat</span>
+                        <span style="background: rgba(34, 197, 94, 0.1); color: var(--accent-green); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">File Sharing</span>
+                        <span style="background: rgba(34, 197, 94, 0.1); color: var(--accent-green); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Notifications</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: var(--gradient-secondary);">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <h4 class="feature-title">Digital Prescriptions</h4>
+                    <p class="feature-description">
+                        Complete e-prescription system with drug interaction checks, 
+                        automatic refill reminders, and pharmacy integration.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">E-Rx</span>
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Drug Checks</span>
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Auto-Refill</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-coral) 100%);">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h4 class="feature-title">Smart Scheduling</h4>
+                    <p class="feature-description">
+                        AI-powered appointment scheduling with conflict resolution, 
+                        automated reminders, and optimized resource allocation.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Auto-Schedule</span>
+                        <span style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Reminders</span>
+                        <span style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Optimization</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="600">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--sky-blue) 0%, var(--light-sky-blue) 100%);">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="feature-title">Security & Compliance</h4>
+                    <p class="feature-description">
+                        Enterprise-grade security with end-to-end encryption, 
+                        HIPAA compliance, and comprehensive audit trails.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(2, 132, 199, 0.1); color: var(--sky-blue); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Encryption</span>
+                        <span style="background: rgba(2, 132, 199, 0.1); color: var(--sky-blue); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">HIPAA</span>
+                        <span style="background: rgba(2, 132, 199, 0.1); color: var(--sky-blue); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Audit</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="700">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--accent-purple) 0%, var(--primary-teal) 100%);">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4 class="feature-title">Health Monitoring</h4>
+                    <p class="feature-description">
+                        Continuous health tracking with vital signs monitoring, 
+                        trend analysis, and early warning systems for better care.
+                    </p>
+                    <div style="margin-top: 1.5rem;">
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Vitals</span>
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem; margin-right: 0.5rem;">Trends</span>
+                        <span style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.875rem;">Alerts</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Why Healthcare Providers Choose MedCare HMS</h2>
+            <p class="section-subtitle">
+                Proven benefits that transform healthcare operations
+            </p>
+        </div>
+        
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="about-image">
+                    <img src="{% static 'ims/hero.jpg' %}" alt="Healthcare Benefits" class="img-fluid" style="border-radius: 20px; box-shadow: 0 12px 30px var(--shadow-medium);">
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="about-text">
+                    <h3 style="font-size: 2rem; font-weight: 700; margin-bottom: 2rem; color: var(--text-dark);">Measurable Results</h3>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                            <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;">
+                                <i class="fas fa-clock" style="color: white; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h5 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">60% Time Savings</h5>
+                                <p style="color: var(--text-light); margin: 0;">Reduce administrative tasks and streamline workflows</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                            <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;">
+                                <i class="fas fa-heart" style="color: white; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h5 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">Enhanced Patient Care</h5>
+                                <p style="color: var(--text-light); margin: 0;">Improved patient satisfaction and health outcomes</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 1.5rem;">
+                            <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;">
+                                <i class="fas fa-dollar-sign" style="color: white; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h5 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">Cost Reduction</h5>
+                                <p style="color: var(--text-light); margin: 0;">Lower operational costs through automation</p>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center;">
+                            <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-coral) 100%); display: flex; align-items: center; justify-content: center; margin-right: 1.5rem; flex-shrink: 0;">
+                                <i class="fas fa-shield-alt" style="color: white; font-size: 1.5rem;"></i>
+                            </div>
+                            <div>
+                                <h5 style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-dark);">100% Compliance</h5>
+                                <p style="color: var(--text-light); margin: 0;">Full HIPAA compliance and data security</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Integration Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Seamless Integration</h2>
+            <p class="section-subtitle">
+                MedCare HMS integrates with your existing healthcare ecosystem
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Hospital Systems</h5>
+                    <p style="color: var(--text-light);">Connect with existing hospital infrastructure</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Pharmacy Systems</h5>
+                    <p style="color: var(--text-light);">Direct integration with local pharmacies</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fas fa-microscope"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Laboratory Systems</h5>
+                    <p style="color: var(--text-light);">Seamless lab result integration</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-coral) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Payment Gateways</h5>
+                    <p style="color: var(--text-light);">Secure payment processing integration</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container text-center">
+        <div data-aos="fade-up">
+            <h2 class="section-title">Ready to Transform Your Healthcare Operations?</h2>
+            <p class="section-subtitle" style="margin-bottom: 3rem;">
+                Experience the power of MedCare HMS and revolutionize your healthcare management
+            </p>
+            <div class="hero-cta">
+                <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                    <i class="fas fa-rocket me-2"></i>Get Started Now
+                </a>
+                <a href="{% url 'contact' %}" class="btn btn-hero-secondary">
+                    <i class="fas fa-comments me-2"></i>Schedule Demo
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

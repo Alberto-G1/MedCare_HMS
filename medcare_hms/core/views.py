@@ -6,11 +6,17 @@ from django.contrib import messages
 def index_view(request):
     return render(request, 'public/index.html')
 
+def features_view(request):
+    return render(request, 'public/features.html')
+
 def about_view(request):
     return render(request, 'public/about.html')
 
 def team_view(request):
     return render(request, 'public/team.html')
+
+def team_detail_view(request):
+    return render(request, 'public/team-detail.html')
 
 
 def contact_view(request):
@@ -44,6 +50,7 @@ def contact_view(request):
             'okwiiyakub@gmail.com',
             'annetkatushabe891@gmail.com',
             'nuwarindaalbertgrande@gmail.com',
+            'wkatswamba@gmail.com',
         ]
 
         try:
