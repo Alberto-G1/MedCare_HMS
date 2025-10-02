@@ -1,0 +1,437 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}Meet Our Team - MedCare HMS{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%); color: white; padding: 100px 0; text-align: center;">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Meet THE WONAs</h1>
+        <p class="lead mb-4">The brilliant minds behind MedCare HMS</p>
+        <p class="mb-0">CSE ⚡ Finalists - Creating innovative healthcare solutions</p>
+    </div>
+</section>
+
+<!-- Team Introduction -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Our Story</h2>
+                <p class="lead mb-4">
+                    THE WONAs is a team of passionate Computer Science and Engineering finalists dedicated to 
+                    revolutionizing healthcare management through technology. Our diverse skills and shared vision 
+                    have come together to create MedCare HMS - a comprehensive hospital management system.
+                </p>
+                <p class="mb-4">
+                    With expertise spanning full-stack development, database design, user experience, and system 
+                    architecture, we've built a platform that streamlines healthcare operations while maintaining 
+                    the highest standards of security and usability.
+                </p>
+                <div class="d-flex gap-3">
+                    <div class="text-center">
+                        <h3 class="fw-bold text-primary">4+</h3>
+                        <p class="small">Team Members</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="fw-bold text-primary">1000+</h3>
+                        <p class="small">Hours of Development</p>
+                    </div>
+                    <div class="text-center">
+                        <h3 class="fw-bold text-primary">10+</h3>
+                        <p class="small">Modules Built</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <img src="{% static 'ims/teamwork.jpg' %}" alt="Team Collaboration" class="img-fluid rounded shadow" style="max-height: 400px;">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Members Grid -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Our Team Members</h2>
+            <p class="lead">Meet the talented individuals behind MedCare HMS</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Team Member 1 -->
+            <div class="col-lg-6">
+                <div class="card card-custom border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="{% static 'team/albert.jpg' %}" alt="Albert" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-github fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h4 class="fw-bold">Albert Nuwarinda</h4>
+                                <p class="text-primary fw-semibold">Team Lead & Full Stack Developer</p>
+                                <p class="mb-3">
+                                    Albert oversees the entire project architecture and leads the development team. 
+                                    With expertise in Django, React, and cloud deployment, he ensures the system 
+                                    meets all technical requirements while maintaining scalability.
+                                </p>
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Key Contributions:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>System Architecture Design</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Backend API Development</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Database Optimization</li>
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">Django</span>
+                                    <span class="badge bg-primary">Python</span>
+                                    <span class="badge bg-primary">AWS</span>
+                                    <span class="badge bg-primary">PostgreSQL</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="col-lg-6">
+                <div class="card card-custom border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="{% static 'team/kubi.jpg' %}" alt="Kubi" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-github fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h4 class="fw-bold">Okwi Yakub</h4>
+                                <p class="text-primary fw-semibold">Frontend Developer & UI/UX Designer</p>
+                                <p class="mb-3">
+                                    Kubi creates intuitive and responsive user interfaces that enhance the user
+                                    experience for both patients and healthcare providers. Her design expertise 
+                                    ensures the platform is both beautiful and functional.
+                                </p>
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Key Contributions:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>UI/UX Design System</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Responsive Frontend</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>User Experience Testing</li>
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">React</span>
+                                    <span class="badge bg-primary">JavaScript</span>
+                                    <span class="badge bg-primary">Figma</span>
+                                    <span class="badge bg-primary">Bootstrap</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="col-lg-6">
+                <div class="card card-custom border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="{% static 'team/annet.jpg' %}" alt="Annet" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-github fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h4 class="fw-bold">Annet Katushabe</h4>
+                                <p class="text-primary fw-semibold">Backend Developer & Database Architect</p>
+                                <p class="mb-3">
+                                    Annet designs and implements the robust database architecture that powers 
+                                    MedCare HMS. Her expertise in data modeling and optimization ensures the 
+                                    system handles healthcare data securely and efficiently.
+                                </p>
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Key Contributions:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Database Design</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>API Development</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Security Implementation</li>
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">PostgreSQL</span>
+                                    <span class="badge bg-primary">Django REST</span>
+                                    <span class="badge bg-primary">Redis</span>
+                                    <span class="badge bg-primary">Docker</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team Member 4 -->
+            <div class="col-lg-6">
+                <div class="card card-custom border-0 h-100">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-3 mb-md-0">
+                                <img src="{% static 'team/wilfred.jpg' %}" alt="Wilfred" class="rounded-circle mb-3" width="150" height="150" style="object-fit: cover;">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="#" class="text-primary"><i class="fab fa-linkedin fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-github fa-lg"></i></a>
+                                    <a href="#" class="text-primary"><i class="fab fa-twitter fa-lg"></i></a>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h4 class="fw-bold">Wilfred Katswamba</h4>
+                                <p class="text-primary fw-semibold">Quality Assurance & DevOps Engineer</p>
+                                <p class="mb-3">
+                                    Wilfred ensures the reliability and performance of MedCare HMS through
+                                    comprehensive testing and efficient deployment pipelines. His attention to
+                                    detail guarantees a seamless experience for all users.
+                                </p>
+                                <div class="mb-3">
+                                    <h6 class="fw-bold">Key Contributions:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success me-2"></i>Automated Testing</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>CI/CD Pipeline</li>
+                                        <li><i class="fas fa-check text-success me-2"></i>Performance Optimization</li>
+                                    </ul>
+                                </div>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-primary">Selenium</span>
+                                    <span class="badge bg-primary">Jenkins</span>
+                                    <span class="badge bg-primary">AWS</span>
+                                    <span class="badge bg-primary">Python</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Project Timeline -->
+<section class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Our Journey</h2>
+            <p class="lead">The development timeline of MedCare HMS</p>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                <div class="timeline">
+                    <!-- Timeline Item 1 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h5 class="fw-bold">Project Inception</h5>
+                            <span class="text-muted">January 2024</span>
+                            <p>Initial research and planning phase. Defined project scope, requirements, and technology stack.</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 2 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h5 class="fw-bold">Core Development</h5>
+                            <span class="text-muted">March 2024</span>
+                            <p>Built the foundational architecture, database design, and implemented core modules including patient management and appointments.</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 3 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h5 class="fw-bold">Feature Expansion</h5>
+                            <span class="text-muted">June 2024</span>
+                            <p>Added advanced features including prescription management, billing system, and real-time chat functionality.</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 4 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h5 class="fw-bold">Testing & Refinement</h5>
+                            <span class="text-muted">September 2024</span>
+                            <p>Comprehensive testing phase, performance optimization, and user experience improvements based on feedback.</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 5 -->
+                    <div class="timeline-item">
+                        <div class="timeline-marker bg-primary"></div>
+                        <div class="timeline-content">
+                            <h5 class="fw-bold">Launch Preparation</h5>
+                            <span class="text-muted">December 2024</span>
+                            <p>Final deployment preparations, documentation, and launch strategy development.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Technologies Used -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Technologies We Used</h2>
+            <p class="lead">Modern tools and frameworks powering MedCare HMS</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-python fa-3x text-primary mb-3"></i>
+                    <h5>Python</h5>
+                    <p class="small text-muted">Backend Development</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-js-square fa-3x text-primary mb-3"></i>
+                    <h5>JavaScript</h5>
+                    <p class="small text-muted">Frontend Development</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fas fa-database fa-3x text-primary mb-3"></i>
+                    <h5>PostgreSQL</h5>
+                    <p class="small text-muted">Database</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-aws fa-3x text-primary mb-3"></i>
+                    <h5>AWS</h5>
+                    <p class="small text-muted">Cloud Infrastructure</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-docker fa-3x text-primary mb-3"></i>
+                    <h5>Docker</h5>
+                    <p class="small text-muted">Containerization</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-git-alt fa-3x text-primary mb-3"></i>
+                    <h5>Git</h5>
+                    <p class="small text-muted">Version Control</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fas fa-code-branch fa-3x text-primary mb-3"></i>
+                    <h5>Django</h5>
+                    <p class="small text-muted">Web Framework</p>
+                </div>
+            </div>
+            <div class="col-md-3 col-6 text-center">
+                <div class="tech-card p-4 rounded bg-white shadow-sm">
+                    <i class="fab fa-bootstrap fa-3x text-primary mb-3"></i>
+                    <h5>Bootstrap</h5>
+                    <p class="small text-muted">UI Framework</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-3">Get In Touch</h2>
+                <p class="lead mb-4">Interested in learning more about our project or collaborating with us?</p>
+                <a href="{% url 'contact' %}" class="btn btn-primary-custom btn-lg">Contact Our Team</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Timeline Styling */
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--primary-teal);
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -2rem;
+        top: 0.5rem;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: var(--primary-teal);
+    }
+
+    .timeline-content {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px var(--shadow-light);
+    }
+
+    .tech-card {
+        transition: all 0.3s ease;
+    }
+
+    .tech-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 24px var(--shadow-medium) !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .timeline {
+            padding-left: 1.5rem;
+        }
+        
+        .timeline-marker {
+            left: -1.5rem;
+        }
+    }
+</style>
+{% endblock %}
