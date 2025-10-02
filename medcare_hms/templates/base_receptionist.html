@@ -1,4 +1,5 @@
 {% load static %}
+{% load profile_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,7 +27,7 @@
             --accent-blue: #14B8A6;
             --accent-green: #22C55E;
             --accent-orange: #F97316;
-            --accent-purple: #8B5CF6;
+            --accent-purple: #5ce9f6;
             --background-light: #F1F5F9;
             --background-white: #FFFFFF;
             --text-dark: #1E293B;
@@ -308,6 +309,29 @@
             border-radius: 8px;
             object-fit: cover;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            background: var(--accent-purple);
+            /* Fallback background color if image fails to load */
+            transition: all 0.3s ease;
+        }
+
+        .user-avatar:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid var(--accent-purple);
+            background: var(--accent-purple);
+        }
+
+        /* Profile page images */
+        .profile-page-image {
+            border: 4px solid var(--background-white);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .user-info {
@@ -511,6 +535,9 @@
     </style>
 </head>
 <body>
+    <!-- Include Messages Component -->
+    {% include 'components/messages.html' %}
+    
     <!-- Professional Sidebar -->
     <nav class="sidebar" id="receptionistSidebar">
         <div class="sidebar-brand">
@@ -525,7 +552,7 @@
                 <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
                 <span class="menu-text">Overview</span>
             </a>
-            <a href="{% url 'receptionist:agenda' %}" class="menu-link {% if request.resolver_match.url_name == 'agenda' %}active{% endif %}">
+            <a href="{% url 'receptionist:appointment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-calendar-day"></i></span>
                 <span class="menu-text">Daily Schedule</span>
             </a>
@@ -534,7 +561,7 @@
         <!-- Patient Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">Patient Management</div>
-            <a href="{% url 'receptionist:register_patient' %}" class="menu-link {% if request.resolver_match.url_name == 'register_patient' %}active{% endif %}">
+            <a href="{% url 'receptionist:add_patient' %}" class="menu-link {% if request.resolver_match.url_name == 'add_patient' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-user-plus"></i></span>
                 <span class="menu-text">Register Patient</span>
             </a>
@@ -542,16 +569,12 @@
                 <span class="menu-icon"><i class="fas fa-users"></i></span>
                 <span class="menu-text">All Patients</span>
             </a>
-            <a href="{% url 'patients:patient_list' %}" class="menu-link">
-                <span class="menu-icon"><i class="fas fa-folder-open"></i></span>
-                <span class="menu-text">Patient Portal</span>
-            </a>
         </div>
 
         <!-- Appointment Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">Appointments</div>
-            <a href="{% url 'receptionist:appointment_create' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_create' %}active{% endif %}">
+            <a href="{% url 'receptionist:book_appointment' %}" class="menu-link {% if request.resolver_match.url_name == 'book_appointment' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>
                 <span class="menu-text">Book Appointment</span>
             </a>
@@ -559,13 +582,9 @@
                 <span class="menu-icon"><i class="fas fa-list"></i></span>
                 <span class="menu-text">All Appointments</span>
             </a>
-            <a href="{% url 'receptionist:appointment_update_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_update_list' %}active{% endif %}">
+            <a href="{% url 'receptionist:appointment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-edit"></i></span>
                 <span class="menu-text">Manage Appointments</span>
-            </a>
-            <a href="{% url 'receptionist:appointment_delete_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_delete_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-calendar-times"></i></span>
-                <span class="menu-text">Cancel Appointments</span>
             </a>
         </div>
 
@@ -580,7 +599,7 @@
                 <span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>
                 <span class="menu-text">Generate Bill</span>
             </a>
-            <a href="{% url 'billing:payment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'payment_list' %}active{% endif %}">
+            <a href="{% url 'billing:bill_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bill_list' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-credit-card"></i></span>
                 <span class="menu-text">Payment Records</span>
             </a>
@@ -630,8 +649,7 @@
                 <!-- User Menu -->
                 <div class="user-dropdown">
                     <button class="user-toggle" id="userMenuToggle">
-                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
-                             alt="User Avatar" class="user-avatar">
+                        {% profile_image user size="32" css_class="user-avatar" %}
                         <div class="user-info">
                             <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
                             <span class="user-role">Receptionist</span>
@@ -641,17 +659,16 @@
                     
                     <div class="user-menu" id="userMenu">
                         <div class="user-menu-header">
-                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
-                                 alt="User Avatar" class="user-menu-avatar">
+                            {% profile_image user size="40" css_class="user-menu-avatar" %}
                             <div>
                                 <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
                                 <div class="user-role">Receptionist</div>
                             </div>
                         </div>
-                        <a href="{% url 'receptionist:profile' %}">
+                        <a href="{% url 'receptionist:receptionist_profile' %}">
                             <i class="fas fa-user"></i> My Profile
                         </a>
-                        <a href="{% url 'receptionist:settings' %}">
+                        <a href="{% url 'receptionist:receptionist_profile' %}">
                             <i class="fas fa-cog"></i> Settings
                         </a>
                         <div class="divider"></div>
@@ -753,6 +770,51 @@
                 }
             });
         }
+
+        // Enhanced profile image error handling
+        function setupProfileImageFallback() {
+            const profileImages = document.querySelectorAll('.user-avatar, .user-menu-avatar');
+            profileImages.forEach(function(img) {
+                img.addEventListener('error', function() {
+                    // Create fallback with user initials if image fails to load
+                    const userName = '{{ user.get_full_name|default:user.username }}';
+                    const initials = userName.split(' ').map(name => name.charAt(0)).join('').toUpperCase();
+                    
+                    // Create a canvas to generate initial-based avatar
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const size = 100; // Higher resolution for better quality
+                    
+                    canvas.width = size;
+                    canvas.height = size;
+                    
+                    // Set background color (receptionist theme)
+                    ctx.fillStyle = '#5ce9f6';
+                    ctx.fillRect(0, 0, size, size);
+                    
+                    // Set text properties
+                    ctx.fillStyle = '#1E293B';
+                    ctx.font = 'bold ' + (size / 2.5) + 'px Poppins, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    // Draw initials
+                    ctx.fillText(initials, size / 2, size / 2);
+                    
+                    // Replace the broken image with the generated avatar
+                    this.src = canvas.toDataURL();
+                    this.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+                });
+                
+                // Also set up a loading placeholder
+                img.addEventListener('loadstart', function() {
+                    this.style.background = 'var(--accent-purple)';
+                });
+            });
+        }
+
+        // Initialize profile image fallbacks
+        setupProfileImageFallback();
     </script>
     {% block extra_js %}{% endblock %}
 </body>

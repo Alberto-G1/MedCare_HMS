@@ -1,0 +1,768 @@
+<!-- Message Toast Container - Top Right Corner -->
+<div id="toast-container" class="toast-container position-fixed" style="top: 20px; right: 20px; z-index: 999999 !important; max-width: 400px;">
+    <!-- Django messages will be converted to toasts -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="toast-message alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show message-alert" 
+                 role="alert" 
+                 data-message-type="{{ message.tags|default:'info' }}"
+                 data-auto-dismiss="{% if message.tags == 'error' %}0{% elif message.tags == 'success' %}4000{% elif message.tags == 'warning' %}8000{% else %}6000{% endif %}">
+                
+                <!-- Message Icon -->
+                <i class="message-icon me-2 {% if message.tags == 'success' %}fas fa-check-circle{% elif message.tags == 'error' %}fas fa-exclamation-triangle{% elif message.tags == 'warning' %}fas fa-exclamation-circle{% else %}fas fa-info-circle{% endif %}"></i>
+                
+                <!-- Message Content -->
+                <span class="message-content">{{ message }}</span>
+                
+                <!-- Dismiss Button -->
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                
+                <!-- Progress Bar for Auto-dismiss -->
+                <div class="message-progress">
+                    <div class="message-progress-bar"></div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <!-- Dynamic toast messages will be inserted here -->
+</div>
+
+<!-- Message Styles -->
+<style>
+:root {
+    /* Message Colors */
+    --message-success: #10b981;
+    --message-success-bg: #ecfdf5;
+    --message-success-border: #a7f3d0;
+    --message-success-text: #065f46;
+    
+    --message-error: #ef4444;
+    --message-error-bg: #fef2f2;
+    --message-error-border: #fecaca;
+    --message-error-text: #991b1b;
+    
+    --message-warning: #f59e0b;
+    --message-warning-bg: #fffbeb;
+    --message-warning-border: #fed7aa;
+    --message-warning-text: #92400e;
+    
+    --message-info: #3b82f6;
+    --message-info-bg: #eff6ff;
+    --message-info-border: #bfdbfe;
+    --message-info-text: #1e40af;
+    
+    /* Animation Timings */
+    --message-slide-duration: 300ms;
+    --message-fade-duration: 250ms;
+    --message-scale-duration: 200ms;
+}
+
+/* Toast Container - Top Right Fixed Position */
+.toast-container {
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
+    z-index: 999999 !important;
+    max-width: 400px !important;
+    pointer-events: none; /* Allow clicks to pass through container */
+}
+
+/* Toast Messages */
+.toast-message {
+    pointer-events: auto; /* Enable clicks on individual messages */
+    margin-bottom: 10px !important;
+}
+
+/* Base Alert Styling with Enhanced Z-Index */
+.message-alert {
+    position: relative !important;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border: 2px solid;
+    border-radius: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
+    overflow: hidden;
+    backdrop-filter: blur(8px);
+    z-index: 999999 !important;
+    /* Default animation - will be overridden by specific types */
+    animation: messageSlideInFromTop var(--message-slide-duration) ease-out;
+}
+
+/* Message Type Specific Styles with Unique Animations */
+.alert-success {
+    background-color: var(--message-success-bg);
+    border-color: var(--message-success-border);
+    color: var(--message-success-text);
+    animation: messageBounceInFromRight var(--message-slide-duration) cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.alert-error,
+.alert-danger {
+    background-color: var(--message-error-bg);
+    border-color: var(--message-error-border);
+    color: var(--message-error-text);
+    animation: messageShakeSlideIn var(--message-slide-duration) ease-out;
+}
+
+.alert-warning {
+    background-color: var(--message-warning-bg);
+    border-color: var(--message-warning-border);
+    color: var(--message-warning-text);
+    animation: messagePulseInFromRight var(--message-slide-duration) ease-out;
+}
+
+.alert-info {
+    background-color: var(--message-info-bg);
+    border-color: var(--message-info-border);
+    color: var(--message-info-text);
+    animation: messageSmoothSlideFromRight var(--message-slide-duration) ease-out;
+}
+
+/* Message Icons */
+.message-icon {
+    font-size: 1.1rem;
+    vertical-align: middle;
+}
+
+.alert-success .message-icon {
+    color: var(--message-success);
+}
+
+.alert-error .message-icon,
+.alert-danger .message-icon {
+    color: var(--message-error);
+}
+
+.alert-warning .message-icon {
+    color: var(--message-warning);
+}
+
+.alert-info .message-icon {
+    color: var(--message-info);
+}
+
+/* Close Button Styling */
+.btn-close {
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.btn-close:hover {
+    opacity: 1;
+}
+
+.btn-close:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    opacity: 1;
+}
+
+/* Progress Bar for Auto-dismiss */
+.message-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.message-progress-bar {
+    height: 100%;
+    background-color: currentColor;
+    opacity: 0.4;
+    transform: translateX(-100%);
+    transition: transform linear;
+}
+
+.alert-success .message-progress-bar {
+    background-color: var(--message-success);
+}
+
+.alert-info .message-progress-bar {
+    background-color: var(--message-info);
+}
+
+.alert-warning .message-progress-bar {
+    background-color: var(--message-warning);
+}
+
+/* Toast Specific Styles */
+.toast-message {
+    max-width: 100%;
+    margin-bottom: 0.75rem;
+    transform: translateX(100%);
+    animation: toastSlideIn var(--message-slide-duration) ease-out forwards;
+}
+
+.toast-message.removing {
+    animation: toastSlideOut var(--message-fade-duration) ease-in forwards;
+}
+
+/* Enhanced Animations for Different Message Types */
+
+/* Success Messages - Bouncy entrance from right */
+@keyframes messageBounceInFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(120%) scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-10%) scale(1.05);
+    }
+    70% {
+        transform: translateX(5%) scale(0.98);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Error Messages - Shake and slide from top */
+@keyframes messageShakeSlideIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-50px) translateX(0) scale(0.9);
+    }
+    20% {
+        opacity: 1;
+        transform: translateY(0) translateX(-8px) scale(1);
+    }
+    40% {
+        transform: translateY(0) translateX(8px) scale(1);
+    }
+    60% {
+        transform: translateY(0) translateX(-4px) scale(1);
+    }
+    80% {
+        transform: translateY(0) translateX(4px) scale(1);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+    }
+}
+
+/* Warning Messages - Pulse in from right */
+@keyframes messagePulseInFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(100%) scale(0.8);
+    }
+    25% {
+        opacity: 0.5;
+        transform: translateX(20%) scale(1.1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: translateX(-5%) scale(0.95);
+    }
+    75% {
+        opacity: 0.9;
+        transform: translateX(2%) scale(1.02);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Info Messages - Smooth slide from right */
+@keyframes messageSmoothSlideFromRight {
+    0% {
+        opacity: 0;
+        transform: translateX(80%) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+/* Original animations preserved for backward compatibility */
+@keyframes messageSlideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) translateX(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(0) scale(1);
+    }
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes messageShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%) translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) translateY(0) scale(1);
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0) translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%) translateY(-10px) scale(0.95);
+    }
+}
+
+@keyframes messageFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .toast-container {
+        position: fixed !important;
+        top: 1rem !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        max-width: none;
+    }
+    
+    .message-alert {
+        font-size: 0.9rem;
+        padding: 0.875rem 1rem;
+    }
+    
+    .toast-message {
+        animation: mobileToastSlideIn var(--message-slide-duration) ease-out forwards;
+    }
+    
+    .toast-message.removing {
+        animation: mobileToastSlideOut var(--message-fade-duration) ease-in forwards;
+    }
+}
+
+@keyframes mobileToastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes mobileToastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-100%) scale(0.95);
+    }
+}
+
+/* Accessibility note: Using aria-live attributes in HTML for screen reader announcements */
+/* instead of deprecated CSS speak property */
+
+/* Focus Management */
+.message-alert:focus-within {
+    outline: 2px solid var(--primary-teal);
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+    .message-alert {
+        border-width: 3px;
+    }
+    
+    .message-icon {
+        font-weight: 900;
+    }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+    .message-alert,
+    .toast-message {
+        animation: none;
+    }
+    
+    .message-progress-bar {
+        transition: none;
+    }
+    
+    .btn-close {
+        transition: none;
+    }
+}
+</style>
+
+<!-- Message JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messageSystem = {
+        init() {
+            this.setupAutoTimers();
+            this.setupKeyboardNavigation();
+            this.announceToScreenReaders();
+        },
+
+        setupAutoTimers() {
+            document.querySelectorAll('.message-alert[data-auto-dismiss]').forEach(alert => {
+                const dismissTime = parseInt(alert.dataset.autoDismiss);
+                if (dismissTime && dismissTime > 0) {
+                    this.setupHoverPause(alert, dismissTime);
+                    this.startProgressBar(alert, dismissTime);
+                    this.scheduleAutoDismiss(alert, dismissTime);
+                }
+            });
+        },
+
+        setupHoverPause(alert, originalDuration) {
+            let startTime = Date.now();
+            let remainingTime = originalDuration;
+            let timeoutId = null;
+            let isPaused = false;
+            const progressBar = alert.querySelector('.message-progress-bar');
+
+            const pauseTimer = () => {
+                if (!isPaused && timeoutId) {
+                    clearTimeout(timeoutId);
+                    remainingTime = originalDuration - (Date.now() - startTime);
+                    if (progressBar) {
+                        progressBar.style.animationPlayState = 'paused';
+                    }
+                    isPaused = true;
+                }
+            };
+
+            const resumeTimer = () => {
+                if (isPaused && remainingTime > 0) {
+                    startTime = Date.now();
+                    if (progressBar) {
+                        progressBar.style.transitionDuration = remainingTime + 'ms';
+                        progressBar.style.animationPlayState = 'running';
+                    }
+                    timeoutId = setTimeout(() => {
+                        this.dismissMessage(alert);
+                    }, remainingTime);
+                    isPaused = false;
+                }
+            };
+
+            alert.addEventListener('mouseenter', pauseTimer);
+            alert.addEventListener('mouseleave', resumeTimer);
+            alert.addEventListener('focusin', pauseTimer);
+            alert.addEventListener('focusout', resumeTimer);
+
+            // Store timeout ID for cleanup
+            alert._autoDismissTimeout = timeoutId;
+        },
+
+        scheduleAutoDismiss(alert, duration) {
+            const timeoutId = setTimeout(() => {
+                this.dismissMessage(alert);
+            }, duration);
+            alert._autoDismissTimeout = timeoutId;
+        },
+
+        startProgressBar(alert, duration) {
+            const progressBar = alert.querySelector('.message-progress-bar');
+            if (progressBar) {
+                // Force reflow to ensure the animation starts
+                progressBar.offsetHeight;
+                progressBar.style.transitionDuration = duration + 'ms';
+                progressBar.style.transform = 'translateX(0)';
+            }
+        },
+
+        dismissMessage(alert) {
+            if (alert && alert.parentNode) {
+                alert.style.animation = 'messageFadeOut 250ms ease-in forwards';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.remove();
+                    }
+                }, 250);
+            }
+        },
+
+        setupKeyboardNavigation() {
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    // Dismiss the newest message on Escape
+                    const newestMessage = document.querySelector('.message-alert:last-child');
+                    if (newestMessage) {
+                        this.dismissMessage(newestMessage);
+                    }
+                }
+            });
+        },
+
+        announceToScreenReaders() {
+            // Create enhanced live regions for different announcement priorities
+            if (!document.getElementById('sr-live-region-polite')) {
+                const politeRegion = document.createElement('div');
+                politeRegion.id = 'sr-live-region-polite';
+                politeRegion.setAttribute('aria-live', 'polite');
+                politeRegion.setAttribute('aria-atomic', 'true');
+                politeRegion.style.position = 'absolute';
+                politeRegion.style.left = '-10000px';
+                politeRegion.style.width = '1px';
+                politeRegion.style.height = '1px';
+                politeRegion.style.overflow = 'hidden';
+                document.body.appendChild(politeRegion);
+            }
+            
+            if (!document.getElementById('sr-live-region-assertive')) {
+                const assertiveRegion = document.createElement('div');
+                assertiveRegion.id = 'sr-live-region-assertive';
+                assertiveRegion.setAttribute('aria-live', 'assertive');
+                assertiveRegion.setAttribute('aria-atomic', 'true');
+                assertiveRegion.style.position = 'absolute';
+                assertiveRegion.style.left = '-10000px';
+                assertiveRegion.style.width = '1px';
+                assertiveRegion.style.height = '1px';
+                assertiveRegion.style.overflow = 'hidden';
+                document.body.appendChild(assertiveRegion);
+            }
+        },
+
+        // Method to add toast messages dynamically with improved timings
+        showToast(message, type = 'info', duration = null) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            // Set improved default durations based on type
+            if (duration === null) {
+                switch(type) {
+                    case 'success':
+                        duration = 4000; // 4 seconds - quick positive feedback
+                        break;
+                    case 'error':
+                    case 'danger':
+                        duration = 0; // Persistent - manual dismiss only
+                        break;
+                    case 'warning':
+                        duration = 8000; // 8 seconds - important warnings need time
+                        break;
+                    default:
+                        duration = 6000; // 6 seconds - standard info
+                }
+            }
+
+            const toastId = 'toast-' + Date.now();
+            const iconClass = this.getIconClass(type);
+            
+            // Determine aria-live attribute based on message type
+            const ariaLive = (type === 'error' || type === 'danger') ? 'assertive' : 'polite';
+            
+            // Calculate staggered delay for smooth multiple message appearance
+            const existingToasts = container.querySelectorAll('.toast-message').length;
+            const staggerDelay = Math.min(existingToasts * 150, 450); // Max 450ms delay
+            
+            const toastHtml = `
+                <div id="${toastId}" class="message-alert alert-${type} toast-message" 
+                     role="alert" 
+                     aria-live="${ariaLive}"
+                     data-message-type="${type}"
+                     data-auto-dismiss="${duration}"
+                     style="animation-delay: ${staggerDelay}ms;">
+                    <i class="message-icon me-2 ${iconClass}"></i>
+                    <span class="message-content">${message}</span>
+                    <button type="button" class="btn-close" onclick="messageSystem.dismissToast('${toastId}')" aria-label="Close"></button>
+                    ${duration > 0 ? '<div class="message-progress"><div class="message-progress-bar"></div></div>' : ''}
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            
+            const toast = document.getElementById(toastId);
+            
+            // Limit number of toasts
+            this.limitToasts(container);
+            
+            // Set up auto-dismiss with hover pause if duration is set
+            if (duration > 0) {
+                setTimeout(() => {
+                    this.setupHoverPause(toast, duration);
+                    this.startProgressBar(toast, duration);
+                    this.scheduleAutoDismiss(toast, duration);
+                }, staggerDelay);
+            }
+
+            // Announce to screen readers with appropriate delay
+            setTimeout(() => {
+                this.announceMessage(message, type);
+            }, staggerDelay + 100);
+            
+            return toastId;
+        },
+
+        // For backward compatibility - all messages now show as toasts
+        showInlineMessage(message, type = 'info', duration = null) {
+            return this.showToast(message, type, duration);
+        },
+
+        clearToasts() {
+            const container = document.getElementById('toast-container');
+            if (container) {
+                const toasts = container.querySelectorAll('.toast-message');
+                toasts.forEach(toast => {
+                    this.dismissToast(toast.id);
+                });
+            }
+        },
+
+        clearInlineMessages() {
+            // For backward compatibility - just clear toasts since all messages are toasts now
+            this.clearToasts();
+        },
+
+        dismissToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                // Clear any pending auto-dismiss timeout
+                if (toast._autoDismissTimeout) {
+                    clearTimeout(toast._autoDismissTimeout);
+                }
+                
+                toast.classList.add('removing');
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.remove();
+                    }
+                }, 300);
+            }
+        },
+
+        limitToasts(container, maxToasts = 3) {
+            const toasts = container.querySelectorAll('.toast-message');
+            if (toasts.length > maxToasts) {
+                // Remove oldest toasts
+                for (let i = 0; i < toasts.length - maxToasts; i++) {
+                    this.dismissMessage(toasts[i]);
+                }
+            }
+        },
+
+        getIconClass(type) {
+            switch(type) {
+                case 'success':
+                    return 'fas fa-check-circle';
+                case 'error':
+                case 'danger':
+                    return 'fas fa-exclamation-triangle';
+                case 'warning':
+                    return 'fas fa-exclamation-circle';
+                default:
+                    return 'fas fa-info-circle';
+            }
+        },
+
+        announceMessage(message, type) {
+            // Use appropriate live region based on message urgency
+            const isUrgent = (type === 'error' || type === 'danger');
+            const liveRegionId = isUrgent ? 'sr-live-region-assertive' : 'sr-live-region-polite';
+            const liveRegion = document.getElementById(liveRegionId);
+            
+            if (liveRegion) {
+                // Clear the region first to ensure announcement
+                liveRegion.textContent = '';
+                
+                // Use descriptive prefixes for better context
+                const typeText = type === 'error' || type === 'danger' ? 'Error message: ' : 
+                               type === 'success' ? 'Success notification: ' : 
+                               type === 'warning' ? 'Warning alert: ' : 'Information: ';
+                
+                // Add timing context for auto-dismissing messages
+                const timingText = type === 'error' ? ' This message will remain until dismissed.' :
+                                 type === 'success' ? ' This message will auto-dismiss in 4 seconds.' :
+                                 type === 'warning' ? ' This message will auto-dismiss in 8 seconds.' :
+                                 ' This message will auto-dismiss in 6 seconds.';
+                
+                // Announce with slight delay to ensure it's picked up
+                setTimeout(() => {
+                    liveRegion.textContent = typeText + message + timingText;
+                }, 100);
+            }
+        }
+    };
+
+    // Initialize the message system
+    messageSystem.init();
+    
+    // Make it globally accessible
+    window.messageSystem = messageSystem;
+    
+    // Create MessagingSystem object for backward compatibility
+    window.MessagingSystem = {
+        showToast: (message, type, duration) => messageSystem.showToast(message, type, duration),
+        showInlineMessage: (message, type, duration) => messageSystem.showToast(message, type, duration),
+        clearToasts: () => messageSystem.clearToasts(),
+        clearInlineMessages: () => messageSystem.clearToasts()
+    };
+});
+
+// Utility functions for easy access with improved defaults
+function showSuccessToast(message, duration = 4000) {
+    return window.messageSystem.showToast(message, 'success', duration);
+}
+
+function showErrorToast(message, duration = 0) {  // Persistent by default
+    return window.messageSystem.showToast(message, 'error', duration);
+}
+
+function showInfoToast(message, duration = 6000) {
+    return window.messageSystem.showToast(message, 'info', duration);
+}
+
+function showWarningToast(message, duration = 8000) {
+    return window.messageSystem.showToast(message, 'warning', duration);
+}
+</script>

@@ -1,4 +1,6 @@
 {% extends 'base_doctor.html' %}
+{% load static %}
+{% load profile_tags %}
 
 {% block title %}Doctor Profile{% endblock %}
 
@@ -11,8 +13,7 @@
     <div class="card-body">
         <div class="row">
             <div class="col-lg-4 text-center border-end">
-                <!-- Corrected default image path -->
-                <img src="{{ profile.profile_picture.url|default:'/media/profile_pictures/default.png' }}" alt="Profile Picture" class="img-fluid rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% profile_image user size="150" css_class="profile-page-image rounded mb-3" %}
                 <h4 class="fw-bold text-custom-dark">Dr. {{ user.get_full_name }}</h4>
                 <p class="text-muted">{{ user.email }}</p>
                 {% if user.is_active %}<span class="badge bg-success">Active</span>

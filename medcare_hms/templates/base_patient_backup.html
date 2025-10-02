@@ -1,0 +1,1272 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedCare HMS - Patient{% endblock %}</title>
+    
+    <!-- Poppins Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-teal: #0E7490;
+            --primary-dark-teal: #0C4A6E;
+            --sky-blue: #0284C7;
+            --light-sky-blue: #38BDF8;
+            --background-light: #F1F5F9;
+            --background-white: #FFFFFF;
+            --accent-blue: #14B8A6;
+            --text-dark: #1E293B;
+            --accent-green: #22C55E;
+            --accent-orange: #F97316;
+        }
+
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            flex: 1;
+        }
+
+        /* Navbar */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .navbar-logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 8px;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 4px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+            color: white !important;
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            color: white !important;
+        }
+
+        /* User Profile Dropdown */
+        .user-profile-nav {
+            position: relative;
+        }
+
+        .user-profile-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+        }
+
+        .user-profile-toggle:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .user-dropdown.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.5rem;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0.75rem;
+            border-radius: 6px;
+            color: var(--text-dark);
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-teal);
+        }
+
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+        }
+
+        /* Mobile Sidebar */
+        @media (max-width: 768px) {
+            .mobile-sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+                z-index: 1040;
+                transition: left 0.3s ease;
+                padding-top: 2rem;
+            }
+            
+            .mobile-sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1039;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        /* Cards */
+        .card-custom {
+            background: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--primary-dark-teal) 0%, #083344 100%);
+            color: white;
+            margin-top: auto;
+        }
+
+        .footer a {
+            color: var(--light-sky-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer a:hover {
+            color: var(--accent-orange);
+        }
+
+        .footer h5 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-custom">
+            <div class="container">
+                <div class="logo-container">
+                    <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
+                    <span class="logo-text">MedCare HMS</span>
+                </div>
+
+                <button class="navbar-toggler border-0 d-lg-none" type="button" id="mobileMenuToggle">
+                    <i class="fas fa-bars text-white"></i>
+                </button>
+
+                <div class="collapse navbar-collapse d-none d-lg-block" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'patient_dashboard' %}">
+                                <i class="fas fa-home me-2"></i>Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patients:my_appointments' %}">
+                                <i class="fas fa-calendar-check me-2"></i>Appointments
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patients:my_medical_records_list' %}">
+                                <i class="fas fa-file-medical me-2"></i>Medical Records
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-prescription me-2"></i>Prescriptions
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'patients:doctor_list' %}">
+                                <i class="fas fa-user-doctor me-2"></i>Find a Doctor
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center">
+                        {% if user.is_authenticated %}
+                        <div class="user-profile-nav">
+                            <button class="user-profile-toggle" id="userProfileToggle">
+                                <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                     alt="User Avatar" class="user-avatar">
+                                <div class="user-info">
+                                    <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                                    <span class="user-role">Patient</span>
+                                </div>
+                                <i class="fas fa-chevron-down ms-2"></i>
+                            </button>
+                            <div class="user-dropdown" id="userDropdown">
+                                <div class="dropdown-header">
+                                    <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                                         alt="User Avatar" class="user-avatar">
+                                    <div>
+                                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="user-role">Patient</div>
+                                    </div>
+                                </div>
+                                <a href="{% url 'patients:patient_profile' %}" class="dropdown-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>My Profile</span>
+                                </a>
+                                <a href="{% url 'patients:edit_patient_profile' %}" class="dropdown-item">
+                                    <i class="fas fa-cog"></i>
+                                    <span>Settings</span>
+                                </a>
+                                <a href="{% url 'patients:my_medical_records_list' %}" class="dropdown-item">
+                                    <i class="fas fa-file-medical"></i>
+                                    <span>Medical History</span>
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a href="{% url 'logout' %}" class="dropdown-item">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-light btn-sm me-2">Login</a>
+                        <a href="{% url 'register' %}" class="btn btn-light btn-sm">Register</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Sidebar -->
+        <div class="mobile-sidebar d-lg-none" id="mobileSidebar">
+            <div class="sidebar-content p-3">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="logo-container">
+                        <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo" style="width: 40px; height: 40px;">
+                        <span class="logo-text" style="font-size: 1.2rem;">MedCare HMS</span>
+                    </div>
+                    <button class="btn-close btn-close-white" id="closeMobileSidebar"></button>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="d-flex align-items-center gap-3 mb-4 p-2 rounded" style="background: rgba(255,255,255,0.1);">
+                    <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default-avatar.png' %}{% endif %}" 
+                         alt="User Avatar" class="user-avatar" style="width: 50px; height: 50px;">
+                    <div>
+                        <div class="user-name">{{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="user-role">Patient</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active text-white" href="{% url 'patient_dashboard' %}">
+                            <i class="fas fa-home me-2"></i>Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'patients:my_appointments' %}">
+                            <i class="fas fa-calendar-check me-2"></i>Appointments
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'patients:my_medical_records_list' %}">
+                            <i class="fas fa-file-medical me-2"></i>Medical Records
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="#">
+                            <i class="fas fa-prescription me-2"></i>Prescriptions
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'patients:doctor_list' %}">
+                            <i class="fas fa-user-doctor me-2"></i>Find a Doctor
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item mt-3">
+                        <a class="nav-link text-white" href="{% url 'patients:patient_profile' %}">
+                            <i class="fas fa-user me-2"></i>My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Include Messages Component -->
+        {% include 'components/messages.html' %}
+
+        <!-- Main Content -->
+        <main class="container-fluid py-4">
+            <div class="container">
+                {% block content %}
+                <!-- Patient specific content goes here -->
+                {% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="footer">
+        <div class="container py-5">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="logo-container mb-3">
+                        <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
+                        <h5 class="logo-text mb-0">MedCare HMS</h5>
+                    </div>
+                    <p class="mb-3">Comprehensive healthcare management for patients and providers. Your health is our priority with secure, accessible medical services.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'patient_dashboard' %}">Dashboard</a></li>
+                        <li><a href="{% url 'patients:my_appointments' %}">Appointments</a></li>
+                        <li><a href="{% url 'patients:my_medical_records_list' %}">Medical Records</a></li>
+                        <li><a href="#">Prescriptions</a></li>
+                        <li><a href="{% url 'patients:doctor_list' %}">Find a Doctor</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-4 mb-4">
+                    <h5>Resources</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#">Health Articles</a></li>
+                        <li><a href="#">Medication Guide</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Support Center</a></li>
+                        <li><a href="#">Emergency Contacts</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-4 mb-4">
+                    <h5>Contact Information</h5>
+                    <div class="mb-3">
+                        <p><i class="fas fa-map-marker-alt me-2"></i>123 Health Street, Medical City, MC 12345</p>
+                        <p><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                        <p><i class="fas fa-envelope me-2"></i>support@medcarehms.com</p>
+                        <p><i class="fas fa-clock me-2"></i>24/7 Emergency Support</p>
+                    </div>
+                    <div class="mt-4">
+                        <h6>Emergency Contacts</h6>
+                        <p class="small mb-1">Ambulance: <strong>911</strong></p>
+                        <p class="small mb-1">Poison Control: <strong>1-800-222-1222</strong></p>
+                    </div>
+                </div>
+            </div>
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userProfileToggle = document.getElementById('userProfileToggle');
+            const userDropdown = document.getElementById('userDropdown');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const closeMobileSidebar = document.getElementById('closeMobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // User profile dropdown toggle
+            if (userProfileToggle && userDropdown) {
+                userProfileToggle.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('show');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (userDropdown.classList.contains('show') && 
+                        !userProfileToggle.contains(e.target) && 
+                        !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+            }
+
+            // Mobile sidebar toggle
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileSidebar.classList.toggle('show');
+                    sidebarOverlay.classList.toggle('show');
+                });
+            }
+
+            // Close mobile sidebar
+            if (closeMobileSidebar) {
+                closeMobileSidebar.addEventListener('click', function() {
+                    mobileSidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    mobileSidebar.classList.remove('show');
+                    this.classList.remove('show');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 2px;
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1.25rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .sidebar-brand img {
+            height: 52px;
+            width: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .brand-text {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .brand-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        .nav-section {
+            margin: 1.5rem 0;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            opacity: 0.65;
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-section-title {
+            opacity: 0;
+            height: 0;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .menu-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            position: relative;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 0.75rem 0.35rem;
+        }
+
+        .menu-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            transform: translateX(6px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .menu-link.active {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+
+        .menu-link.active::before {
+            content: '';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 20px;
+            background: var(--accent-orange);
+            border-radius: 2px;
+        }
+
+        .menu-icon {
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .menu-text {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed .menu-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        .sidebar.collapsed .menu-link {
+            justify-content: center;
+            padding: 0.85rem;
+        }
+
+        /* Professional Top Bar */
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--primary-teal) 100%);
+            color: #fff;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 20px var(--shadow-light);
+            height: var(--header-height);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .sidebar-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 10px;
+            transition: all 0.25s;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .topbar-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .notification-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: var(--accent-orange);
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-toggle {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            transition: all 0.25s;
+            cursor: pointer;
+        }
+
+        .user-toggle:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .user-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            line-height: 1;
+        }
+
+        .user-menu {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            min-width: 240px;
+            background: #fff;
+            color: var(--text-dark);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            display: none;
+            z-index: 1001;
+        }
+
+        .user-menu::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            right: 20px;
+            width: 12px;
+            height: 12px;
+            background: #fff;
+            border-radius: 2px;
+            transform: rotate(45deg);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+
+        .user-menu a {
+            text-decoration: none;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            padding: 0.6rem 0.75rem;
+            border-radius: 8px;
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            transition: all 0.2s;
+            margin: 0.2rem 0;
+        }
+
+        .user-menu a:hover {
+            background: #f8fafc;
+            color: var(--primary-teal);
+            transform: translateX(4px);
+        }
+
+        .user-menu .divider {
+            height: 1px;
+            background: #e2e8f0;
+            margin: 0.5rem 0;
+        }
+
+        /* Main Content Area */
+        .content-wrapper {
+            margin-left: var(--sidebar-width);
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .sidebar.collapsed ~ .content-wrapper {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+
+        /* Professional Footer */
+        footer {
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--primary-teal) 100%);
+            color: #fff;
+            padding: 1.5rem 2rem 1rem;
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        /* Dashboard Components */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px var(--shadow-light);
+            border-left: 4px solid var(--accent-coral);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-medium);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-coral) 0%, var(--accent-blue) 100%);
+            color: #fff;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-teal);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .content-wrapper,
+            .sidebar.collapsed ~ .content-wrapper {
+                margin-left: 0;
+            }
+
+            .topbar-title {
+                font-size: 1rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .topbar {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include Messages Component -->
+    {% include 'components/messages.html' %}
+    
+    <!-- Professional Sidebar -->
+    <nav class="sidebar" id="patientSidebar">
+        <div class="sidebar-brand">
+            <img src="{% static 'images/logo.png' %}" alt="MedCare Logo">
+            <span class="brand-text">MedCare HMS</span>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Dashboard</div>
+            <a href="{% url 'patient_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'patient_dashboard' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
+                <span class="menu-text">Overview</span>
+            </a>
+        </div>
+
+        <!-- My Profile Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">My Profile</div>
+            <a href="{% url 'patients:patient_profile' %}" class="menu-link {% if request.resolver_match.url_name == 'patient_profile' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-user"></i></span>
+                <span class="menu-text">Personal Info</span>
+            </a>
+            <a href="{% url 'patients:my_medical_records_list' %}" class="menu-link {% if request.resolver_match.url_name == 'my_medical_records_list' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-file-medical"></i></span>
+                <span class="menu-text">Medical History</span>
+            </a>
+        </div>
+
+        <!-- Appointments Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Appointments</div>
+            <a href="{% url 'patients:book_appointment' %}" class="menu-link {% if request.resolver_match.url_name == 'book_appointment' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>
+                <span class="menu-text">Book Appointment</span>
+            </a>
+            <a href="{% url 'patients:my_appointments' %}" class="menu-link {% if request.resolver_match.url_name == 'my_appointments' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-calendar-check"></i></span>
+                <span class="menu-text">My Appointments</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-calendar-alt"></i></span>
+                <span class="menu-text">Reschedule</span>
+            </a>
+        </div>
+
+        <!-- Medical Records Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Medical Records</div>
+            <a href="{% url 'patients:my_medical_records_list' %}" class="menu-link {% if request.resolver_match.url_name == 'my_medical_records_list' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-folder-open"></i></span>
+                <span class="menu-text">My Records</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-prescription-bottle-alt"></i></span>
+                <span class="menu-text">Prescriptions</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-vials"></i></span>
+                <span class="menu-text">Lab Results</span>
+            </a>
+        </div>
+
+        <!-- Billing Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Billing</div>
+            <a href="{% url 'patients:my_bills_list' %}" class="menu-link {% if request.resolver_match.url_name == 'my_bills_list' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-file-invoice"></i></span>
+                <span class="menu-text">Bills & Payments</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-credit-card"></i></span>
+                <span class="menu-text">Make Payment</span>
+            </a>
+        </div>
+
+        <!-- Healthcare Team Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Healthcare Team</div>
+            <a href="{% url 'patients:doctor_list' %}" class="menu-link {% if request.resolver_match.url_name == 'doctor_list' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-user-md"></i></span>
+                <span class="menu-text">Find Doctors</span>
+            </a>
+            <a href="#" class="menu-link">
+                <span class="menu-icon"><i class="fas fa-stethoscope"></i></span>
+                <span class="menu-text">My Doctors</span>
+            </a>
+        </div>
+
+        <!-- Communication Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Communication</div>
+            <a href="{% url 'chat:thread_list' %}" class="menu-link {% if request.resolver_match.app_name == 'chat' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-comments"></i></span>
+                <span class="menu-text">Messages</span>
+            </a>
+            <a href="{% url 'notifications:notification_list' %}" class="menu-link {% if request.resolver_match.app_name == 'notifications' %}active{% endif %}">
+                <span class="menu-icon"><i class="fas fa-bell"></i></span>
+                <span class="menu-text">Notifications</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper" id="patientContent">
+        <!-- Professional Top Bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h6 class="topbar-title mb-0">Patient Portal</h6>
+            </div>
+            
+            <div class="topbar-right">
+                <!-- Notifications -->
+                <a href="{% url 'notifications:notification_list' %}" class="notification-btn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">2</span>
+                </a>
+                
+                <!-- User Menu -->
+                <div class="user-dropdown">
+                    <button class="user-toggle" id="userMenuToggle">
+                        <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
+                             alt="User Avatar" class="user-avatar">
+                        <div class="user-info">
+                            <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                            <span class="user-role">Patient</span>
+                        </div>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-menu-header">
+                            <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'profile_pictures/default.jpeg' %}{% endif %}" 
+                                 alt="User Avatar" class="user-menu-avatar">
+                            <div>
+                                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                                <div class="user-role">Patient</div>
+                            </div>
+                        </div>
+                        <a href="{% url 'patients:patient_profile' %}">
+                            <i class="fas fa-user"></i> My Profile
+                        </a>
+                        <a href="{% url 'patients:edit_patient_profile' %}">
+                            <i class="fas fa-cog"></i> Settings
+                        </a>
+                        <div class="divider"></div>
+                        <a href="{% url 'logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            {% block content %}
+            <!-- Default Dashboard Content -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-value">{{ upcoming_appointments|default:"--" }}</div>
+                    <div class="stat-label">Upcoming Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <div class="stat-value">{{ recent_records|default:"--" }}</div>
+                    <div class="stat-label">Recent Medical Records</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-prescription-bottle-alt"></i>
+                    </div>
+                    <div class="stat-value">{{ active_prescriptions|default:"--" }}</div>
+                    <div class="stat-label">Active Prescriptions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="stat-value">{{ pending_bills|default:"--" }}</div>
+                    <div class="stat-label">Pending Bills</div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+
+        <!-- Professional Footer -->
+        <footer>
+            <p class="mb-0">© 2025 MedCare HMS | Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
+        </footer>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('patientSidebar');
+        const content = document.getElementById('patientContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            localStorage.setItem('patientSidebarCollapsed', sidebar.classList.contains('collapsed'));
+        });
+
+        // Restore sidebar state
+        if (localStorage.getItem('patientSidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+
+        // User menu toggle
+        const userToggle = document.getElementById('userMenuToggle');
+        const userMenu = document.getElementById('userMenu');
+
+        userToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Close user menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
+                userMenu.style.display = 'none';
+            }
+        });
+
+        // Mobile sidebar toggle
+        if (window.innerWidth <= 991.98) {
+            sidebarToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
