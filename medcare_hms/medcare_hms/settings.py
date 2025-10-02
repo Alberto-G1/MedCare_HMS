@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'accounts',
+    'core',
     'patients',
     'doctors',
     'management',
@@ -163,3 +164,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = 'dashboard_redirect'
 LOGIN_URL = 'login'
 LOGOUT_REDIRECT_URL = 'login'
+
+
+# --- EMAIL CONFIGURATION ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True  # Use Transport Layer Security
+EMAIL_HOST_USER = 'nuwarindaalbertgrande@gmail.com'  # The email you generated the App Password for
+EMAIL_HOST_PASSWORD = 'giwosabwcjzaohdn' # The 16-digit App Password you just generated (no spaces)
+DEFAULT_FROM_EMAIL = 'nuwarindaalbertgrande@gmail.com'

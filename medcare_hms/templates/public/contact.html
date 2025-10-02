@@ -1,0 +1,84 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}Contact Us - MedCare HMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold">Contact Us</h1>
+                <p class="lead">Get in touch with our team for any questions or support.</p>
+            </div>
+
+            <!-- === MESSAGE DISPLAY BLOCK === -->
+            <!-- This will show success or error messages after form submission -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <!-- === END MESSAGE BLOCK === -->
+
+            <div class="card card-custom border-0 shadow-lg">
+                <div class="card-body p-4 p-md-5">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control form-control-lg" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control form-control-lg" id="email" name="email" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control form-control-lg" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control form-control-lg" id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary-custom btn-lg">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row mt-5 pt-4">
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h5>Visit Us</h5>
+                    <p class="text-muted">123 Health Street<br>Medical City, MC 12345</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <h5>Call Us</h5>
+                    <p class="text-muted">+1 (555) 123-4567<br>Mon-Fri, 9AM-5PM</p>
+                </div>
+                <div class="col-md-4 text-center mb-4">
+                    <div class="feature-icon mb-3">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h5>Email Us</h5>
+                    <p class="text-muted">support@medcarehms.com<br>help@medcarehms.com</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

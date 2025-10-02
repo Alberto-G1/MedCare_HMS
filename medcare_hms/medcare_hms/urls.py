@@ -33,8 +33,9 @@ urlpatterns = [
     path('notifications/', include('notifications.urls', namespace='notifications')),
     path('reports/', include('reports.urls', namespace='reports')),
     path('prescriptions/', include('prescriptions.urls', namespace='prescriptions')),
-        path('audit/', include(('audit.urls', 'audit'), namespace='audit')),
-    path('', RedirectView.as_view(url='/accounts/login/', permanent=True)),
+    path('audit/', include(('audit.urls', 'audit'), namespace='audit')),
+    path('accounts/', include('accounts.urls')),
+    path('', include('core.urls')),
 ]
 
 if settings.DEBUG:
