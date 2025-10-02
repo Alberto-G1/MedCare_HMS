@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}MedCare HMS - Doctor{% endblock %}</title>
+    <title>{% block title %}MedCare HMS - Receptionist{% endblock %}</title>
     
     <!-- Poppins Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,7 +30,6 @@
             --shadow-medium: rgba(15, 23, 42, 0.15);
             --sidebar-width: 280px;
             --sidebar-collapsed: 70px;
-            --right-sidebar-width: 320px;
             --accent-green: #22C55E;
             --accent-orange: #F97316;
         }
@@ -203,56 +202,17 @@
             opacity: 0;
         }
 
-        /* Right Sidebar */
-        .right-sidebar {
-            background: var(--background-white);
-            height: 100vh;
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: var(--right-sidebar-width);
-            z-index: 1015;
-            box-shadow: -4px 0 12px var(--shadow-medium);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .right-sidebar.collapsed {
-            width: 0;
-            overflow: hidden;
-        }
-
-        .right-sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .right-sidebar-content {
-            padding: 1.5rem;
-            flex: 1;
-        }
-
         /* Main Content */
-        .main-content-doctor {
+        .main-content-receptionist {
             margin-left: var(--sidebar-width);
-            margin-right: 0;
             min-height: 100vh;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             flex-direction: column;
         }
 
-        .main-content-doctor.expanded-left {
+        .main-content-receptionist.expanded-left {
             margin-left: var(--sidebar-collapsed);
-        }
-
-        .main-content-doctor.expanded-right {
-            margin-right: var(--right-sidebar-width);
         }
 
         .content-area {
@@ -274,21 +234,6 @@
 
         .sidebar-toggle:hover {
             background-color: rgba(135, 206, 235, 0.2);
-        }
-
-        .right-sidebar-toggle {
-            background: none;
-            border: none;
-            color: var(--text-dark);
-            font-size: 1.2rem;
-            padding: 0.5rem;
-            border-radius: 6px;
-            transition: background-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .right-sidebar-toggle:hover {
-            background-color: var(--background-light);
         }
 
         /* Cards */
@@ -342,55 +287,6 @@
             opacity: 0.8;
         }
 
-        /* Patient List */
-        .patient-item {
-            display: flex;
-            align-items: center;
-            padding: 1rem;
-            border-bottom: 1px solid #eee;
-            transition: background-color 0.3s ease;
-        }
-
-        .patient-item:hover {
-            background-color: var(--background-light);
-        }
-
-        .patient-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 1rem;
-        }
-
-        .patient-info h6 {
-            margin-bottom: 0.2rem;
-            font-weight: 600;
-        }
-
-        .patient-info small {
-            color: #666;
-        }
-
-        .patient-status {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-left: auto;
-        }
-
-        .status-urgent {
-            background-color: #EF4444;
-        }
-
-        .status-routine {
-            background-color: #10B981;
-        }
-
-        .status-waiting {
-            background-color: #F59E0B;
-        }
-
         /* Responsive Design */
         @media (max-width: 1199.98px) {
             .left-sidebar {
@@ -401,19 +297,9 @@
                 transform: translateX(0);
             }
 
-            .right-sidebar {
-                transform: translateX(100%);
-            }
-
-            .right-sidebar.show {
-                transform: translateX(0);
-            }
-
-            .main-content-doctor,
-            .main-content-doctor.expanded-left,
-            .main-content-doctor.expanded-right {
+            .main-content-receptionist,
+            .main-content-receptionist.expanded-left {
                 margin-left: 0;
-                margin-right: 0;
             }
 
             .sidebar-overlay {
@@ -439,6 +325,10 @@
             .content-area {
                 padding: 1rem;
             }
+            
+            .user-info {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -460,42 +350,38 @@
             </div>
 
             <div class="d-flex align-items-center">
-                <span class="text-white me-3 d-none d-md-block">Welcome, Dr. {{ user.first_name }} {{ user.last_name }}</span>
+                <span class="text-white me-3 d-none d-md-block">Welcome, {{ user.first_name }} {{ user.last_name }}</span>
                 
                 <!-- Notification Bell -->
                 <div class="dropdown me-3">
                     <button class="btn btn-outline-light position-relative" data-bs-toggle="dropdown">
                         <i class="fas fa-bell"></i>
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            3
+                            5
                         </span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <h6 class="dropdown-header">Notifications</h6>
-                        <a class="dropdown-item" href="#">New appointment request</a>
-                        <a class="dropdown-item" href="#">Lab results ready</a>
-                        <a class="dropdown-item" href="#">Patient message</a>
+                        <a class="dropdown-item" href="#">New patient registration</a>
+                        <a class="dropdown-item" href="#">Appointment reminder</a>
+                        <a class="dropdown-item" href="#">Payment pending</a>
+                        <a class="dropdown-item" href="#">Doctor availability update</a>
                     </div>
                 </div>
-
-                <!-- Right Sidebar Toggle -->
-                <button class="right-sidebar-toggle me-3" id="rightSidebarToggle">
-                    <i class="fas fa-columns"></i>
-                </button>
 
                 <!-- User Profile -->
                 <div class="dropdown">
                     <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
                         <img src="{% if user.profile.image %}{{ user.profile.image.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
                              alt="User Avatar" class="rounded-circle me-2" width="32" height="32">
-                        <span class="d-none d-md-inline">Dr. {{ user.first_name }}</span>
+                        <span class="d-none d-md-inline">{{ user.first_name }}</span>
                     </button>
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="#">
                             <i class="fas fa-user me-2"></i>Profile
                         </a>
                         <a class="dropdown-item" href="#">
-                            <i class="fas fa-calendar me-2"></i>Schedule
+                            <i class="fas fa-cog me-2"></i>Settings
                         </a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{% url 'logout' %}">
@@ -520,15 +406,15 @@
                 <div class="menu-section-title">Dashboard</div>
                 <ul class="list-unstyled">
                     <li class="menu-item">
-                        <a href="{% url 'doctor_dashboard' %}" class="menu-link active">
+                        <a href="{% url 'receptionist_dashboard' %}" class="menu-link active">
                             <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
                             <span class="menu-text">Overview</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'doctors:availability' %}" class="menu-link">
+                        <a href="#" class="menu-link">
                             <span class="menu-icon"><i class="fas fa-calendar-alt"></i></span>
-                            <span class="menu-text">My Schedule</span>
+                            <span class="menu-text">Daily Schedule</span>
                         </a>
                     </li>
                 </ul>
@@ -539,46 +425,71 @@
                 <div class="menu-section-title">Patient Management</div>
                 <ul class="list-unstyled">
                     <li class="menu-item">
-                        <a href="{% url 'doctors:patient_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-procedures"></i></span>
-                            <span class="menu-text">My Patients</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-user-plus"></i></span>
+                            <span class="menu-text">Add New Patient</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'doctors:appointment_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-calendar-check"></i></span>
-                            <span class="menu-text">Appointments</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-users"></i></span>
+                            <span class="menu-text">All Patients</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'doctors:prescription_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-prescription"></i></span>
-                            <span class="menu-text">Prescriptions</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-folder"></i></span>
+                            <span class="menu-text">Patient Records</span>
                         </a>
                     </li>
                 </ul>
             </li>
 
-            <!-- Medical Records Section -->
+            <!-- Appointment Management Section -->
             <li class="menu-section">
-                <div class="menu-section-title">Medical Records</div>
+                <div class="menu-section-title">Appointments</div>
                 <ul class="list-unstyled">
                     <li class="menu-item">
-                        <a href="{% url 'doctors:medical_record_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-file-medical"></i></span>
-                            <span class="menu-text">Patient Records</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>
+                            <span class="menu-text">Book Appointment</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'doctors:lab_results' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-vial"></i></span>
-                            <span class="menu-text">Lab Results</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-list"></i></span>
+                            <span class="menu-text">All Appointments</span>
                         </a>
                     </li>
                     <li class="menu-item">
-                        <a href="{% url 'doctors:diagnosis_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-stethoscope"></i></span>
-                            <span class="menu-text">Diagnosis</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-calendar-day"></i></span>
+                            <span class="menu-text">Calendar View</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- Billing Section -->
+            <li class="menu-section">
+                <div class="menu-section-title">Billing & Payments</div>
+                <ul class="list-unstyled">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-file-invoice"></i></span>
+                            <span class="menu-text">All Bills</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>
+                            <span class="menu-text">Generate Bill</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-credit-card"></i></span>
+                            <span class="menu-text">Payments</span>
                         </a>
                     </li>
                 </ul>
@@ -589,15 +500,21 @@
                 <div class="menu-section-title">Communication</div>
                 <ul class="list-unstyled">
                     <li class="menu-item">
-                        <a href="{% url 'chat:thread_list' %}" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-comments"></i></span>
-                            <span class="menu-text">Messages</span>
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-phone"></i></span>
+                            <span class="menu-text">Phone Calls</span>
                         </a>
                     </li>
                     <li class="menu-item">
                         <a href="#" class="menu-link">
-                            <span class="menu-icon"><i class="fas fa-broadcast-tower"></i></span>
-                            <span class="menu-text">Telemedicine</span>
+                            <span class="menu-icon"><i class="fas fa-envelope"></i></span>
+                            <span class="menu-text">Email Patients</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link">
+                            <span class="menu-icon"><i class="fas fa-sms"></i></span>
+                            <span class="menu-text">SMS Reminders</span>
                         </a>
                     </li>
                 </ul>
@@ -615,102 +532,18 @@
         </ul>
     </aside>
 
-    <!-- Right Sidebar -->
-    <aside class="right-sidebar smooth-transform" id="rightSidebar">
-        <div class="right-sidebar-header">
-            <h5 class="mb-0">Today's Schedule</h5>
-            <button class="right-sidebar-toggle" id="closeRightSidebar">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-
-        <div class="right-sidebar-content">
-            <!-- Upcoming Appointments -->
-            <h6 class="mb-3">Upcoming Appointments</h6>
-            <div class="mb-4">
-                <div class="patient-item">
-                    <img src="{% static 'images/patient1.jpg' %}" alt="Patient" class="patient-avatar">
-                    <div class="patient-info">
-                        <h6 class="mb-0">John Smith</h6>
-                        <small>10:00 AM - Checkup</small>
-                    </div>
-                    <div class="patient-status status-routine"></div>
-                </div>
-                <div class="patient-item">
-                    <img src="{% static 'images/patient2.jpg' %}" alt="Patient" class="patient-avatar">
-                    <div class="patient-info">
-                        <h6 class="mb-0">Sarah Johnson</h6>
-                        <small>11:30 AM - Follow-up</small>
-                    </div>
-                    <div class="patient-status status-waiting"></div>
-                </div>
-                <div class="patient-item">
-                    <img src="{% static 'images/patient3.jpg' %}" alt="Patient" class="patient-avatar">
-                    <div class="patient-info">
-                        <h6 class="mb-0">Michael Brown</h6>
-                        <small>2:15 PM - Consultation</small>
-                    </div>
-                    <div class="patient-status status-urgent"></div>
-                </div>
-            </div>
-
-            <!-- Quick Stats -->
-            <h6 class="mb-3">Today's Stats</h6>
-            <div class="row g-3 mb-4">
-                <div class="col-6">
-                    <div class="stat-card">
-                        <div class="stat-number">5</div>
-                        <div class="stat-label">Appointments</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="stat-card">
-                        <div class="stat-number">3</div>
-                        <div class="stat-label">Completed</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="stat-card">
-                        <div class="stat-number">2</div>
-                        <div class="stat-label">Pending</div>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="stat-card">
-                        <div class="stat-number">8</div>
-                        <div class="stat-label">Messages</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <h6 class="mb-3">Quick Actions</h6>
-            <div class="d-grid gap-2">
-                <a href="#" class="btn btn-primary-custom">
-                    <i class="fas fa-plus me-2"></i>New Appointment
-                </a>
-                <a href="#" class="btn btn-outline-primary">
-                    <i class="fas fa-prescription me-2"></i>Write Prescription
-                </a>
-                <a href="#" class="btn btn-outline-primary">
-                    <i class="fas fa-file-medical me-2"></i>Add Medical Note
-                </a>
-            </div>
-        </div>
-    </aside>
-
     <!-- Main Content -->
-    <div class="main-content-doctor smooth-transform" id="mainContent">
+    <div class="main-content-receptionist smooth-transform" id="mainContent">
         <!-- Content Area -->
         <div class="content-area">
             {% block content %}
-            <!-- Doctor specific content goes here -->
+            <!-- Receptionist specific content goes here -->
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2 class="fw-bold">Doctor Dashboard</h2>
-                    <p class="text-muted">Welcome back, Dr. {{ user.first_name }} {{ user.last_name }}</p>
+                    <h2 class="fw-bold">Receptionist Dashboard</h2>
+                    <p class="text-muted">Welcome back, {{ user.first_name }} {{ user.last_name }}</p>
                 </div>
-                <button class="sidebar-toggle d-none d-lg-block" id="leftSidebarToggle">
+                <button class="sidebar-toggle d-none d-lg-block" id="leftSidebarToggleDesktop">
                     <i class="fas fa-bars"></i>
                 </button>
             </div>
@@ -719,51 +552,60 @@
             <div class="row g-4 mb-5">
                 <div class="col-md-3">
                     <div class="stat-card">
-                        <div class="stat-number">24</div>
-                        <div class="stat-label">Patients This Week</div>
+                        <div class="stat-number">18</div>
+                        <div class="stat-label">Today's Appointments</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
-                        <div class="stat-number">18</div>
-                        <div class="stat-label">Appointments Today</div>
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">New Patients</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
                         <div class="stat-number">12</div>
-                        <div class="stat-label">Prescriptions</div>
+                        <div class="stat-label">Pending Bills</div>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="stat-card">
-                        <div class="stat-number">5</div>
-                        <div class="stat-label">Pending Tasks</div>
+                        <div class="stat-number">3</div>
+                        <div class="stat-label">Urgent Tasks</div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Activity and Upcoming Appointments -->
+            <!-- Quick Actions and Today's Schedule -->
             <div class="row g-4">
                 <div class="col-lg-8">
                     <div class="card-custom">
                         <div class="card-header-custom">
-                            <i class="fas fa-calendar-day me-2"></i>Today's Appointments
+                            <i class="fas fa-calendar-day me-2"></i>Today's Schedule
                         </div>
                         <div class="card-body">
-                            <!-- Appointment list would go here -->
-                            <p class="text-center py-4">Today's appointment details will be displayed here.</p>
+                            <!-- Today's schedule content would go here -->
+                            <p class="text-center py-4">Today's appointment schedule will be displayed here.</p>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="card-custom">
                         <div class="card-header-custom">
-                            <i class="fas fa-bell me-2"></i>Notifications
+                            <i class="fas fa-bolt me-2"></i>Quick Actions
                         </div>
                         <div class="card-body">
-                            <!-- Notifications would go here -->
-                            <p class="text-center py-4">Important notifications will appear here.</p>
+                            <div class="d-grid gap-2">
+                                <a href="#" class="btn btn-primary-custom">
+                                    <i class="fas fa-user-plus me-2"></i>Add New Patient
+                                </a>
+                                <a href="#" class="btn btn-outline-primary">
+                                    <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                                </a>
+                                <a href="#" class="btn btn-outline-primary">
+                                    <i class="fas fa-file-invoice-dollar me-2"></i>Generate Bill
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -785,28 +627,49 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const leftSidebar = document.getElementById('leftSidebar');
-            const rightSidebar = document.getElementById('rightSidebar');
             const mainContent = document.getElementById('mainContent');
             const leftSidebarToggle = document.getElementById('leftSidebarToggle');
+            const leftSidebarToggleDesktop = document.getElementById('leftSidebarToggleDesktop');
             const leftSidebarToggleMobile = document.getElementById('leftSidebarToggleMobile');
-            const rightSidebarToggle = document.getElementById('rightSidebarToggle');
-            const closeRightSidebar = document.getElementById('closeRightSidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            // Left sidebar toggle (desktop)
+            // Left sidebar toggle (desktop - collapse button in sidebar)
             if (leftSidebarToggle) {
                 leftSidebarToggle.addEventListener('click', function () {
                     leftSidebar.classList.toggle('collapsed');
                     mainContent.classList.toggle('expanded-left');
                     
-                    // Update button text
+                    // Update button text and icon
                     const buttonText = this.querySelector('span');
+                    const buttonIcon = this.querySelector('i');
                     if (leftSidebar.classList.contains('collapsed')) {
                         buttonText.textContent = 'Expand';
-                        this.querySelector('i').className = 'fas fa-chevron-right';
+                        buttonIcon.className = 'fas fa-chevron-right';
                     } else {
                         buttonText.textContent = 'Collapse';
-                        this.querySelector('i').className = 'fas fa-chevron-left';
+                        buttonIcon.className = 'fas fa-chevron-left';
+                    }
+                });
+            }
+
+            // Left sidebar toggle (desktop - navbar toggle)
+            if (leftSidebarToggleDesktop) {
+                leftSidebarToggleDesktop.addEventListener('click', function () {
+                    leftSidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('expanded-left');
+                    
+                    // Update the collapse button in sidebar if it exists
+                    const collapseButton = document.getElementById('leftSidebarToggle');
+                    if (collapseButton) {
+                        const buttonText = collapseButton.querySelector('span');
+                        const buttonIcon = collapseButton.querySelector('i');
+                        if (leftSidebar.classList.contains('collapsed')) {
+                            buttonText.textContent = 'Expand';
+                            buttonIcon.className = 'fas fa-chevron-right';
+                        } else {
+                            buttonText.textContent = 'Collapse';
+                            buttonIcon.className = 'fas fa-chevron-left';
+                        }
                     }
                 });
             }
@@ -816,22 +679,6 @@
                 leftSidebarToggleMobile.addEventListener('click', function () {
                     leftSidebar.classList.toggle('show');
                     sidebarOverlay.classList.toggle('show');
-                });
-            }
-
-            // Right sidebar toggle
-            if (rightSidebarToggle) {
-                rightSidebarToggle.addEventListener('click', function () {
-                    rightSidebar.classList.toggle('collapsed');
-                    mainContent.classList.toggle('expanded-right');
-                });
-            }
-
-            // Close right sidebar
-            if (closeRightSidebar) {
-                closeRightSidebar.addEventListener('click', function () {
-                    rightSidebar.classList.add('collapsed');
-                    mainContent.classList.remove('expanded-right');
                 });
             }
 

@@ -4,117 +4,263 @@
 {% block title %}About Us - MedCare HMS{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <!-- Header Section -->
-    <div class="text-center mb-5">
-        <h1 class="fw-bold mb-3">About MedCare HMS</h1>
-        <p class="lead">Revolutionizing healthcare management through technology</p>
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 60vh; background: var(--gradient-primary); color: white; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center" data-aos="fade-up">
+                <h1 class="hero-title" style="font-size: 3rem; margin-bottom: 1.5rem;">About MedCare HMS</h1>
+                <p class="hero-subtitle" style="font-size: 1.3rem; margin-bottom: 2rem;">
+                    Revolutionizing healthcare management through innovative technology and passionate dedication
+                </p>
+                <div class="hero-cta">
+                    <a href="{% url 'team' %}" class="btn btn-hero-primary">
+                        <i class="fas fa-users me-2"></i>Meet Our Team
+                    </a>
+                    <a href="#mission" class="btn btn-hero-secondary">
+                        <i class="fas fa-arrow-down me-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+</section>
 
-    <!-- Mission & Vision -->
-    <div class="row align-items-center mb-5">
-        <div class="col-lg-6">
-            <h2 class="fw-bold mb-4">Our Mission</h2>
-            <p class="mb-4">To provide a comprehensive, secure, and user-friendly healthcare management system that streamlines medical workflows, enhances patient care, and improves overall healthcare delivery.</p>
-            
-            <h2 class="fw-bold mb-4">Our Vision</h2>
-            <p>To become the leading healthcare management solution that bridges the gap between patients and healthcare providers through innovative technology and seamless user experiences.</p>
-        </div>
-        <div class="col-lg-6 text-center">
-            <img src="{% static 'ims/hero.jpg' %}" alt="Healthcare Technology" class="img-fluid rounded shadow">
+<!-- Mission & Vision Section -->
+<section id="mission" style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <div class="about-text">
+                    <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; color: var(--text-dark);">Our Mission</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 2rem;">
+                        To provide a comprehensive, secure, and user-friendly healthcare management system that 
+                        streamlines medical workflows, enhances patient care, and improves overall healthcare delivery 
+                        through cutting-edge technology and intuitive design.
+                    </p>
+                    
+                    <h2 style="font-size: 2.5rem; font-weight: 700; margin-bottom: 2rem; color: var(--text-dark);">Our Vision</h2>
+                    <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7;">
+                        To become the leading healthcare management solution that bridges the gap between patients 
+                        and healthcare providers through innovative technology, seamless user experiences, and 
+                        unwavering commitment to healthcare excellence.
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left">
+                <div class="about-image">
+                    <img src="{% static 'ims/hero.jpg' %}" alt="Healthcare Technology" class="img-fluid" style="border-radius: 20px; box-shadow: 0 12px 30px var(--shadow-medium);">
+                </div>
+            </div>
         </div>
     </div>
+</section>
 
-    <!-- Project Purpose -->
-    <div class="bg-light rounded p-5 mb-5">
-        <div class="text-center mb-4">
-            <h2 class="fw-bold">Project Purpose</h2>
+<!-- Project Purpose Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Project Purpose & Goals</h2>
+            <p class="section-subtitle">
+                MedCare HMS was developed to address the growing need for efficient digital solutions in healthcare management
+            </p>
         </div>
-        <p class="text-center lead">MedCare HMS was developed to address the growing need for efficient digital solutions in healthcare management. Our platform aims to:</p>
         
-        <div class="row mt-4">
-            <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-check-circle text-success me-3 mt-1"></i>
-                    <div>
-                        <h5>Streamline Operations</h5>
-                        <p>Automate administrative tasks and reduce paperwork for healthcare providers</p>
+        <div class="row g-4">
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: var(--gradient-primary);">
+                        <i class="fas fa-cogs"></i>
                     </div>
+                    <h4 class="feature-title">Streamline Operations</h4>
+                    <p class="feature-description">
+                        Automate administrative tasks, reduce paperwork, and eliminate redundancies 
+                        for healthcare providers, allowing them to focus on what matters most - patient care.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-check-circle text-success me-3 mt-1"></i>
-                    <div>
-                        <h5>Enhance Patient Experience</h5>
-                        <p>Provide patients with easy access to their medical information and services</p>
+            
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);">
+                        <i class="fas fa-heart"></i>
                     </div>
+                    <h4 class="feature-title">Enhance Patient Experience</h4>
+                    <p class="feature-description">
+                        Provide patients with easy access to their medical information, seamless appointment 
+                        booking, and direct communication channels with their healthcare providers.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-check-circle text-success me-3 mt-1"></i>
-                    <div>
-                        <h5>Improve Communication</h5>
-                        <p>Facilitate secure and efficient communication between patients and providers</p>
+            
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: var(--gradient-secondary);">
+                        <i class="fas fa-comments"></i>
                     </div>
+                    <h4 class="feature-title">Improve Communication</h4>
+                    <p class="feature-description">
+                        Facilitate secure, efficient, and real-time communication between patients, 
+                        doctors, and administrative staff through integrated messaging systems.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-6 mb-3">
-                <div class="d-flex align-items-start">
-                    <i class="fas fa-check-circle text-success me-3 mt-1"></i>
-                    <div>
-                        <h5>Ensure Data Security</h5>
-                        <p>Implement robust security measures to protect sensitive medical information</p>
+            
+            <div class="col-lg-6" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card" style="height: 100%;">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--accent-purple) 0%, var(--primary-teal) 100%);">
+                        <i class="fas fa-shield-alt"></i>
                     </div>
+                    <h4 class="feature-title">Ensure Data Security</h4>
+                    <p class="feature-description">
+                        Implement robust security measures, encryption protocols, and compliance standards 
+                        to protect sensitive medical information and maintain patient privacy.
+                    </p>
                 </div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Team Section -->
-    <div class="text-center mb-5">
-        <h2 class="fw-bold mb-3">Meet THE WONAs</h2>
-        <p class="lead">The brilliant minds behind MedCare HMS</p>
+<!-- Technology Stack Section -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Built with Modern Technology</h2>
+            <p class="section-subtitle">
+                Leveraging cutting-edge technologies to deliver a robust and scalable healthcare solution
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fab fa-python"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Django Framework</h5>
+                    <p style="color: var(--text-light);">Robust backend development with Python's most powerful web framework</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="300">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fab fa-bootstrap"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Bootstrap UI</h5>
+                    <p style="color: var(--text-light);">Responsive and modern user interface design for all devices</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="400">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">SQLite Database</h5>
+                    <p style="color: var(--text-light);">Reliable data storage with optimized query performance</p>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="500">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="width: 80px; height: 80px; border-radius: 16px; background: linear-gradient(135deg, var(--accent-orange) 0%, var(--accent-coral) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 2rem;">
+                        <i class="fab fa-js-square"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">JavaScript</h5>
+                    <p style="color: var(--text-light);">Interactive frontend features and real-time functionality</p>
+                </div>
+            </div>
+        </div>
     </div>
+</section>
 
-    <div class="row justify-content-center">
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card card-custom text-center border-0">
-                <div class="card-body">
-                    <img src="{% static 'team/albert.jpg' %}" alt="Team Member" class="rounded-circle mb-3" width="120" height="120">
-                    <h5>Albert Nuwarinda</h5>
-                    <p class="text-muted">Full Stack Developer</p>
+<!-- Team Preview Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Meet THE WONAs</h2>
+            <p class="section-subtitle">
+                The brilliant minds behind MedCare HMS - passionate CSE finalists creating innovative healthcare solutions
+            </p>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card text-center" style="border: none; padding: 2rem;">
+                    <img src="{% static 'team/albert.jpg' %}" alt="Albert Nuwarinda" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid var(--primary-teal);">
+                    <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Albert Nuwarinda</h5>
+                    <p style="color: var(--primary-teal); font-weight: 500; margin-bottom: 1rem;">Team Lead & Full Stack Developer</p>
+                    <a href="{% url 'team' %}" class="btn" style="background: var(--gradient-primary); color: white; padding: 0.5rem 1.5rem; border-radius: 8px;">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card text-center" style="border: none; padding: 2rem;">
+                    <img src="{% static 'team/kubi.jpg' %}" alt="Okwi Yakub" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid var(--accent-green);">
+                    <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Okwi Yakub</h5>
+                    <p style="color: var(--accent-green); font-weight: 500; margin-bottom: 1rem;">Frontend Developer</p>
+                    <a href="{% url 'team' %}" class="btn" style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1.5rem; border-radius: 8px;">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card text-center" style="border: none; padding: 2rem;">
+                    <img src="{% static 'team/annet.jpg' %}" alt="Annet Katushabe" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid var(--accent-purple);">
+                    <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Annet Katushabe</h5>
+                    <p style="color: var(--accent-purple); font-weight: 500; margin-bottom: 1rem;">Frontend Developer</p>
+                    <a href="{% url 'team' %}" class="btn" style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1.5rem; border-radius: 8px;">
+                        View Details
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-3 col-md-6 mb-4" data-aos="fade-up" data-aos-delay="500">
+                <div class="feature-card text-center" style="border: none; padding: 2rem;">
+                    <img src="{% static 'team/wilfred.jpg' %}" alt="Wilfred Katswamba" 
+                         style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin-bottom: 1.5rem; border: 4px solid var(--accent-blue);">
+                    <h5 style="font-weight: 600; margin-bottom: 0.5rem;">Wilfred Katswamba</h5>
+                    <p style="color: var(--accent-blue); font-weight: 500; margin-bottom: 1rem;">Database Architect</p>
+                    <a href="{% url 'team' %}" class="btn" style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1.5rem; border-radius: 8px;">
+                        View Details
+                    </a>
                 </div>
             </div>
         </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card card-custom text-center border-0">
-                <div class="card-body">
-                    <img src="{% static 'team/kubi.jpg' %}" alt="Team Member" class="rounded-circle mb-3" width="120" height="120">
-                    <h5>Okwi Yakub</h5>
-                    <p class="text-muted">Frontend Developer</p>
-                </div>
-            </div>
+        
+        <div class="text-center mt-4" data-aos="fade-up" data-aos-delay="600">
+            <a href="{% url 'team' %}" class="btn btn-hero-primary">
+                <i class="fas fa-users me-2"></i>Meet the Full Team
+            </a>
         </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card card-custom text-center border-0">
-                <div class="card-body">
-                    <img src="{% static 'team/annet.jpg' %}" alt="Team Member" class="rounded-circle mb-3" width="120" height="120">
-                    <h5>Annet Katushabe</h5>
-                    <p class="text-muted">Frontend Developer</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card card-custom text-center border-0">
-                <div class="card-body">
-                    <img src="{% static 'team/wilfred.jpg' %}" alt="Team Member" class="rounded-circle mb-3" width="120" height="120">
-                    <h5>Wilfred Katswamba</h5>
-                    <p class="text-muted">Database Architect</p>
-                </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container text-center">
+        <div data-aos="fade-up">
+            <h2 class="section-title">Ready to Experience MedCare HMS?</h2>
+            <p class="section-subtitle" style="margin-bottom: 3rem;">
+                Join us in revolutionizing healthcare management through technology
+            </p>
+            <div class="hero-cta">
+                <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                    <i class="fas fa-rocket me-2"></i>Explore the System
+                </a>
+                <a href="{% url 'contact' %}" class="btn btn-hero-secondary">
+                    <i class="fas fa-envelope me-2"></i>Get in Touch
+                </a>
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

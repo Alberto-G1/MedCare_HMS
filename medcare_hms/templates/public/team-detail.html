@@ -1,0 +1,394 @@
+{% extends 'base_public.html' %}
+{% load static %}
+
+{% block title %}{{ member.name }} - Team Member Details{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section" style="min-height: 60vh; background: var(--gradient-primary); color: white; display: flex; align-items: center;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-4 text-center" data-aos="fade-right">
+                <img id="member-photo" src="{% static 'team/albert.jpg' %}" alt="Team Member" 
+                     style="width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 6px solid rgba(255,255,255,0.3); margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                    <a href="#" class="social-link" style="width: 45px; height: 45px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-link" style="width: 45px; height: 45px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="#" class="social-link" style="width: 45px; height: 45px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: all 0.3s ease;">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-8" data-aos="fade-left">
+                <div class="hero-content">
+                    <h1 id="member-name" class="hero-title" style="font-size: 3rem; margin-bottom: 1rem;">Albert Nuwarinda</h1>
+                    <p id="member-role" class="hero-subtitle" style="font-size: 1.5rem; margin-bottom: 1.5rem; color: rgba(255,255,255,0.9);">
+                        Team Lead & Full Stack Developer
+                    </p>
+                    <p id="member-bio" style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; color: rgba(255,255,255,0.9);">
+                        Albert oversees the entire project architecture and leads the development team. 
+                        With expertise in Django, React, and cloud deployment, he ensures the system 
+                        meets all technical requirements while maintaining scalability.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="{% url 'team' %}" class="btn btn-hero-primary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Team
+                        </a>
+                        <a href="{% url 'contact' %}" class="btn btn-hero-secondary">
+                            <i class="fas fa-envelope me-2"></i>Contact
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Member Details Section -->
+<section style="padding: 6rem 0; background: white;">
+    <div class="container">
+        <div class="row">
+            <!-- Detailed Information -->
+            <div class="col-lg-8">
+                <div class="feature-card" style="padding: 3rem; border: none;">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Professional Background</h2>
+                    
+                    <div id="member-details">
+                        <!-- Albert's Details (Default) -->
+                        <div class="member-info" data-member="albert">
+                            <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 2rem;">
+                                Albert Nuwarinda is a passionate Computer Science Engineering finalist with a strong background in 
+                                full-stack development and system architecture. His leadership skills and technical expertise have 
+                                been instrumental in bringing the MedCare HMS vision to life.
+                            </p>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Key Contributions to MedCare HMS</h4>
+                            <ul style="color: var(--text-light); line-height: 1.8; margin-bottom: 2rem;">
+                                <li><strong>System Architecture:</strong> Designed the overall architecture and database schema</li>
+                                <li><strong>Backend Development:</strong> Built robust Django APIs and business logic</li>
+                                <li><strong>Team Leadership:</strong> Coordinated development efforts and code reviews</li>
+                                <li><strong>Database Optimization:</strong> Implemented efficient query optimization strategies</li>
+                                <li><strong>Security Implementation:</strong> Ensured HIPAA compliance and data security</li>
+                                <li><strong>Cloud Deployment:</strong> Set up and managed production environments</li>
+                            </ul>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Technical Expertise</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Django</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Python</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">PostgreSQL</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">AWS</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Docker</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">React</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">JavaScript</span>
+                                <span style="background: var(--gradient-primary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Git</span>
+                            </div>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Education & Achievements</h4>
+                            <ul style="color: var(--text-light); line-height: 1.8;">
+                                <li>Computer Science Engineering - Final Year</li>
+                                <li>Specialized in Software Engineering and Database Systems</li>
+                                <li>Led multiple successful software development projects</li>
+                                <li>Recognized for excellence in system design and implementation</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Yakub's Details -->
+                        <div class="member-info" data-member="yakub" style="display: none;">
+                            <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 2rem;">
+                                Okwi Yakub is a talented frontend developer and UI/UX enthusiast who brings creativity and 
+                                technical precision to every project. His attention to detail and user-centered design 
+                                approach have made MedCare HMS both functional and beautiful.
+                            </p>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Key Contributions to MedCare HMS</h4>
+                            <ul style="color: var(--text-light); line-height: 1.8; margin-bottom: 2rem;">
+                                <li><strong>Frontend Development:</strong> Created responsive and intuitive user interfaces</li>
+                                <li><strong>User Experience Design:</strong> Designed user-friendly workflows and interactions</li>
+                                <li><strong>Cross-browser Compatibility:</strong> Ensured consistent experience across platforms</li>
+                                <li><strong>Performance Optimization:</strong> Implemented efficient frontend optimization techniques</li>
+                                <li><strong>Accessibility Features:</strong> Developed inclusive design for all users</li>
+                                <li><strong>Testing & Quality Assurance:</strong> Conducted thorough UI/UX testing</li>
+                            </ul>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Technical Expertise</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">JavaScript</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">HTML5</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">CSS3</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Bootstrap</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">React</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Vue.js</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">SASS</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Figma</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Annet's Details -->
+                        <div class="member-info" data-member="annet" style="display: none;">
+                            <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 2rem;">
+                                Annet Katushabe is a creative frontend developer with a passion for user interface design 
+                                and interactive web applications. Her innovative approach to problem-solving and keen eye 
+                                for aesthetics have significantly enhanced the user experience of MedCare HMS.
+                            </p>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Key Contributions to MedCare HMS</h4>
+                            <ul style="color: var(--text-light); line-height: 1.8; margin-bottom: 2rem;">
+                                <li><strong>UI Component Development:</strong> Built reusable and scalable UI components</li>
+                                <li><strong>Interactive Features:</strong> Implemented dynamic user interactions and animations</li>
+                                <li><strong>Mobile Responsiveness:</strong> Ensured seamless mobile and tablet experiences</li>
+                                <li><strong>Design System:</strong> Developed consistent design patterns and guidelines</li>
+                                <li><strong>User Testing:</strong> Conducted user feedback sessions and iterative improvements</li>
+                                <li><strong>Documentation:</strong> Created comprehensive frontend documentation</li>
+                            </ul>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Technical Expertise</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">JavaScript</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">TypeScript</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">React</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Angular</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">CSS3</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Bootstrap</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Adobe XD</span>
+                                <span style="background: var(--gradient-secondary); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">jQuery</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Wilfred's Details -->
+                        <div class="member-info" data-member="wilfred" style="display: none;">
+                            <p style="font-size: 1.1rem; color: var(--text-light); line-height: 1.7; margin-bottom: 2rem;">
+                                Wilfred Katswamba is a skilled database architect and backend developer who specializes in 
+                                data modeling and optimization. His expertise in database design and data management has 
+                                ensured that MedCare HMS can handle complex healthcare data efficiently and securely.
+                            </p>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Key Contributions to MedCare HMS</h4>
+                            <ul style="color: var(--text-light); line-height: 1.8; margin-bottom: 2rem;">
+                                <li><strong>Database Design:</strong> Architected efficient and scalable database schemas</li>
+                                <li><strong>Data Modeling:</strong> Created comprehensive entity-relationship models</li>
+                                <li><strong>Query Optimization:</strong> Implemented high-performance database queries</li>
+                                <li><strong>Data Security:</strong> Designed secure data access and encryption strategies</li>
+                                <li><strong>Backup & Recovery:</strong> Established robust data backup and recovery systems</li>
+                                <li><strong>Performance Monitoring:</strong> Set up database performance monitoring and tuning</li>
+                            </ul>
+                            
+                            <h4 style="font-weight: 600; margin-bottom: 1.5rem; color: var(--text-dark);">Technical Expertise</h4>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 2rem;">
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">PostgreSQL</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">MySQL</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">SQLite</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">MongoDB</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Redis</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Python</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Django ORM</span>
+                                <span style="background: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-sky-blue) 100%); color: white; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem;">Data Analytics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Member Selector -->
+            <div class="col-lg-4">
+                <div class="feature-card" style="padding: 2rem; border: none; position: sticky; top: 2rem;">
+                    <h3 style="font-weight: 700; margin-bottom: 2rem; color: var(--text-dark);">Other Team Members</h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div class="team-member-card" data-member="albert" style="display: flex; align-items: center; padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; border: 2px solid var(--primary-teal);">
+                            <img src="{% static 'team/albert.jpg' %}" alt="Albert" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 1rem;">
+                            <div>
+                                <h6 style="font-weight: 600; margin: 0; color: var(--text-dark);">Albert Nuwarinda</h6>
+                                <p style="color: var(--text-light); margin: 0; font-size: 0.9rem;">Team Lead & Full Stack</p>
+                            </div>
+                        </div>
+                        
+                        <div class="team-member-card" data-member="yakub" style="display: flex; align-items: center; padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;">
+                            <img src="{% static 'team/kubi.jpg' %}" alt="Yakub" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 1rem;">
+                            <div>
+                                <h6 style="font-weight: 600; margin: 0; color: var(--text-dark);">Okwi Yakub</h6>
+                                <p style="color: var(--text-light); margin: 0; font-size: 0.9rem;">Frontend Developer</p>
+                            </div>
+                        </div>
+                        
+                        <div class="team-member-card" data-member="annet" style="display: flex; align-items: center; padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;">
+                            <img src="{% static 'team/annet.jpg' %}" alt="Annet" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 1rem;">
+                            <div>
+                                <h6 style="font-weight: 600; margin: 0; color: var(--text-dark);">Annet Katushabe</h6>
+                                <p style="color: var(--text-light); margin: 0; font-size: 0.9rem;">Frontend Developer</p>
+                            </div>
+                        </div>
+                        
+                        <div class="team-member-card" data-member="wilfred" style="display: flex; align-items: center; padding: 1rem; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; border: 2px solid transparent;">
+                            <img src="{% static 'team/wilfred.jpg' %}" alt="Wilfred" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; margin-right: 1rem;">
+                            <div>
+                                <h6 style="font-weight: 600; margin: 0; color: var(--text-dark);">Wilfred Katswamba</h6>
+                                <p style="color: var(--text-light); margin: 0; font-size: 0.9rem;">Database Architect</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr style="border-color: var(--border-light); margin: 2rem 0;">
+                    
+                    <div style="text-align: center;">
+                        <a href="{% url 'team' %}" class="btn" style="background: var(--gradient-primary); color: white; padding: 0.75rem 1.5rem; border-radius: 10px; text-decoration: none; display: inline-block;">
+                            <i class="fas fa-users me-2"></i>View Full Team
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Projects & Achievements Section -->
+<section style="padding: 6rem 0; background: var(--background-light);">
+    <div class="container">
+        <div class="text-center mb-5" data-aos="fade-up">
+            <h2 class="section-title">Projects & Achievements</h2>
+            <p class="section-subtitle">
+                Showcasing the incredible work and accomplishments of our team members
+            </p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-hospital"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">MedCare HMS</h5>
+                    <p style="color: var(--text-light);">
+                        Comprehensive healthcare management system serving hospitals and clinics
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Academic Excellence</h5>
+                    <p style="color: var(--text-light);">
+                        Outstanding performance in Computer Science Engineering program
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-lg-4" data-aos="fade-up" data-aos-delay="400">
+                <div class="feature-card" style="height: 100%; text-align: center;">
+                    <div style="width: 60px; height: 60px; border-radius: 12px; background: var(--gradient-secondary); display: flex; align-items: center; justify-content: center; margin: 0 auto 1.5rem; color: white; font-size: 1.5rem;">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <h5 style="font-weight: 600; margin-bottom: 1rem;">Innovation Awards</h5>
+                    <p style="color: var(--text-light);">
+                        Recognition for innovative solutions in healthcare technology
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Team member data
+const teamMembers = {
+    albert: {
+        name: "Albert Nuwarinda",
+        role: "Team Lead & Full Stack Developer",
+        photo: "{% static 'team/albert.jpg' %}",
+        bio: "Albert oversees the entire project architecture and leads the development team. With expertise in Django, React, and cloud deployment, he ensures the system meets all technical requirements while maintaining scalability."
+    },
+    yakub: {
+        name: "Okwi Yakub",
+        role: "Frontend Developer",
+        photo: "{% static 'team/kubi.jpg' %}",
+        bio: "Yakub is a talented frontend developer who brings creativity and technical precision to every project. His attention to detail and user-centered design approach have made MedCare HMS both functional and beautiful."
+    },
+    annet: {
+        name: "Annet Katushabe",
+        role: "Frontend Developer",
+        photo: "{% static 'team/annet.jpg' %}",
+        bio: "Annet is a creative frontend developer with a passion for user interface design and interactive web applications. Her innovative approach to problem-solving has significantly enhanced the user experience of MedCare HMS."
+    },
+    wilfred: {
+        name: "Wilfred Katswamba",
+        role: "Database Architect",
+        photo: "{% static 'team/wilfred.jpg' %}",
+        bio: "Wilfred specializes in data modeling and optimization. His expertise in database design and data management has ensured that MedCare HMS can handle complex healthcare data efficiently and securely."
+    }
+};
+
+// Function to switch team member details
+function switchMember(memberKey) {
+    const member = teamMembers[memberKey];
+    
+    // Update hero section
+    document.getElementById('member-name').textContent = member.name;
+    document.getElementById('member-role').textContent = member.role;
+    document.getElementById('member-photo').src = member.photo;
+    document.getElementById('member-bio').textContent = member.bio;
+    
+    // Hide all member info sections
+    document.querySelectorAll('.member-info').forEach(info => {
+        info.style.display = 'none';
+    });
+    
+    // Show selected member info
+    const selectedInfo = document.querySelector(`[data-member="${memberKey}"]`);
+    if (selectedInfo) {
+        selectedInfo.style.display = 'block';
+    }
+    
+    // Update active state in sidebar
+    document.querySelectorAll('.team-member-card').forEach(card => {
+        card.style.border = '2px solid transparent';
+        card.style.background = 'transparent';
+    });
+    
+    const activeCard = document.querySelector(`.team-member-card[data-member="${memberKey}"]`);
+    if (activeCard) {
+        activeCard.style.border = '2px solid var(--primary-teal)';
+        activeCard.style.background = 'rgba(14, 116, 144, 0.05)';
+    }
+    
+    // Update page title
+    document.title = `${member.name} - Team Member Details`;
+}
+
+// Add click listeners to team member cards
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.team-member-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const memberKey = this.getAttribute('data-member');
+            switchMember(memberKey);
+        });
+        
+        // Add hover effects
+        card.addEventListener('mouseenter', function() {
+            if (this.style.border !== '2px solid var(--primary-teal)') {
+                this.style.background = 'rgba(14, 116, 144, 0.02)';
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            if (this.style.border !== '2px solid var(--primary-teal)') {
+                this.style.background = 'transparent';
+            }
+        });
+    });
+    
+    // Check if URL has member parameter and switch accordingly
+    const urlParams = new URLSearchParams(window.location.search);
+    const memberParam = urlParams.get('member');
+    if (memberParam && teamMembers[memberParam]) {
+        switchMember(memberParam);
+    }
+});
+</script>
+{% endblock %}
