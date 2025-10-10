@@ -1,0 +1,208 @@
+{% load theme_tags %}
+{% load profile_tags %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MedCare HMS{% endblock %}</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Dynamic theme loading -->
+    {% load_theme_css %}
+    
+    {% block extra_head %}{% endblock %}
+    
+    <style>
+        /* Shared base styles that adapt to theme */
+        :root {
+            --shared-bg-light: #F8FAFC;
+            --shared-bg-white: #FFFFFF;
+            --shared-text-dark: #1E293B;
+            --shared-text-muted: #64748B;
+            --shared-border-light: #E2E8F0;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--shared-bg-light);
+            color: var(--shared-text-dark);
+        }
+        
+        /* Adaptive navbar that changes based on theme */
+        .navbar-adaptive {
+            background: linear-gradient(135deg, var(--theme-primary, #0E7490) 0%, var(--theme-primary-dark, #0C4A6E) 100%);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-adaptive .navbar-brand,
+        .navbar-adaptive .nav-link {
+            color: white !important;
+            font-weight: 500;
+        }
+        
+        .navbar-adaptive .nav-link:hover {
+            color: var(--theme-primary-light, #67E8F9) !important;
+        }
+        
+        /* Adaptive content container */
+        .content-adaptive {
+            min-height: calc(100vh - 76px);
+            padding: 2rem 0;
+        }
+        
+        /* Adaptive cards */
+        .card-adaptive {
+            background: var(--shared-bg-white);
+            border: 1px solid rgba(var(--theme-primary), 0.1);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .card-adaptive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        }
+        
+        /* Adaptive buttons */
+        .btn-adaptive-primary {
+            background: linear-gradient(135deg, var(--theme-primary, #0E7490) 0%, var(--theme-primary-dark, #0C4A6E) 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-adaptive-primary:hover {
+            background: var(--theme-primary-dark, #0C4A6E);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            color: white;
+        }
+        
+        .btn-adaptive-secondary {
+            background: transparent;
+            border: 2px solid var(--theme-primary, #0E7490);
+            color: var(--theme-primary, #0E7490);
+            font-weight: 500;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-adaptive-secondary:hover {
+            background: var(--theme-primary, #0E7490);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer-adaptive {
+            background: var(--shared-text-dark);
+            color: white;
+            padding: 2rem 0;
+            margin-top: auto;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .content-adaptive {
+                padding: 1rem 0;
+            }
+        }
+    </style>
+</head>
+<body class="{% get_user_theme %}">
+    <!-- Adaptive Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-adaptive">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="{% url 'accounts:dashboard_redirect' %}">
+                <i class="fas fa-heartbeat me-2"></i>MedCare HMS
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:dashboard_redirect' %}">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'chat:thread_list' %}">
+                            <i class="fas fa-comments me-1"></i>Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'notifications:notification_list' %}">
+                            <i class="fas fa-bell me-1"></i>Notifications
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                            {% profile_image user size="30" css_class="rounded-circle me-2" %}
+                            <span>{{ user.get_full_name|default:user.username }}</span>
+                            <small class="ms-1 opacity-75">({% get_user_role_display %})</small>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user me-2"></i>Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-adaptive">
+        <div class="container">
+            <!-- Messages Display -->
+            {% include 'components/messages.html' %}
+            
+            {% block content %}
+            <div class="text-center py-5">
+                <h2>Welcome to MedCare HMS</h2>
+                <p class="text-muted">Professional Healthcare Management System</p>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer-adaptive mt-auto">
+        <div class="container text-center">
+            <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS | Professional Healthcare Solutions</p>
+            <p class="mb-0 small">Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -523,7 +523,7 @@
         <!-- Dashboard Section -->
         <div class="nav-section">
             <div class="nav-section-title">Dashboard</div>
-            <a href="{% url 'admin_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <a href="{% url 'accounts:admin_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
                 <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
                 <span class="menu-text">Overview</span>
             </a>
@@ -536,15 +536,15 @@
         <!-- User Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">User Management</div>
-            <a href="{% url 'staff_management_list' %}" class="menu-link">
+            <a href="{% url 'accounts:staff_management_list' %}" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-users"></i></span>
                 <span class="menu-text">All Staff</span>
             </a>
-            <a href="{% url 'pending_staff_list' %}" class="menu-link">
+            <a href="{% url 'accounts:pending_staff_list' %}" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-user-clock"></i></span>
                 <span class="menu-text">Pending Approvals</span>
             </a>
-            <a href="{% url 'deactivated_staff_list' %}" class="menu-link">
+            <a href="{% url 'accounts:deactivated_staff_list' %}" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-user-slash"></i></span>
                 <span class="menu-text">Deactivated Staff</span>
             </a>
@@ -553,11 +553,11 @@
         <!-- Hospital Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">Hospital Management</div>
-            <a href="{% url 'department_list' %}" class="menu-link">
+            <a href="{% url 'management:department_list' %}" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-sitemap"></i></span>
                 <span class="menu-text">Departments</span>
             </a>
-            <a href="{% url 'room_list' %}" class="menu-link">
+            <a href="{% url 'management:room_list' %}" class="menu-link">
                 <span class="menu-icon"><i class="fas fa-bed"></i></span>
                 <span class="menu-text">Rooms</span>
             </a>
@@ -653,7 +653,7 @@
                             <i class="fas fa-toolbox"></i> Django Admin
                         </a>
                         <div class="divider"></div>
-                        <a href="{% url 'logout' %}">
+                        <a href="{% url 'accounts:logout' %}">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </a>
                     </div>

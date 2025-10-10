@@ -1,0 +1,359 @@
+/* Doctor Theme CSS Framework */
+/* Professional Medical Theme with Teal-Green Accent */
+
+:root {
+    /* Doctor-specific color palette */
+    --doctor-primary: #14B8A6;
+    --doctor-primary-dark: #0F766E;
+    --doctor-primary-light: #5EEAD4;
+    --doctor-secondary: #0284C7;
+    --doctor-accent: #22C55E;
+    --doctor-warning: #F59E0B;
+    --doctor-danger: #EF4444;
+    --doctor-success: #10B981;
+    
+    /* Medical professional gradients */
+    --doctor-gradient-primary: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);
+    --doctor-gradient-secondary: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+    --doctor-gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    
+    /* Professional shadows */
+    --doctor-shadow-primary: 0 4px 20px rgba(20, 184, 166, 0.25);
+    --doctor-shadow-card: 0 8px 32px rgba(15, 118, 110, 0.15);
+    --doctor-shadow-hover: 0 12px 40px rgba(20, 184, 166, 0.3);
+}
+
+/* Doctor-specific component styling */
+.doctor-theme {
+    /* Cards and containers */
+    .card-custom {
+        background: var(--doctor-gradient-card);
+        border: 1px solid rgba(20, 184, 166, 0.1);
+        box-shadow: var(--doctor-shadow-card);
+        transition: all 0.3s ease;
+    }
+    
+    .card-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--doctor-shadow-hover);
+    }
+    
+    .card-header-custom {
+        background: var(--doctor-gradient-primary);
+        color: white;
+        border-bottom: 2px solid var(--doctor-primary-dark);
+    }
+    
+    /* Buttons */
+    .btn-primary-custom {
+        background: var(--doctor-gradient-primary);
+        border: none;
+        color: white;
+        font-weight: 600;
+        box-shadow: var(--doctor-shadow-primary);
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary-custom:hover {
+        background: var(--doctor-primary-dark);
+        transform: translateY(-1px);
+        box-shadow: var(--doctor-shadow-hover);
+    }
+    
+    .btn-secondary-custom {
+        background: var(--doctor-gradient-secondary);
+        border: none;
+        color: white;
+        font-weight: 500;
+    }
+    
+    .btn-outline-custom {
+        border: 2px solid var(--doctor-primary);
+        color: var(--doctor-primary);
+        background: transparent;
+        font-weight: 500;
+    }
+    
+    .btn-outline-custom:hover {
+        background: var(--doctor-primary);
+        color: white;
+    }
+    
+    /* Medical status indicators */
+    .status-indicator {
+        &.routine {
+            background: var(--doctor-success);
+            color: white;
+        }
+        
+        &.urgent {
+            background: var(--doctor-danger);
+            color: white;
+        }
+        
+        &.follow-up {
+            background: var(--doctor-warning);
+            color: white;
+        }
+        
+        &.consultation {
+            background: var(--doctor-secondary);
+            color: white;
+        }
+    }
+    
+    /* Stats and metrics */
+    .metric-card {
+        background: white;
+        border-left: 4px solid var(--doctor-primary);
+        box-shadow: var(--doctor-shadow-card);
+        transition: all 0.3s ease;
+    }
+    
+    .metric-card:hover {
+        border-left-color: var(--doctor-accent);
+        transform: translateX(3px);
+    }
+    
+    .metric-value {
+        color: var(--doctor-primary);
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    
+    .metric-label {
+        color: var(--doctor-primary-dark);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+    }
+    
+    /* Forms and inputs */
+    .form-control:focus {
+        border-color: var(--doctor-primary);
+        box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.25);
+    }
+    
+    .form-select:focus {
+        border-color: var(--doctor-primary);
+        box-shadow: 0 0 0 0.2rem rgba(20, 184, 166, 0.25);
+    }
+    
+    /* Medical prescription styling */
+    .prescription-form {
+        background: linear-gradient(145deg, #ffffff 0%, #f0fdfa 100%);
+        border: 2px solid var(--doctor-primary-light);
+        border-radius: 12px;
+        padding: 2rem;
+    }
+    
+    .medication-item {
+        background: white;
+        border: 1px solid var(--doctor-primary-light);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .medication-item:hover {
+        box-shadow: var(--doctor-shadow-card);
+        transform: translateY(-1px);
+    }
+    
+    /* Patient information panels */
+    .patient-info-panel {
+        background: linear-gradient(145deg, #ffffff 0%, #ecfdf5 100%);
+        border: 1px solid var(--doctor-primary-light);
+        border-radius: 10px;
+        padding: 1.5rem;
+    }
+    
+    .patient-vitals {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+    
+    .vital-reading {
+        text-align: center;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        border: 1px solid var(--doctor-primary-light);
+    }
+    
+    .vital-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--doctor-primary);
+    }
+    
+    .vital-label {
+        font-size: 0.875rem;
+        color: var(--doctor-primary-dark);
+        font-weight: 500;
+    }
+    
+    /* Appointment scheduling */
+    .appointment-slot {
+        background: white;
+        border: 2px solid var(--doctor-primary-light);
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .appointment-slot:hover {
+        border-color: var(--doctor-primary);
+        background: var(--doctor-primary-light);
+    }
+    
+    .appointment-slot.selected {
+        background: var(--doctor-primary);
+        color: white;
+        border-color: var(--doctor-primary-dark);
+    }
+    
+    /* Medical record styling */
+    .medical-record {
+        background: white;
+        border: 1px solid var(--doctor-primary-light);
+        border-left: 4px solid var(--doctor-primary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+    
+    .medical-record::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -4px;
+        width: 4px;
+        height: 100%;
+        background: var(--doctor-gradient-primary);
+        border-radius: 0 4px 4px 0;
+    }
+    
+    .record-date {
+        color: var(--doctor-primary);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .record-content {
+        margin-top: 0.75rem;
+        line-height: 1.6;
+    }
+    
+    /* Doctor profile enhancements */
+    .doctor-specialization {
+        background: var(--doctor-primary-light);
+        color: var(--doctor-primary-dark);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        display: inline-block;
+    }
+    
+    .doctor-credentials {
+        color: var(--doctor-primary);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    /* Dashboard widgets */
+    .dashboard-widget {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--doctor-shadow-card);
+        border-top: 4px solid var(--doctor-primary);
+        transition: all 0.3s ease;
+    }
+    
+    .dashboard-widget:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--doctor-shadow-hover);
+    }
+    
+    .widget-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--doctor-gradient-primary);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    /* Medical emergency styling */
+    .emergency-alert {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        border: 2px solid #ef4444;
+        border-radius: 8px;
+        padding: 1rem;
+        color: #dc2626;
+        font-weight: 600;
+    }
+    
+    .emergency-alert .alert-icon {
+        color: #ef4444;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+}
+
+/* Responsive doctor theme adjustments */
+@media (max-width: 768px) {
+    .doctor-theme {
+        .patient-vitals {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .dashboard-widget {
+            padding: 1rem;
+        }
+        
+        .widget-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+    }
+}
+
+/* Print styles for medical documents */
+@media print {
+    .doctor-theme {
+        .prescription-form,
+        .medical-record,
+        .patient-info-panel {
+            background: white !important;
+            border: 2px solid #000 !important;
+            box-shadow: none !important;
+        }
+        
+        .btn-primary-custom,
+        .btn-secondary-custom {
+            display: none !important;
+        }
+        
+        .card-custom {
+            background: white !important;
+            box-shadow: none !important;
+            border: 1px solid #000 !important;
+        }
+    }
+}

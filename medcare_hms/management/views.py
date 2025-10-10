@@ -21,7 +21,7 @@ class DepartmentCreateView(SuccessMessageMixin, CreateView):
     model = Department
     form_class = DepartmentForm # <-- USE OUR CUSTOM FORM
     template_name = 'management/department_form.html'
-    success_url = reverse_lazy('department_list')
+    success_url = reverse_lazy('management:department_list')
     success_message = "Department '%(name)s' was created successfully."
 
 @method_decorator(admin_required, name='dispatch')
@@ -29,7 +29,7 @@ class DepartmentUpdateView(SuccessMessageMixin, UpdateView):
     model = Department
     form_class = DepartmentForm # <-- USE OUR CUSTOM FORM
     template_name = 'management/department_form.html'
-    success_url = reverse_lazy('department_list')
+    success_url = reverse_lazy('management:department_list')
     success_message = "Department '%(name)s' was updated successfully."
 
 @admin_required
@@ -40,7 +40,7 @@ def department_toggle_active(request, pk):
     if department.is_active:
         if Department.objects.filter(is_active=True).count() == 1:
             messages.error(request, "Cannot deactivate the last active department.")
-            return redirect('department_list')
+            return redirect('management:department_list')
     
     department.is_active = not department.is_active
     department.save()
@@ -50,7 +50,7 @@ def department_toggle_active(request, pk):
     else:
         messages.info(request, f"Department '{department.name}' has been deactivated.")
         
-    return redirect('department_list')
+    return redirect('management:department_list')
 
 # --- Room Views ---
 
@@ -66,7 +66,7 @@ class RoomCreateView(SuccessMessageMixin, CreateView):
     model = Room
     form_class = RoomForm # <-- USE OUR CUSTOM FORM
     template_name = 'management/room_form.html'
-    success_url = reverse_lazy('room_list')
+    success_url = reverse_lazy('management:room_list')
     success_message = "Room '%(room_number)s' in department '%(department)s' was created successfully."
 
 @method_decorator(admin_required, name='dispatch')
@@ -74,7 +74,7 @@ class RoomUpdateView(SuccessMessageMixin, UpdateView):
     model = Room
     form_class = RoomForm # <-- USE OUR CUSTOM FORM
     template_name = 'management/room_form.html'
-    success_url = reverse_lazy('room_list')
+    success_url = reverse_lazy('management:room_list')
     success_message = "Room '%(room_number)s' was updated successfully."
 
 @admin_required
@@ -88,7 +88,7 @@ def room_toggle_active(request, pk):
     
     if room.is_active and active_admissions:
         messages.error(request, f"Cannot deactivate Room {room.room_number}. It is currently occupied.")
-        return redirect('room_list')
+        return redirect('management:room_list')
         
     room.is_active = not room.is_active
     room.save()
@@ -98,4 +98,4 @@ def room_toggle_active(request, pk):
     else:
         messages.info(request, f"Room '{room.room_number}' has been deactivated.")
         
-    return redirect('room_list')
+    return redirect('management:room_list')

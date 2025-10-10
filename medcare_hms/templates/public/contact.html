@@ -134,7 +134,7 @@
                 <div class="feature-card" style="padding: 2rem; border: none; background: var(--gradient-primary); color: white; margin-top: 2rem;">
                     <h4 style="font-weight: 600; margin-bottom: 1.5rem;">Quick Access</h4>
                     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <a href="{% url 'login' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
+                        <a href="{% url 'accounts:login' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
                             <i class="fas fa-sign-in-alt me-2"></i>Login to System
                         </a>
                         <a href="{% url 'about' %}" style="color: white; text-decoration: none; display: flex; align-items: center; padding: 0.75rem; border-radius: 8px; transition: background 0.3s ease;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">
@@ -328,7 +328,7 @@
                 Join us in revolutionizing healthcare management through technology
             </p>
             <div class="hero-cta">
-                <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                <a href="{% url 'accounts:login' %}" class="btn btn-hero-primary">
                     <i class="fas fa-rocket me-2"></i>Access the System
                 </a>
                 <a href="{% url 'about' %}" class="btn btn-hero-secondary">

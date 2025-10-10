@@ -538,7 +538,7 @@
                         <a class="nav-link" href="{% url 'contact' %}">Contact</a>
                     </li>
                     <li class="nav-item ms-2">
-                        <a class="btn btn-login" href="{% url 'login' %}">
+                        <a class="btn btn-login" href="{% url 'accounts:login' %}">
                             <i class="fas fa-sign-in-alt me-2"></i>Login
                         </a>
                     </li>
@@ -561,7 +561,7 @@
                             Built for efficiency, designed for care.
                         </p>
                         <div class="hero-cta">
-                            <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-hero-primary">
                                 <i class="fas fa-sign-in-alt me-2"></i>Get Started
                             </a>
                             <a href="#features" class="btn btn-hero-secondary">
@@ -693,7 +693,7 @@
                             our system handles all aspects of hospital administration while 
                             maintaining the highest standards of security and reliability.
                         </p>
-                        <a href="{% url 'login' %}" class="btn btn-hero-primary">
+                        <a href="{% url 'accounts:login' %}" class="btn btn-hero-primary">
                             Explore the System
                         </a>
                     </div>
@@ -731,15 +731,15 @@
                     <a href="{% url 'index' %}">Home</a><br>
                     <a href="#features">Features</a><br>
                     <a href="{% url 'about' %}">About</a><br>
-                    <a href="{% url 'login' %}">Login</a>
+                    <a href="{% url 'accounts:login' %}">Login</a>
                 </div>
                 
                 <div class="footer-section">
                     <h5>User Portals</h5>
-                    <a href="{% url 'admin_dashboard' %}">Admin Dashboard</a><br>
-                    <a href="{% url 'doctor_dashboard' %}">Doctor Portal</a><br>
-                    <a href="{% url 'patient_dashboard' %}">Patient Portal</a><br>
-                    <a href="{% url 'receptionist_dashboard' %}">Reception Desk</a>
+                    <a href="{% url 'accounts:admin_dashboard' %}">Admin Dashboard</a><br>
+                    <a href="{% url 'accounts:doctor_dashboard' %}">Doctor Portal</a><br>
+                    <a href="{% url 'accounts:patient_dashboard' %}">Patient Portal</a><br>
+                    <a href="{% url 'accounts:receptionist_dashboard' %}">Reception Desk</a>
                 </div>
                 
                 <div class="footer-section">

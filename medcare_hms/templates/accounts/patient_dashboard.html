@@ -1,113 +1,172 @@
 {% extends 'base_patient.html' %}
-
 {% load static %}
-{% block title %}Patient Dashboard{% endblock %}
+{% block title %}My Health Dashboard{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h2 fw-bold text-custom-dark">Welcome, {{ user.first_name|default:user.username }}!</h1>
-            <p class="text-muted">Here's a summary of your health portal.</p>
-        </div>
-        <!-- CORRECTION: Namespaced URL -->
-        <a href="{% url 'patients:book_appointment' %}" class="btn btn-primary-custom"><i class="fas fa-plus me-2"></i>Book New Appointment</a>
+<!-- Welcome Header -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h2 fw-bold text-custom-dark">Welcome, {{ user.first_name|default:user.username }}!</h1>
+        <p class="text-muted">Here's a summary of your health portal.</p>
     </div>
+    <a href="{% url 'patients:book_appointment' %}" class="btn btn-primary-custom d-none d-md-flex">
+        <i class="fas fa-plus me-2"></i>Book New Appointment
+    </a>
+</div>
 
-    <!-- Profile Incomplete Warning -->
-    {% if not profile_is_complete %}
-    <div class="alert alert-warning d-flex justify-content-between align-items-center fade-in-up">
-        <span><i class="fas fa-exclamation-triangle me-2"></i>Your profile is incomplete. Please update it to access all features.</span>
-        <!-- CORRECTION: Namespaced URL -->
-        <a href="{% url 'patients:patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
-    </div>
-    {% endif %}
+<!-- Profile Incomplete Warning -->
+{% if not profile_is_complete %}
+<div class="alert alert-warning d-flex justify-content-between align-items-center">
+    <span><i class="fas fa-exclamation-triangle me-2"></i>Your profile is incomplete. Please update it for a better experience.</span>
+    <a href="{% url 'patients:patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
+</div>
+{% endif %}
 
-    <!-- Dashboard Cards -->
-    <div class="row fade-in-up">
-        <div class="col-lg-4 col-md-6 mb-4">
+<!-- Quick Stats Cards -->
+<div class="row">
+    <div class="col-lg-3 col-md-6 mb-4">
+        <a href="{% url 'patients:my_appointments' %}" class="card-link">
             <div class="card card-custom h-100">
-                <div class="card-body text-center">
-                    <div class="bg-primary p-3 rounded-circle d-inline-block mb-3">
-                        <i class="fas fa-user-circle text-white fa-2x"></i>
-                    </div>
-                    <h5 class="card-title">My Profile</h5>
-                    <p class="card-text text-muted">View and edit your personal and medical information.</p>
-                    <!-- CORRECTION: Namespaced URL -->
-                    <a href="{% url 'patients:patient_profile' %}" class="btn btn-outline-primary-custom mt-auto">Go to Profile</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card card-custom h-100">
-                <div class="card-body text-center">
-                    <div class="bg-info p-3 rounded-circle d-inline-block mb-3">
-                        <i class="fas fa-calendar-check text-white fa-2x"></i>
-                    </div>
-                    <h5 class="card-title">Upcoming Appointments</h5>
-                    <p class="card-text text-muted">You have <strong>{{ upcoming_appointments|length }}</strong> upcoming appointment(s).</p>
-                    <!-- CORRECTION: Namespaced URL -->
-                    <a href="{% url 'patients:my_appointments' %}" class="btn btn-outline-primary-custom mt-auto">View Appointments</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-lg-3 col-md-6 mb-4">
-            <div class="card card-custom h-100 text-center">
                 <div class="card-body">
-                    <div class="bg-danger p-3 rounded-circle d-inline-block mb-3">
-                        <i class="fas fa-notes-medical text-white fa-2x"></i>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Upcoming Appointments</h6>
+                            <h2 class="fw-bold text-custom-dark">{{ upcoming_appointments|length }}</h2>
+                        </div>
+                        <div class="bg-info text-white p-3 rounded-circle"><i class="fas fa-calendar-check fa-2x"></i></div>
                     </div>
-                    <h5 class="card-title">Medical Records</h5>
-                    <p class="card-text text-muted">View your consultation history and diagnoses.</p>
-                    <a href="{% url 'patients:my_medical_records_list' %}" class="btn btn-outline-primary-custom mt-auto">View Records</a>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-4">
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <a href="#" class="card-link">
             <div class="card card-custom h-100">
-                <div class="card-body text-center">
-                    <div class="bg-success p-3 rounded-circle d-inline-block mb-3">
-                        <i class="fas fa-file-invoice-dollar text-white fa-2x"></i>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Active Prescriptions</h6>
+                            <h2 class="fw-bold text-custom-dark">{{ recent_prescriptions|length }}</h2>
+                        </div>
+                        <div class="bg-primary text-white p-3 rounded-circle"><i class="fas fa-prescription-bottle-alt fa-2x"></i></div>
                     </div>
-                    <h5 class="card-title">Billing & Payments</h5>
-                    <p class="card-text text-muted">You have <strong>{{ unpaid_bills_count }}</strong> unpaid bill(s).</p>
-                    <!-- CORRECTION: Namespaced URL for BILLING app -->
-                    <a href="{% url 'patients:my_bills_list' %}" class="btn btn-outline-primary-custom mt-auto">View Bills</a>
                 </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <a href="{% url 'patients:my_bills_list' %}" class="card-link">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Unpaid Bills</h6>
+                            <h2 class="fw-bold text-danger">{{ unpaid_bills_count }}</h2>
+                        </div>
+                        <div class="bg-success text-white p-3 rounded-circle"><i class="fas fa-file-invoice-dollar fa-2x"></i></div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-4">
+        <a href="{% url 'chat:thread_list' %}" class="card-link">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted">Messages</h6>
+                            <h2 class="fw-bold text-custom-dark">View</h2>
+                        </div>
+                        <div class="bg-accent-orange text-white p-3 rounded-circle"><i class="fas fa-comments fa-2x"></i></div>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="row">
+    <!-- Upcoming Appointments -->
+    <div class="col-lg-7 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
+                <a href="{% url 'patients:my_appointments' %}" class="btn btn-sm btn-outline-primary-custom">View All</a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_appointments %}
+                    <div class="list-group list-group-flush">
+                    {% for appointment in upcoming_appointments|slice:":4" %} {# Show up to 4 appointments #}
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-0">Appointment with {{ appointment.doctor }}</h6>
+                                <small class="text-muted">{{ appointment.appointment_date|date:"l, F d" }} at {{ appointment.appointment_time|time:"g:i A" }}</small>
+                            </div>
+                            {% if appointment.status == 'Approved' %}<span class="badge bg-success">{{ appointment.status }}</span>
+                            {% elif appointment.status == 'Pending' %}<span class="badge bg-warning">{{ appointment.status }}</span>
+                            {% else %}<span class="badge bg-secondary">{{ appointment.status }}</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-0">You have no upcoming appointments.</p>
+                        <a href="{% url 'patients:book_appointment' %}" class="btn btn-sky mt-3">Book One Now</a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Upcoming Appointments Section -->
-    <div class="card card-custom mt-2 fade-in-up">
-        <div class="card-header-custom">
-            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
-        </div>
-        <div class="card-body">
-            {% if upcoming_appointments %}
-                <div class="list-group list-group-flush">
-                {% for appointment in upcoming_appointments %}
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">Appointment with {{ appointment.doctor }}</h6>
-                            <small class="text-muted">{{ appointment.appointment_date|date:"l, F d, Y" }} at {{ appointment.appointment_time|time:"g:i A" }}</small>
+    <!-- Recent Prescriptions & Last Record -->
+    <div class="col-lg-5 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header-custom d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Health Activity</h5>
+                <a href="{% url 'patients:my_medical_records_list' %}" class="btn btn-sm btn-outline-primary-custom">View All</a>
+            </div>
+            <div class="card-body">
+                {% if last_medical_record %}
+                    <h6 class="text-primary">Last Consultation Summary</h6>
+                    <div class="p-3 rounded mb-3" style="background-color: var(--background-light);">
+                        <div class="d-flex justify-content-between">
+                            <strong>{{ last_medical_record.diagnosis }}</strong>
+                            <small class="text-muted">{{ last_medical_record.record_date|date:"F d, Y" }}</small>
                         </div>
-                        {% if appointment.status == 'Approved' %}<span class="badge bg-success">{{ appointment.status }}</span>
-                        {% elif appointment.status == 'Pending' %}<span class="badge bg-warning">{{ appointment.status }}</span>
-                        {% else %}<span class="badge bg-secondary">{{ appointment.status }}</span>
-                        {% endif %}
+                        <p class="small text-muted mb-0">with {{ last_medical_record.doctor }}</p>
                     </div>
-                {% endfor %}
-                </div>
-            {% else %}
-                <div class="text-center py-4">
-                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">You have no upcoming appointments.</p>
-                    <a href="{% url 'patients:book_appointment' %}" class="btn btn-sky mt-3">Book One Now</a>
-                </div>
-            {% endif %}
+                {% endif %}
+
+                <h6 class="text-primary mt-4">Recent Prescriptions</h6>
+                {% if recent_prescriptions %}
+                    <ul class="list-unstyled">
+                    {% for prescription in recent_prescriptions %}
+                        <li class="mb-2">
+                            <i class="fas fa-pills text-success me-2"></i>
+                            <strong>{{ prescription.medication_name }}</strong> - <span class="text-muted">{{ prescription.dosage }}</span>
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                     <div class="text-center text-muted pt-3">
+                        <p>No recent prescriptions found.</p>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+    .card-link {
+        text-decoration: none;
+    }
+    .card-link .card-custom:hover {
+        border-color: var(--primary-dark-teal);
+    }
+</style>
 {% endblock %}

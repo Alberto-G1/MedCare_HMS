@@ -57,10 +57,10 @@ def register_view(request):
 
             if user.is_active:
                 login(request, user)
-                return redirect('dashboard_redirect')
+                return redirect('accounts:dashboard_redirect')
             else:
                 messages.info(request, 'Your account is pending approval from an administrator.')
-                return redirect('login')  # Redirect to login page to show messages
+                return redirect('accounts:login')  # Redirect to login page to show messages
     else:
         form = RegistrationForm()
 
@@ -77,7 +77,7 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f"Welcome back, {user.username}!")
-                return redirect('dashboard_redirect')
+                return redirect('accounts:dashboard_redirect')
             else:
                 messages.error(request, 'Invalid username or password.')
         else:
@@ -90,7 +90,7 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been successfully logged out.")
-    return redirect('login')
+    return redirect('accounts:login')
 
 
 @login_required
@@ -99,18 +99,18 @@ def dashboard_redirect_view(request):
     if hasattr(request.user, 'userprofile'):
         profile = request.user.userprofile
         if profile.role == 'ADMIN':
-            return redirect('admin_dashboard')
+            return redirect('accounts:admin_dashboard')
         elif profile.role == 'DOCTOR':
-            return redirect('doctor_dashboard')
+            return redirect('accounts:doctor_dashboard')
         elif profile.role == 'RECEPTIONIST':
-            return redirect('receptionist_dashboard')
+            return redirect('accounts:receptionist_dashboard')
         elif profile.role == 'PATIENT':
-            return redirect('patient_dashboard')
+            return redirect('accounts:patient_dashboard')
 
     # Fallback for users without a profile or if something goes wrong
     messages.error(request, "Could not determine user role. Logging out.")
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')
 
 
 # --- Admin Views ---
@@ -167,13 +167,13 @@ def approve_user(request, user_id):
         # --- NOTIFICATION LOGIC ---
         message = "Welcome to MedCare HMS! Your staff account has been approved by an administrator."
         # The link can just go to their own dashboard
-        create_notification(recipient=user, message=message, link=reverse('dashboard_redirect'))
+        create_notification(recipient=user, message=message, link=reverse('accounts:dashboard_redirect'))
         # --- END NOTIFICATION LOGIC ---
         
         messages.success(request, f"User '{user.username}' has been approved.")
     except User.DoesNotExist:
         messages.error(request, "User not found.")
-    return redirect('staff_management_list')
+    return redirect('accounts:staff_management_list')
 
 
 @login_required
@@ -186,7 +186,7 @@ def reject_user(request, user_id):
         messages.success(request, f"User '{username}' has been rejected and their account deleted.")
     except User.DoesNotExist:
         messages.error(request, "User not found.")
-    return redirect('staff_management_list')
+    return redirect('accounts:staff_management_list')
 
 
 # --- Other Role Dashboards ---
@@ -321,14 +321,14 @@ def toggle_staff_status(request, user_id):
     if user_to_toggle.userprofile.role == 'ADMIN':
         if UserProfile.objects.filter(role='ADMIN', user__is_active=True).count() == 1 and user_to_toggle.is_active:
             messages.error(request, "Cannot deactivate the last active administrator.")
-            return redirect('staff_management_list')
+            return redirect('accounts:staff_management_list')
 
     user_to_toggle.is_active = not user_to_toggle.is_active
     user_to_toggle.save()
 
     status = "activated" if user_to_toggle.is_active else "deactivated"
     messages.success(request, f"User '{user_to_toggle.username}' has been successfully {status}.")
-    return redirect('staff_management_list')
+    return redirect('accounts:staff_management_list')
 
 
 @admin_required
@@ -364,7 +364,7 @@ class StaffUpdateView(SuccessMessageMixin, UpdateView):
     model = User
     form_class = StaffUpdateForm
     template_name = 'accounts/staff_update_form.html'
-    success_url = reverse_lazy('staff_management_list')
+    success_url = reverse_lazy('accounts:staff_management_list')
     success_message = "Staff member '%(username)s' was updated successfully."
 
 # --- Update toggle_staff_status for smarter redirects ---
@@ -374,7 +374,7 @@ def toggle_staff_status(request, user_id):
     user_to_toggle = get_object_or_404(User, pk=user_id)
     
     # Determine where the request came from to redirect back appropriately
-    redirect_url = request.META.get('HTTP_REFERER', 'staff_management_list')
+    redirect_url = request.META.get('HTTP_REFERER', 'accounts:staff_management_list')
     
     # ... (safety check for last admin) ...
 
