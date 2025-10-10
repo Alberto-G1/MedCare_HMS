@@ -23,10 +23,10 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('accounts.urls')),
+    path('accounts/', include(('accounts.urls', 'accounts'), namespace='accounts')),
     path('patients/', include('patients.urls')),
     path('doctors/', include('doctors.urls')),
-    path('management/', include('management.urls')),
+    path('management/', include(('management.urls', 'management'), namespace='management')),
     path('receptionist/', include('receptionist.urls')), 
     path('billing/', include('billing.urls')),
     path('chat/', include('chat.urls', namespace='chat')),
@@ -34,7 +34,7 @@ urlpatterns = [
     path('reports/', include('reports.urls', namespace='reports')),
     path('prescriptions/', include('prescriptions.urls', namespace='prescriptions')),
     path('audit/', include(('audit.urls', 'audit'), namespace='audit')),
-    path('accounts/', include('accounts.urls')),
+    # Remove duplicate accounts URL inclusion
     path('', include('core.urls')),
 ]
 

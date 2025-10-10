@@ -161,9 +161,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Define login redirect behavior
-LOGIN_REDIRECT_URL = 'dashboard_redirect'
-LOGIN_URL = 'login'
-LOGOUT_REDIRECT_URL = 'login'
+LOGIN_REDIRECT_URL = 'accounts:dashboard_redirect'
+LOGIN_URL = 'accounts:login'
+LOGOUT_REDIRECT_URL = 'accounts:login'
 
 
 # --- EMAIL CONFIGURATION ---

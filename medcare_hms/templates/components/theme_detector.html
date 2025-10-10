@@ -1,0 +1,126 @@
+{% load static %}
+<!-- Dynamic Theme CSS Loader -->
+<link rel="stylesheet" href="{% static theme_css %}">
+
+<!-- Theme JavaScript for Dynamic Styling -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add theme class to body for global theme styling
+    document.body.classList.add('{{ theme_class }}');
+    
+    // Set CSS custom properties for dynamic theming
+    const root = document.documentElement;
+    {% if theme_colors %}
+    root.style.setProperty('--theme-primary', '{{ theme_colors.primary }}');
+    root.style.setProperty('--theme-primary-dark', '{{ theme_colors.primary_dark }}');
+    root.style.setProperty('--theme-primary-light', '{{ theme_colors.primary_light }}');
+    root.style.setProperty('--theme-secondary', '{{ theme_colors.secondary }}');
+    {% endif %}
+    
+    // Apply theme-specific enhancements
+    const themeClass = '{{ theme_class }}';
+    
+    // Add theme-specific animations and interactions
+    if (themeClass === 'doctor-theme') {
+        // Medical professional interactions
+        addMedicalThemeEffects();
+    } else if (themeClass === 'patient-theme') {
+        // Patient-friendly interactions
+        addPatientThemeEffects();
+    } else if (themeClass === 'receptionist-theme') {
+        // Administrative efficiency interactions
+        addReceptionistThemeEffects();
+    }
+});
+
+function addMedicalThemeEffects() {
+    // Add stethoscope cursor for medical forms
+    const medicalForms = document.querySelectorAll('.prescription-form, .medical-record');
+    medicalForms.forEach(form => {
+        form.style.cursor = 'crosshair';
+    });
+    
+    // Add pulse effect to vital signs
+    const vitals = document.querySelectorAll('.vital-reading');
+    vitals.forEach(vital => {
+        vital.addEventListener('mouseenter', function() {
+            this.style.animation = 'pulse 1s ease-in-out';
+        });
+        vital.addEventListener('mouseleave', function() {
+            this.style.animation = '';
+        });
+    });
+}
+
+function addPatientThemeEffects() {
+    // Add gentle transitions for patient comfort
+    const healthWidgets = document.querySelectorAll('.health-widget');
+    healthWidgets.forEach(widget => {
+        widget.style.transition = 'all 0.4s ease';
+    });
+    
+    // Add wellness tracking animations
+    const wellnessStats = document.querySelectorAll('.wellness-stat');
+    wellnessStats.forEach((stat, index) => {
+        stat.style.animationDelay = `${index * 0.1}s`;
+        stat.classList.add('fade-in-up');
+    });
+}
+
+function addReceptionistThemeEffects() {
+    // Add efficiency-focused interactions
+    const actionItems = document.querySelectorAll('.action-item');
+    actionItems.forEach(item => {
+        item.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+    });
+    
+    // Add quick hover effects for admin tables
+    const tableRows = document.querySelectorAll('.admin-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.borderLeft = '4px solid var(--receptionist-primary)';
+        });
+        row.addEventListener('mouseleave', function() {
+            this.style.borderLeft = '';
+        });
+    });
+}
+
+// Theme-specific CSS animations
+const style = document.createElement('style');
+style.textContent = `
+    .fade-in-up {
+        animation: fadeInUp 0.6s ease forwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+<!-- Theme-specific meta information -->
+<meta name="theme-color" content="{{ theme_colors.primary|default:'#0E7490' }}">
+<meta name="theme-name" content="{{ theme_class }}">
