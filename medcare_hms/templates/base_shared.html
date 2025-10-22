@@ -163,9 +163,27 @@
                             <small class="ms-1 opacity-75">({% get_user_role_display %})</small>
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                                <i class="fas fa-user me-2"></i>Profile
-                            </a></li>
+                            <li>
+                                {% if user.is_authenticated %}
+                                    {% if user.groups.all.0.name == 'Doctors' %}
+                                        <a class="dropdown-item" href="{% url 'doctors:doctor_profile' %}">
+                                            <i class="fas fa-user me-2"></i>Profile
+                                        </a>
+                                    {% elif user.groups.all.0.name == 'Patients' %}
+                                        <a class="dropdown-item" href="{% url 'patients:patient_profile' %}">
+                                            <i class="fas fa-user me-2"></i>Profile
+                                        </a>
+                                    {% elif user.groups.all.0.name == 'Receptionists' %}
+                                        <a class="dropdown-item" href="{% url 'receptionist:receptionist_profile' %}">
+                                            <i class="fas fa-user me-2"></i>Profile
+                                        </a>
+                                    {% else %}
+                                        <a class="dropdown-item" href="#">
+                                            <i class="fas fa-user me-2"></i>Profile
+                                        </a>
+                                    {% endif %}
+                                {% endif %}
+                            </li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
                                 <i class="fas fa-sign-out-alt me-2"></i>Logout

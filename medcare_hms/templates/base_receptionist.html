@@ -30,14 +30,13 @@
             --accent-blue: #14B8A6;
             --accent-green: #22C55E;
             --accent-orange: #F97316;
-            --accent-purple: #5ce9f6;
             --background-light: #F1F5F9;
             --background-white: #FFFFFF;
             --text-dark: #1E293B;
             --text-light: #64748B;
             --sidebar-width: 280px;
             --sidebar-collapsed: 75px;
-            --header-height: 70px;
+            --header-height: 85px;
             --shadow-light: rgba(15, 23, 42, 0.08);
             --shadow-medium: rgba(15, 23, 42, 0.15);
             --shadow-strong: rgba(15, 23, 42, 0.25);
@@ -61,7 +60,7 @@
         /* Professional Sidebar */
         .sidebar {
             width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--accent-purple) 0%, var(--primary-teal) 100%);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
             color: #fff;
             position: fixed;
             top: 0;
@@ -207,18 +206,71 @@
             padding: 0.85rem;
         }
 
+        /* Dropdown Menu Styles */
+        .menu-dropdown {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .menu-dropdown.show {
+            max-height: 500px;
+        }
+
+        .menu-link.has-submenu::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-left: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-link.has-submenu.active::after {
+            transform: rotate(180deg);
+        }
+
+        .submenu-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.7rem 1.25rem 0.7rem 3.5rem;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 0.75rem 0.25rem;
+        }
+
+        .submenu-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding-left: 3.75rem;
+        }
+
+        .submenu-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .sidebar.collapsed .menu-dropdown,
+        .sidebar.collapsed .menu-link.has-submenu::after {
+            display: none;
+        }
+
         /* Professional Top Bar */
         .topbar {
             position: sticky;
             top: 0;
             z-index: 100;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--primary-teal) 100%);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
             color: #fff;
-            padding: 1rem 1.5rem;
+            padding: 1.25rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 20px var(--shadow-light);
+            box-shadow: 0 4px 24px var(--shadow-medium);
             height: var(--header-height);
         }
 
@@ -232,11 +284,16 @@
             background: rgba(255, 255, 255, 0.15);
             border: none;
             color: #fff;
-            padding: 0.6rem;
-            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
             transition: all 0.25s;
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            height: 48px;
         }
 
         .sidebar-toggle:hover {
@@ -245,44 +302,59 @@
         }
 
         .topbar-title {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             font-weight: 600;
             margin: 0;
+            letter-spacing: -0.3px;
         }
 
         .topbar-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.25rem;
         }
 
         .notification-btn {
             background: rgba(255, 255, 255, 0.15);
             border: none;
             color: #fff;
-            padding: 0.6rem;
-            border-radius: 10px;
+            padding: 0;
+            border-radius: 12px;
             position: relative;
             transition: all 0.25s;
             cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 48px;
+            height: 48px;
+            font-size: 1.2rem;
         }
 
         .notification-btn:hover {
             background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: #fff;
         }
 
         .notification-badge {
             position: absolute;
-            top: -2px;
-            right: -2px;
+            top: 4px;
+            right: 4px;
             background: var(--accent-orange);
             color: #fff;
-            font-size: 0.7rem;
-            padding: 0.2rem 0.4rem;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.4rem;
             border-radius: 10px;
-            min-width: 18px;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            font-weight: 600;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(249, 115, 22, 0.4);
         }
 
         .user-dropdown {
@@ -293,32 +365,37 @@
             background: rgba(255, 255, 255, 0.15);
             border: none;
             color: #fff;
-            padding: 0.6rem 1rem;
-            border-radius: 10px;
+            padding: 0.5rem 1.25rem;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.85rem;
             transition: all 0.25s;
             cursor: pointer;
+            min-height: 48px;
+            backdrop-filter: blur(10px);
         }
 
         .user-toggle:hover {
             background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: var(--accent-purple);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            background: var(--primary-teal);
             /* Fallback background color if image fails to load */
             transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
         }
 
-        .user-avatar:hover {
-            border-color: rgba(255, 255, 255, 0.6);
+        .user-toggle:hover .user-avatar {
+            border-color: rgba(255, 255, 255, 0.8);
             transform: scale(1.05);
         }
 
@@ -327,8 +404,8 @@
             height: 40px;
             border-radius: 8px;
             object-fit: cover;
-            border: 2px solid var(--accent-purple);
-            background: var(--accent-purple);
+            border: 2px solid var(--primary-teal);
+            background: var(--primary-teal);
         }
 
         /* Profile page images */
@@ -344,15 +421,26 @@
         }
 
         .user-name {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 600;
-            line-height: 1.2;
+            line-height: 1.3;
+            letter-spacing: -0.2px;
         }
 
         .user-role {
             font-size: 0.75rem;
-            opacity: 0.8;
+            opacity: 0.85;
             line-height: 1;
+            font-weight: 400;
+        }
+
+        .user-toggle i.fa-chevron-down {
+            font-size: 0.7rem;
+            transition: transform 0.3s ease;
+        }
+
+        .user-dropdown.show .user-toggle i.fa-chevron-down {
+            transform: rotate(180deg);
         }
 
         .user-menu {
@@ -443,7 +531,7 @@
 
         /* Professional Footer */
         footer {
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--primary-teal) 100%);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
             color: #fff;
             padding: 1.5rem 2rem 1rem;
             text-align: center;
@@ -463,7 +551,7 @@
             padding: 1.5rem;
             border-radius: 16px;
             box-shadow: 0 2px 12px var(--shadow-light);
-            border-left: 4px solid var(--accent-purple);
+            border-left: 4px solid var(--primary-teal);
             transition: all 0.3s ease;
         }
 
@@ -481,7 +569,7 @@
             justify-content: center;
             font-size: 1.2rem;
             margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--accent-purple) 0%, var(--accent-blue) 100%);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--accent-blue) 100%);
             color: #fff;
         }
 
@@ -513,11 +601,15 @@
             }
 
             .topbar-title {
-                font-size: 1rem;
+                font-size: 1.1rem;
             }
 
             .user-info {
                 display: none;
+            }
+
+            .topbar {
+                padding: 1rem 1.5rem;
             }
         }
 
@@ -532,7 +624,44 @@
             }
 
             .topbar {
-                padding: 0.75rem 1rem;
+                padding: 0.85rem 1rem;
+            }
+
+            .topbar-title {
+                font-size: 1rem;
+            }
+
+            .sidebar-toggle {
+                min-width: 42px;
+                height: 42px;
+                padding: 0.6rem 0.85rem;
+                font-size: 1.1rem;
+            }
+
+            .notification-btn {
+                min-width: 42px;
+                height: 42px;
+                font-size: 1.1rem;
+            }
+
+            .user-avatar {
+                width: 36px;
+                height: 36px;
+            }
+
+            .user-toggle {
+                padding: 0.45rem 1rem;
+                min-height: 42px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .topbar-title {
+                font-size: 0.9rem;
+            }
+
+            .topbar {
+                padding: 0.75rem 0.85rem;
             }
         }
     </style>
@@ -555,57 +684,57 @@
                 <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
                 <span class="menu-text">Overview</span>
             </a>
-            <a href="{% url 'receptionist:appointment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-calendar-day"></i></span>
-                <span class="menu-text">Daily Schedule</span>
-            </a>
         </div>
 
         <!-- Patient Management Section -->
         <div class="nav-section">
-            <div class="nav-section-title">Patient Management</div>
-            <a href="{% url 'receptionist:add_patient' %}" class="menu-link {% if request.resolver_match.url_name == 'add_patient' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-user-plus"></i></span>
-                <span class="menu-text">Register Patient</span>
+            <div class="nav-section-title">Management</div>
+            <a href="#" class="menu-link has-submenu" data-target="patientMenu">
+                <span class="menu-icon"><i class="fas fa-user-injured"></i></span>
+                <span class="menu-text">Patients</span>
             </a>
-            <a href="{% url 'receptionist:patient_list' %}" class="menu-link {% if request.resolver_match.url_name == 'patient_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-users"></i></span>
-                <span class="menu-text">All Patients</span>
-            </a>
-        </div>
+            <div class="menu-dropdown" id="patientMenu">
+                <a href="{% url 'receptionist:add_patient' %}" class="submenu-link {% if request.resolver_match.url_name == 'add_patient' %}active{% endif %}">
+                    <i class="fas fa-user-plus"></i> Register Patient
+                </a>
+                <a href="{% url 'receptionist:patient_list' %}" class="submenu-link {% if request.resolver_match.url_name == 'patient_list' %}active{% endif %}">
+                    <i class="fas fa-users"></i> All Patients
+                </a>
+            </div>
 
-        <!-- Appointment Management Section -->
-        <div class="nav-section">
-            <div class="nav-section-title">Appointments</div>
-            <a href="{% url 'receptionist:book_appointment' %}" class="menu-link {% if request.resolver_match.url_name == 'book_appointment' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-calendar-plus"></i></span>
-                <span class="menu-text">Book Appointment</span>
+            <!-- Appointments Dropdown -->
+            <a href="#" class="menu-link has-submenu" data-target="appointmentMenu">
+                <span class="menu-icon"><i class="fas fa-calendar-alt"></i></span>
+                <span class="menu-text">Appointments</span>
             </a>
-            <a href="{% url 'receptionist:appointment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-list"></i></span>
-                <span class="menu-text">All Appointments</span>
-            </a>
-            <a href="{% url 'receptionist:appointment_list' %}" class="menu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-edit"></i></span>
-                <span class="menu-text">Manage Appointments</span>
-            </a>
-        </div>
+            <div class="menu-dropdown" id="appointmentMenu">
+                <a href="{% url 'receptionist:book_appointment' %}" class="submenu-link {% if request.resolver_match.url_name == 'book_appointment' %}active{% endif %}">
+                    <i class="fas fa-calendar-plus"></i> Book Appointment
+                </a>
+                <a href="{% url 'receptionist:appointment_list' %}" class="submenu-link {% if request.resolver_match.url_name == 'appointment_list' %}active{% endif %}">
+                    <i class="fas fa-list"></i> All Appointments
+                </a>
+                <a href="{% url 'receptionist:appointment_list' %}" class="submenu-link">
+                    <i class="fas fa-calendar-day"></i> Daily Schedule
+                </a>
+            </div>
 
-        <!-- Billing Section -->
-        <div class="nav-section">
-            <div class="nav-section-title">Billing & Payments</div>
-            <a href="{% url 'billing:bill_list' %}" class="menu-link {% if request.resolver_match.app_name == 'billing' and 'bill_list' in request.resolver_match.url_name %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-file-invoice"></i></span>
-                <span class="menu-text">All Bills</span>
-            </a>
-            <a href="{% url 'billing:select_appointment' %}" class="menu-link {% if request.resolver_match.url_name == 'select_appointment' %}active{% endif %}">
+            <!-- Billing Dropdown -->
+            <a href="#" class="menu-link has-submenu" data-target="billingMenu">
                 <span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>
-                <span class="menu-text">Generate Bill</span>
+                <span class="menu-text">Billing</span>
             </a>
-            <a href="{% url 'billing:bill_list' %}" class="menu-link {% if request.resolver_match.url_name == 'bill_list' %}active{% endif %}">
-                <span class="menu-icon"><i class="fas fa-credit-card"></i></span>
-                <span class="menu-text">Payment Records</span>
-            </a>
+            <div class="menu-dropdown" id="billingMenu">
+                <a href="{% url 'billing:select_appointment' %}" class="submenu-link {% if request.resolver_match.url_name == 'select_appointment' %}active{% endif %}">
+                    <i class="fas fa-plus-circle"></i> Generate Bill
+                </a>
+                <a href="{% url 'billing:bill_list' %}" class="submenu-link {% if 'bill_list' in request.resolver_match.url_name %}active{% endif %}">
+                    <i class="fas fa-file-invoice"></i> All Bills
+                </a>
+                <a href="{% url 'billing:bill_list' %}" class="submenu-link">
+                    <i class="fas fa-credit-card"></i> Payment Records
+                </a>
+            </div>
         </div>
 
         <!-- Communication Section -->
@@ -644,15 +773,17 @@
             
             <div class="topbar-right">
                 <!-- Notifications -->
-                <a href="{% url 'notifications:notification_list' %}" class="notification-btn">
+                <a href="{% url 'notifications:notification_list' %}" class="notification-btn" title="Notifications">
                     <i class="fas fa-bell"></i>
-                    <span class="notification-badge">5</span>
+                    {% if unread_notifications_count %}
+                    <span class="notification-badge">{{ unread_notifications_count|default:"0" }}</span>
+                    {% endif %}
                 </a>
                 
                 <!-- User Menu -->
-                <div class="user-dropdown">
+                <div class="user-dropdown" id="userDropdown">
                     <button class="user-toggle" id="userMenuToggle">
-                        {% profile_image user size="32" css_class="user-avatar" %}
+                        {% profile_image user size="40" css_class="user-avatar" %}
                         <div class="user-info">
                             <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
                             <span class="user-role">Receptionist</span>
@@ -744,19 +875,87 @@
             sidebar.classList.add('collapsed');
         }
 
+        // Dropdown menu functionality
+        const dropdownLinks = document.querySelectorAll('.menu-link.has-submenu');
+        dropdownLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Don't toggle if sidebar is collapsed
+                if (sidebar.classList.contains('collapsed')) {
+                    return;
+                }
+                
+                const targetId = link.getAttribute('data-target');
+                const targetMenu = document.getElementById(targetId);
+                const isActive = link.classList.contains('active');
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                    if (menu !== targetMenu) {
+                        menu.classList.remove('show');
+                    }
+                });
+                document.querySelectorAll('.menu-link.has-submenu').forEach(l => {
+                    if (l !== link) {
+                        l.classList.remove('active');
+                    }
+                });
+                
+                // Toggle current dropdown
+                if (isActive) {
+                    link.classList.remove('active');
+                    targetMenu.classList.remove('show');
+                } else {
+                    link.classList.add('active');
+                    targetMenu.classList.add('show');
+                }
+                
+                // Save state
+                localStorage.setItem('activeDropdown', isActive ? '' : targetId);
+            });
+        });
+
+        // Restore dropdown state
+        const activeDropdown = localStorage.getItem('activeDropdown');
+        if (activeDropdown && !sidebar.classList.contains('collapsed')) {
+            const targetMenu = document.getElementById(activeDropdown);
+            const targetLink = document.querySelector(`[data-target="${activeDropdown}"]`);
+            if (targetMenu && targetLink) {
+                targetLink.classList.add('active');
+                targetMenu.classList.add('show');
+            }
+        }
+
+        // Close dropdowns when sidebar is collapsed
+        sidebar.addEventListener('transitionend', () => {
+            if (sidebar.classList.contains('collapsed')) {
+                document.querySelectorAll('.menu-dropdown').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+                document.querySelectorAll('.menu-link.has-submenu').forEach(link => {
+                    link.classList.remove('active');
+                });
+            }
+        });
+
         // User menu toggle
+        const userDropdown = document.getElementById('userDropdown');
         const userToggle = document.getElementById('userMenuToggle');
         const userMenu = document.getElementById('userMenu');
 
         userToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+            const isShowing = userMenu.style.display === 'block';
+            userMenu.style.display = isShowing ? 'none' : 'block';
+            userDropdown.classList.toggle('show', !isShowing);
         });
 
         // Close user menu when clicking outside
         document.addEventListener('click', (e) => {
             if (!userMenu.contains(e.target) && !userToggle.contains(e.target)) {
                 userMenu.style.display = 'none';
+                userDropdown.classList.remove('show');
             }
         });
 
@@ -792,7 +991,7 @@
                     canvas.height = size;
                     
                     // Set background color (receptionist theme)
-                    ctx.fillStyle = '#5ce9f6';
+                    ctx.fillStyle = '#0E7490';
                     ctx.fillRect(0, 0, size, size);
                     
                     // Set text properties
