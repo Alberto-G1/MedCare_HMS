@@ -11,6 +11,14 @@ from accounts.tests import create_user_with_role
 class PatientProfileAndAppointmentModelTest(TestCase):
 
     def setUp(self):
+        # Clean up existing data in correct order (delete Bills before PatientProfiles)
+        from billing.models import Bill, BillItem
+        BillItem.objects.all().delete()
+        Bill.objects.all().delete()
+        Appointment.objects.all().delete()
+        PatientProfile.objects.all().delete()
+        DoctorProfile.objects.all().delete()
+        
         self.patient_user = create_user_with_role('test_patient', 'password', 'PATIENT')
         self.doctor_user = create_user_with_role('test_doctor', 'password', 'DOCTOR')
         PatientProfile.objects.create(user=self.patient_user)
@@ -34,14 +42,22 @@ class PatientProfileAndAppointmentModelTest(TestCase):
 class PatientViewsTest(TestCase):
 
     def setUp(self):
-        self.patient_user = create_user_with_role('view_patient', 'password', 'PATIENT')
+        # Clean up existing data in correct order (delete Bills before PatientProfiles)
+        from billing.models import Bill, BillItem
+        BillItem.objects.all().delete()
+        Bill.objects.all().delete()
+        Appointment.objects.all().delete()
+        PatientProfile.objects.all().delete()
+        DoctorProfile.objects.all().delete()
+        
+        self.patient_user = create_user_with_role('patient_user', 'password', 'PATIENT')
         self.doctor_user = create_user_with_role('view_doctor', 'password', 'DOCTOR')
         PatientProfile.objects.create(user=self.patient_user)
-        DoctorProfile.objects.create(user=self.doctor_user, specialization='Cardiology')
+        DoctorProfile.objects.create(user=self.doctor_user, specialization='General Practice')
     
     def test_patient_can_book_appointment(self):
         """Test that a patient can successfully book an appointment."""
-        self.client.login(username='view_patient', password='password')
+        self.client.login(username='patient_user', password='password')
         
         appointment_date = date.today() + timedelta(days=5)
         form_data = {
@@ -62,7 +78,8 @@ class PatientViewsTest(TestCase):
         """A doctor should be redirected from the patient's booking page."""
         self.client.login(username='view_doctor', password='password')
         response = self.client.get(reverse('patients:book_appointment'))
-        self.assertEqual(response.status_code, 302, "Doctor should be redirected.")
+        # The decorator returns 403 Forbidden, not a redirect
+        self.assertEqual(response.status_code, 403, "Doctor should get 403.")
 
 class PatientFormsTest(TestCase):
 

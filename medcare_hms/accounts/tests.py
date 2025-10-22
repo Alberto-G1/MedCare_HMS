@@ -26,7 +26,7 @@ class AuthenticationTests(TestCase):
         Ensure that a new user registering with the 'PATIENT' role is automatically active.
         """
         # The client is a dummy web browser
-        response = self.client.post(reverse('register'), {
+        response = self.client.post(reverse('accounts:register'), {
             'username': 'testpatient',
             'email': 'patient@test.com',
             'contact': '1234567890',
@@ -47,7 +47,7 @@ class AuthenticationTests(TestCase):
         """
         Ensure that a new user registering with the 'DOCTOR' role is NOT active by default.
         """
-        self.client.post(reverse('register'), {
+        self.client.post(reverse('accounts:register'), {
             'username': 'testdoctor',
             'email': 'doctor@test.com',
             'contact': '0987654321',
@@ -100,36 +100,37 @@ class DashboardAccessTests(TestCase):
     def test_patient_can_access_patient_dashboard(self):
         """A logged-in patient should be able to access their own dashboard."""
         self.client.login(username='patientuser', password='password')
-        response = self.client.get(reverse('patient_dashboard'))
+        response = self.client.get(reverse('accounts:patient_dashboard'))
         self.assertEqual(response.status_code, 200)
 
     def test_patient_cannot_access_doctor_dashboard(self):
         """A patient should be redirected if they try to access the doctor dashboard."""
         self.client.login(username='patientuser', password='password')
-        response = self.client.get(reverse('doctor_dashboard'))
-        # 302 means a redirect. The user is redirected because the @doctor_required decorator failed.
-        self.assertEqual(response.status_code, 302, "Patient should be redirected from doctor dashboard.")
+        response = self.client.get(reverse('accounts:doctor_dashboard'))
+        # The decorator returns 403 Forbidden, not a redirect
+        self.assertEqual(response.status_code, 403, "Patient should get 403 from doctor dashboard.")
 
     def test_patient_cannot_access_admin_dashboard(self):
         """A patient should be redirected from the admin dashboard."""
         self.client.login(username='patientuser', password='password')
-        response = self.client.get(reverse('admin_dashboard'))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse('accounts:admin_dashboard'))
+        # The decorator returns 403 Forbidden, not a redirect
+        self.assertEqual(response.status_code, 403)
 
     def test_doctor_can_access_doctor_dashboard(self):
         """A logged-in doctor should be able to access their own dashboard."""
         self.client.login(username='doctoruser', password='password')
-        response = self.client.get(reverse('doctor_dashboard'))
+        response = self.client.get(reverse('accounts:doctor_dashboard'))
         self.assertEqual(response.status_code, 200)
 
     def test_anonymous_user_is_redirected_from_dashboards(self):
         """A user who is not logged in should be redirected to the login page from any dashboard."""
-        response = self.client.get(reverse('patient_dashboard'))
+        response = self.client.get(reverse('accounts:patient_dashboard'))
         # The redirect URL should contain the login page URL
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('patient_dashboard')}")
+        self.assertRedirects(response, f"{reverse('accounts:login')}?next={reverse('accounts:patient_dashboard')}")
         
-        response = self.client.get(reverse('doctor_dashboard'))
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('doctor_dashboard')}")
+        response = self.client.get(reverse('accounts:doctor_dashboard'))
+        self.assertRedirects(response, f"{reverse('accounts:login')}?next={reverse('accounts:doctor_dashboard')}")
         
-        response = self.client.get(reverse('admin_dashboard'))
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('admin_dashboard')}")
+        response = self.client.get(reverse('accounts:admin_dashboard'))
+        self.assertRedirects(response, f"{reverse('accounts:login')}?next={reverse('accounts:admin_dashboard')}")

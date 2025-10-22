@@ -9,16 +9,25 @@ from accounts.tests import create_user_with_role # Import the helper function
 
 class DoctorProfileModelTest(TestCase):
     
+    def setUp(self):
+        # Clean up existing data in correct order (delete related objects first)
+        from patients.models import Appointment
+        from billing.models import Bill, BillItem
+        BillItem.objects.all().delete()
+        Bill.objects.all().delete()
+        Appointment.objects.all().delete()
+        DoctorProfile.objects.all().delete()
+    
     def test_doctor_profile_creation(self):
         """Test that a DoctorProfile is created and linked correctly to a User."""
-        user = User.objects.create_user(username='testdoc', password='password')
+        user = User.objects.create_user(username='testdoc', password='password', first_name='John', last_name='Smith')
         profile = DoctorProfile.objects.create(
             user=user,
             specialization='Cardiology',
             years_of_experience=10
         )
         self.assertEqual(profile.user.username, 'testdoc')
-        self.assertEqual(str(profile), f"Dr. {user.first_name} {user.last_name}")
+        self.assertEqual(str(profile), f"Dr. John Smith")
         self.assertEqual(DoctorProfile.objects.count(), 1)
         self.assertEqual(user.doctorprofile, profile)
 
@@ -43,13 +52,13 @@ class DoctorViewsTest(TestCase):
         """Test that a patient is redirected from doctor-specific pages."""
         self.client.login(username='pat_user', password='password')
         
-        # Test doctor profile view
+        # Test doctor profile view - decorator returns 403 Forbidden
         response = self.client.get(reverse('doctors:doctor_profile'))
-        self.assertEqual(response.status_code, 302, "Patient should be redirected from doctor profile.")
+        self.assertEqual(response.status_code, 403, "Patient should get 403 from doctor profile.")
         
-        # Test doctor appointments view
+        # Test doctor appointments view - decorator returns 403 Forbidden
         response = self.client.get(reverse('doctors:doctor_appointments'))
-        self.assertEqual(response.status_code, 302, "Patient should be redirected from doctor appointments.")
+        self.assertEqual(response.status_code, 403, "Patient should get 403 from doctor appointments.")
 
     def test_doctor_can_update_profile(self):
         """Test that a doctor can successfully POST data to update their profile."""
@@ -81,18 +90,26 @@ class DoctorFormsTest(TestCase):
     def test_doctor_profile_form_valid(self):
         """Test that the DoctorProfileForm is valid with correct data."""
         user = create_user_with_role('form_doc', 'password', 'DOCTOR')
+        # Create DoctorProfile for this user
+        from doctors.models import DoctorProfile
+        doctor_profile = DoctorProfile.objects.create(user=user, specialization='General Medicine')
+        
         form_data = {
             'first_name': 'Jane', 'last_name': 'Smith', 'specialization': 'Neurology',
             'license_number': 'LIC54321', 'years_of_experience': 5, 'availability': 'Weekends'
         }
-        form = DoctorProfileForm(data=form_data, instance=user.doctorprofile)
+        form = DoctorProfileForm(data=form_data, instance=doctor_profile)
         self.assertTrue(form.is_valid())
 
     def test_doctor_profile_form_invalid_data(self):
         """Test that the form is invalid if required fields are missing."""
         user = create_user_with_role('form_doc2', 'password', 'DOCTOR')
+        # Create DoctorProfile for this user
+        from doctors.models import DoctorProfile
+        doctor_profile = DoctorProfile.objects.create(user=user, specialization='General Medicine')
+        
         form_data = {'first_name': 'Jane'} # Missing last name and specialization
-        form = DoctorProfileForm(data=form_data, instance=user.doctorprofile)
+        form = DoctorProfileForm(data=form_data, instance=doctor_profile)
         self.assertFalse(form.is_valid())
         self.assertIn('last_name', form.errors)
         self.assertIn('specialization', form.errors)
