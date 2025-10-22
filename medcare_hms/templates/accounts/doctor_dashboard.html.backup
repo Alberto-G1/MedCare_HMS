@@ -1,0 +1,252 @@
+{% extends "base_doctor.html" %}
+{% load static %}
+
+{% block title %}Doctor Dashboard - MedCare HMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 fw-bold text-custom-dark">Doctor Dashboard</h1>
+            <p class="text-muted">Welcome, Dr. {{ user.first_name|default:user.username }}!</p>
+        </div>
+
+        <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-primary-custom">
+            <i class="fas fa-user-md me-2"></i>View My Profile
+        </a>
+
+        <div class="d-flex align-items-center">
+            <span class="badge bg-primary me-3">
+                <i class="fas fa-clock me-1"></i>
+                <span id="current-time">{{ current_time|date:"h:i A" }}</span>
+            </span>
+            <span class="badge bg-info">
+                <i class="fas fa-calendar me-1"></i>
+                <span id="current-date">{{ current_time|date:"F j, Y" }}</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Quick Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Today's Appointments</h6>
+                            <h3 class="mb-0 fw-bold text-custom-dark">{{ todays_appointments_count }}</h3>
+                        </div>
+                        <div class="bg-primary p-3 rounded-circle"><i class="fas fa-calendar-check text-white fa-2x"></i></div>
+                    </div>
+                    <div class="mt-3"><span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> {{ completed_today_count }} completed</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Waiting Patients</h6>
+                            <h3 class="mb-0 fw-bold text-custom-dark">{{ waiting_patients_count }}</h3>
+                        </div>
+                        <div class="bg-warning p-3 rounded-circle"><i class="fas fa-user-clock text-white fa-2x"></i></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Messages</h6>
+                            <h3 class="mb-0 fw-bold text-custom-dark">{{ unread_messages_count }}</h3>
+                        </div>
+                        <div class="bg-info p-3 rounded-circle"><i class="fas fa-envelope text-white fa-2x"></i></div>
+                    </div>
+                    <div class="mt-3"><span class="badge bg-danger"><i class="fas fa-exclamation-circle me-1"></i> 2 urgent</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card card-custom h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title text-muted">Lab Results</h6>
+                            <h3 class="mb-0 fw-bold text-custom-dark">{{ pending_lab_results_count }}</h3>
+                        </div>
+                        <div class="bg-success p-3 rounded-circle"><i class="fas fa-vial text-white fa-2x"></i></div>
+                    </div>
+                    <div class="mt-3"><span class="badge bg-warning"><i class="fas fa-clock me-1"></i> 2 pending review</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-lg-8">
+            <!-- Quick Actions -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom"><h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <!-- Corrected Link -->
+                            <a href="{% url 'doctors:doctor_appointments' %}" class="text-decoration-none">
+                                <div class="bg-primary p-3 rounded-circle d-inline-block"><i class="fas fa-calendar-alt text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">My Schedule</p>
+                            </a>
+                        </div>
+
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="{% url 'doctors:manage_availability' %}" class="text-decoration-none">
+                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-user-clock text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">Set Availability</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="{% url 'chat:thread_list' %}" class="text-decoration-none">
+                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-comments text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">My Chats</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <!-- Corrected Link -->
+                            <a href="{% url 'doctors:medical_record_list' %}" class="text-decoration-none">
+                                <div class="bg-warning p-3 rounded-circle d-inline-block"><i class="fas fa-file-medical text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">Patient Records</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none text-muted">
+                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-prescription text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">e-Prescribe</p>
+                            </a>
+                        </div>
+                        <div class="col-md-3 col-6 text-center mb-3">
+                            <a href="#" class="text-decoration-none text-muted">
+                                <div class="bg-success p-3 rounded-circle d-inline-block"><i class="fas fa-vial text-white fa-2x"></i></div>
+                                <p class="mt-2 mb-0">Order Tests</p>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Today's Appointments Table (DYNAMIC) -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Today's Appointments</h5>
+                    <a href="{% url 'doctors:doctor_appointments' %}" class="btn btn-sm btn-sky">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr><th>Time</th><th>Patient</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+                            </thead>
+                            <tbody>
+                                {% for appt in upcoming_appointments_today %}
+                                <tr class="{% if appt.status == 'Completed' %}table-success{% elif appt.status == 'Approved' %}table-warning{% endif %}">
+                                    <td>{{ appt.appointment_time|time:"g:i A" }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ appt.patient.profile_picture.url }}" class="rounded-circle me-2" alt="Patient" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <div>{{ appt.patient.user.get_full_name }}</div>
+                                        </div>
+                                    </td>
+                                    <td>{{ appt.reason|truncatewords:5 }}</td>
+                                    <td>
+                                        {% if appt.status == 'Approved' %}<span class="badge bg-warning">Waiting</span>
+                                        {% elif appt.status == 'Pending' %}<span class="badge bg-secondary">Pending</span>
+                                        {% elif appt.status == 'Completed' %}<span class="badge bg-success">Completed</span>
+                                        {% else %}<span class="badge bg-danger">{{ appt.status }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            {% if appt.status == 'Approved' %}
+                                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary" title="Add Medical Record"><i class="fas fa-file-medical"></i></a>
+                                            {% elif appt.status == 'Pending' %}
+                                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></a>
+                                            {% else %}
+                                                <span class="text-muted small">--</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center text-muted py-4">You have no appointments scheduled for today.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-lg-4">
+            <!-- Current Patient Card (DUMMY DATA) -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom"><h5 class="mb-0">Current Patient: Robert Williams</h5></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12 text-center">
+                            <img src="https://via.placeholder.com/120x120/87CEEB/1e3a3a?text=RW" class="rounded-circle mb-3" alt="Patient">
+                            <h5>Robert Williams</h5>
+                            <p class="text-muted">58 years old</p>
+                            <span class="badge bg-info">Hypertension</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Lab Results Card (DUMMY DATA) -->
+            <div class="card card-custom mb-4">
+                <div class="card-header-custom"><h5 class="mb-0">Recent Lab Results</h5></div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-danger p-2 rounded-circle me-3"><i class="fas fa-exclamation-triangle text-white"></i></div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Sarah Johnson</h6>
+                            <small class="text-muted">Cholesterol Panel - High LDL</small>
+                            <small class="text-muted d-block">Today, 8:45 AM</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary">Review</button>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-warning p-2 rounded-circle me-3"><i class="fas fa-clock text-white"></i></div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-0">Robert Williams</h6>
+                            <small class="text-muted">Metabolic Panel - Pending</small>
+                            <small class="text-muted d-block">Yesterday, 1:15 PM</small>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary">View</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('current-time');
+        const dateEl = document.getElementById('current-date');
+        if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+        if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+</script>
+{% endblock %}

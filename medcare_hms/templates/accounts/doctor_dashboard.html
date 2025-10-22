@@ -4,84 +4,355 @@
 {% block title %}Doctor Dashboard - MedCare HMS{% endblock %}
 
 {% block content %}
+<style>
+    /* Dashboard-specific enhancements */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(14, 116, 144, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 200px;
+        height: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+    }
+    
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: -50px;
+        left: -50px;
+        width: 150px;
+        height: 150px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 50%;
+    }
+    
+    .dashboard-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-subtitle {
+        opacity: 0.9;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .time-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    
+    .stats-card {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(31, 41, 55, 0.05);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 28px rgba(31, 41, 55, 0.15);
+    }
+    
+    .stats-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .stats-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+    
+    .stats-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+        color: var(--text-dark);
+    }
+    
+    .stats-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .stats-meta {
+        margin-top: 0.75rem;
+        font-size: 0.8rem;
+    }
+    
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-item {
+        text-align: center;
+        padding: 1.5rem 1rem;
+        border-radius: 12px;
+        background: white;
+        box-shadow: 0 2px 8px rgba(31, 41, 55, 0.05);
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: var(--text-dark);
+        display: block;
+    }
+    
+    .action-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 16px rgba(31, 41, 55, 0.1);
+        color: var(--text-dark);
+    }
+    
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .action-label {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    .card-header-custom {
+        background: white;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px 12px 0 0 !important;
+    }
+    
+    .card-header-custom h5 {
+        margin: 0;
+        font-weight: 600;
+        color: var(--text-dark);
+    }
+    
+    .table-responsive {
+        border-radius: 0 0 12px 12px;
+    }
+    
+    .table > :not(caption) > * > * {
+        padding: 1rem 0.75rem;
+    }
+    
+    .table thead th {
+        background-color: #f8fafc;
+        border-bottom: 1px solid #e5e7eb;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .patient-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #e5e7eb;
+    }
+    
+    .current-patient-card .patient-avatar {
+        width: 80px;
+        height: 80px;
+        border: 4px solid white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .lab-result-item {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        background: #f8fafc;
+        transition: all 0.2s ease;
+    }
+    
+    .lab-result-item:hover {
+        background: #f1f5f9;
+    }
+    
+    .lab-result-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .btn-sky {
+        background-color: var(--sky-blue);
+        border-color: var(--sky-blue);
+        color: white;
+    }
+    
+    .btn-sky:hover {
+        background-color: var(--primary-teal);
+        border-color: var(--primary-teal);
+        color: white;
+    }
+    
+    .badge-status {
+        padding: 0.35rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    /* Color assignments for different elements */
+    .stats-icon-appointments { background-color: rgba(14, 116, 144, 0.1); color: var(--primary-teal); }
+    .stats-icon-waiting { background-color: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
+    .stats-icon-messages { background-color: rgba(2, 132, 199, 0.1); color: var(--sky-blue); }
+    .stats-icon-lab { background-color: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+    
+    .action-icon-schedule { background-color: rgba(14, 116, 144, 0.1); color: var(--primary-teal); }
+    .action-icon-availability { background-color: rgba(2, 132, 199, 0.1); color: var(--sky-blue); }
+    .action-icon-chats { background-color: rgba(2, 132, 199, 0.1); color: var(--sky-blue); }
+    .action-icon-records { background-color: rgba(249, 115, 22, 0.1); color: var(--accent-orange); }
+    .action-icon-prescribe { background-color: rgba(2, 132, 199, 0.1); color: var(--sky-blue); }
+    .action-icon-tests { background-color: rgba(34, 197, 94, 0.1); color: var(--accent-green); }
+</style>
+
 <div class="container-fluid">
-    <!-- Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h2 fw-bold text-custom-dark">Doctor Dashboard</h1>
-            <p class="text-muted">Welcome, Dr. {{ user.first_name|default:user.username }}!</p>
-        </div>
-
-        <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-primary-custom">
-            <i class="fas fa-user-md me-2"></i>View My Profile
-        </a>
-
-        <div class="d-flex align-items-center">
-            <span class="badge bg-primary me-3">
-                <i class="fas fa-clock me-1"></i>
-                <span id="current-time">{{ current_time|date:"h:i A" }}</span>
-            </span>
-            <span class="badge bg-info">
-                <i class="fas fa-calendar me-1"></i>
-                <span id="current-date">{{ current_time|date:"F j, Y" }}</span>
-            </span>
+    <!-- Enhanced Dashboard Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="dashboard-title">Doctor Dashboard</h1>
+                <p class="dashboard-subtitle">Welcome, Dr. {{ user.first_name|default:user.username }}!</p>
+            </div>
+            
+            <div class="d-flex align-items-center gap-3">
+                <div class="time-badge">
+                    <i class="fas fa-clock me-2"></i>
+                    <span id="current-time">{{ current_time|date:"h:i A" }}</span>
+                </div>
+                <div class="time-badge">
+                    <i class="fas fa-calendar me-2"></i>
+                    <span id="current-date">{{ current_time|date:"F j, Y" }}</span>
+                </div>
+                <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-light">
+                    <i class="fas fa-user-md me-2"></i>View My Profile
+                </a>
+            </div>
         </div>
     </div>
 
     <!-- Quick Stats Cards -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom h-100">
+            <div class="stats-card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="card-title text-muted">Today's Appointments</h6>
-                            <h3 class="mb-0 fw-bold text-custom-dark">{{ todays_appointments_count }}</h3>
+                            <p class="stats-label">Today's Appointments</p>
+                            <h2 class="stats-value">{{ todays_appointments_count }}</h2>
+                            <div class="stats-meta">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i> {{ completed_today_count }} completed
+                                </span>
+                            </div>
                         </div>
-                        <div class="bg-primary p-3 rounded-circle"><i class="fas fa-calendar-check text-white fa-2x"></i></div>
-                    </div>
-                    <div class="mt-3"><span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> {{ completed_today_count }} completed</span></div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-title text-muted">Waiting Patients</h6>
-                            <h3 class="mb-0 fw-bold text-custom-dark">{{ waiting_patients_count }}</h3>
+                        <div class="stats-icon stats-icon-appointments">
+                            <i class="fas fa-calendar-check"></i>
                         </div>
-                        <div class="bg-warning p-3 rounded-circle"><i class="fas fa-user-clock text-white fa-2x"></i></div>
                     </div>
                 </div>
             </div>
         </div>
+        
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom h-100">
+            <div class="stats-card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="card-title text-muted">Messages</h6>
-                            <h3 class="mb-0 fw-bold text-custom-dark">{{ unread_messages_count }}</h3>
+                            <p class="stats-label">Waiting Patients</p>
+                            <h2 class="stats-value">{{ waiting_patients_count }}</h2>
                         </div>
-                        <div class="bg-info p-3 rounded-circle"><i class="fas fa-envelope text-white fa-2x"></i></div>
+                        <div class="stats-icon stats-icon-waiting">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
                     </div>
-                    <div class="mt-3"><span class="badge bg-danger"><i class="fas fa-exclamation-circle me-1"></i> 2 urgent</span></div>
                 </div>
             </div>
         </div>
+        
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom h-100">
+            <div class="stats-card">
                 <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-start">
                         <div>
-                            <h6 class="card-title text-muted">Lab Results</h6>
-                            <h3 class="mb-0 fw-bold text-custom-dark">{{ pending_lab_results_count }}</h3>
+                            <p class="stats-label">Unread Messages</p>
+                            <h2 class="stats-value">{{ unread_messages_count }}</h2>
+                            <div class="stats-meta">
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-exclamation-circle me-1"></i> 2 urgent
+                                </span>
+                            </div>
                         </div>
-                        <div class="bg-success p-3 rounded-circle"><i class="fas fa-vial text-white fa-2x"></i></div>
+                        <div class="stats-icon stats-icon-messages">
+                            <i class="fas fa-envelope"></i>
+                        </div>
                     </div>
-                    <div class="mt-3"><span class="badge bg-warning"><i class="fas fa-clock me-1"></i> 2 pending review</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="stats-label">Pending Lab Results</p>
+                            <h2 class="stats-value">{{ pending_lab_results_count }}</h2>
+                            <div class="stats-meta">
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i> 2 pending review
+                                </span>
+                            </div>
+                        </div>
+                        <div class="stats-icon stats-icon-lab">
+                            <i class="fas fa-vial"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -93,53 +364,57 @@
         <div class="col-lg-8">
             <!-- Quick Actions -->
             <div class="card card-custom mb-4">
-                <div class="card-header-custom"><h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5></div>
+                <div class="card-header-custom">
+                    <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+                </div>
                 <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <!-- Corrected Link -->
-                            <a href="{% url 'doctors:doctor_appointments' %}" class="text-decoration-none">
-                                <div class="bg-primary p-3 rounded-circle d-inline-block"><i class="fas fa-calendar-alt text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">My Schedule</p>
-                            </a>
-                        </div>
-
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <a href="{% url 'doctors:manage_availability' %}" class="text-decoration-none">
-                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-user-clock text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">Set Availability</p>
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <a href="{% url 'chat:thread_list' %}" class="text-decoration-none">
-                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-comments text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">My Chats</p>
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <!-- Corrected Link -->
-                            <a href="{% url 'doctors:medical_record_list' %}" class="text-decoration-none">
-                                <div class="bg-warning p-3 rounded-circle d-inline-block"><i class="fas fa-file-medical text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">Patient Records</p>
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <a href="#" class="text-decoration-none text-muted">
-                                <div class="bg-info p-3 rounded-circle d-inline-block"><i class="fas fa-prescription text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">e-Prescribe</p>
-                            </a>
-                        </div>
-                        <div class="col-md-3 col-6 text-center mb-3">
-                            <a href="#" class="text-decoration-none text-muted">
-                                <div class="bg-success p-3 rounded-circle d-inline-block"><i class="fas fa-vial text-white fa-2x"></i></div>
-                                <p class="mt-2 mb-0">Order Tests</p>
-                            </a>
-                        </div>
+                    <div class="quick-actions-grid">
+                        <a href="{% url 'doctors:doctor_appointments' %}" class="action-item">
+                            <div class="action-icon action-icon-schedule">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="action-label">My Schedule</div>
+                        </a>
+                        
+                        <a href="{% url 'doctors:manage_availability' %}" class="action-item">
+                            <div class="action-icon action-icon-availability">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="action-label">Set Availability</div>
+                        </a>
+                        
+                        <a href="{% url 'chat:thread_list' %}" class="action-item">
+                            <div class="action-icon action-icon-chats">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="action-label">My Chats</div>
+                        </a>
+                        
+                        <a href="{% url 'doctors:medical_record_list' %}" class="action-item">
+                            <div class="action-icon action-icon-records">
+                                <i class="fas fa-file-medical"></i>
+                            </div>
+                            <div class="action-label">Patient Records</div>
+                        </a>
+                        
+                        <a href="#" class="action-item">
+                            <div class="action-icon action-icon-prescribe">
+                                <i class="fas fa-prescription"></i>
+                            </div>
+                            <div class="action-label">e-Prescribe</div>
+                        </a>
+                        
+                        <a href="#" class="action-item">
+                            <div class="action-icon action-icon-tests">
+                                <i class="fas fa-vial"></i>
+                            </div>
+                            <div class="action-label">Order Tests</div>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Today's Appointments Table (DYNAMIC) -->
+            <!-- Today's Appointments Table -->
             <div class="card card-custom mb-4">
                 <div class="card-header-custom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0"><i class="fas fa-calendar-day me-2"></i>Today's Appointments</h5>
@@ -149,7 +424,13 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead class="table-light">
-                                <tr><th>Time</th><th>Patient</th><th>Reason</th><th>Status</th><th>Actions</th></tr>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Patient</th>
+                                    <th>Reason</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 {% for appt in upcoming_appointments_today %}
@@ -157,24 +438,32 @@
                                     <td>{{ appt.appointment_time|time:"g:i A" }}</td>
                                     <td>
                                         <div class="d-flex align-items-center">
-                                            <img src="{{ appt.patient.profile_picture.url }}" class="rounded-circle me-2" alt="Patient" style="width: 40px; height: 40px; object-fit: cover;">
+                                            <img src="{{ appt.patient.profile_picture.url }}" class="patient-avatar me-2" alt="Patient">
                                             <div>{{ appt.patient.user.get_full_name }}</div>
                                         </div>
                                     </td>
                                     <td>{{ appt.reason|truncatewords:5 }}</td>
                                     <td>
-                                        {% if appt.status == 'Approved' %}<span class="badge bg-warning">Waiting</span>
-                                        {% elif appt.status == 'Pending' %}<span class="badge bg-secondary">Pending</span>
-                                        {% elif appt.status == 'Completed' %}<span class="badge bg-success">Completed</span>
-                                        {% else %}<span class="badge bg-danger">{{ appt.status }}</span>
+                                        {% if appt.status == 'Approved' %}
+                                            <span class="badge-status bg-warning text-dark">Waiting</span>
+                                        {% elif appt.status == 'Pending' %}
+                                            <span class="badge-status bg-secondary">Pending</span>
+                                        {% elif appt.status == 'Completed' %}
+                                            <span class="badge-status bg-success">Completed</span>
+                                        {% else %}
+                                            <span class="badge-status bg-danger">{{ appt.status }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group">
                                             {% if appt.status == 'Approved' %}
-                                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary" title="Add Medical Record"><i class="fas fa-file-medical"></i></a>
+                                                <a href="{% url 'doctors:add_medical_record' appt.pk %}" class="btn btn-sm btn-primary" title="Add Medical Record">
+                                                    <i class="fas fa-file-medical"></i>
+                                                </a>
                                             {% elif appt.status == 'Pending' %}
-                                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success" title="Approve"><i class="fas fa-check"></i></a>
+                                                <a href="{% url 'doctors:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success" title="Approve">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
                                             {% else %}
                                                 <span class="text-muted small">--</span>
                                             {% endif %}
@@ -182,7 +471,12 @@
                                     </td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="5" class="text-center text-muted py-4">You have no appointments scheduled for today.</td></tr>
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted py-4">
+                                        <i class="fas fa-calendar-times fa-2x mb-2 d-block"></i>
+                                        You have no appointments scheduled for today.
+                                    </td>
+                                </tr>
                                 {% endfor %}
                             </tbody>
                         </table>
@@ -193,42 +487,64 @@
 
         <!-- Right Column -->
         <div class="col-lg-4">
-            <!-- Current Patient Card (DUMMY DATA) -->
-            <div class="card card-custom mb-4">
-                <div class="card-header-custom"><h5 class="mb-0">Current Patient: Robert Williams</h5></div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-12 text-center">
-                            <img src="https://via.placeholder.com/120x120/87CEEB/1e3a3a?text=RW" class="rounded-circle mb-3" alt="Patient">
-                            <h5>Robert Williams</h5>
-                            <p class="text-muted">58 years old</p>
-                            <span class="badge bg-info">Hypertension</span>
+            <!-- Current Patient Card -->
+            <div class="card card-custom mb-4 current-patient-card">
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Current Patient</h5>
+                </div>
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/120x120/87CEEB/1e3a3a?text=RW" class="patient-avatar mb-3" alt="Patient">
+                    <h5>Robert Williams</h5>
+                    <p class="text-muted mb-2">58 years old</p>
+                    <span class="badge bg-info">Hypertension</span>
+                    
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-6 border-end">
+                                <div class="text-muted small">Last Visit</div>
+                                <div class="fw-bold">2 weeks ago</div>
+                            </div>
+                            <div class="col-6">
+                                <div class="text-muted small">Next Appointment</div>
+                                <div class="fw-bold">Tomorrow</div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Recent Lab Results Card (DUMMY DATA) -->
+            <!-- Recent Lab Results Card -->
             <div class="card card-custom mb-4">
-                <div class="card-header-custom"><h5 class="mb-0">Recent Lab Results</h5></div>
+                <div class="card-header-custom">
+                    <h5 class="mb-0">Recent Lab Results</h5>
+                </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="bg-danger p-2 rounded-circle me-3"><i class="fas fa-exclamation-triangle text-white"></i></div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Sarah Johnson</h6>
-                            <small class="text-muted">Cholesterol Panel - High LDL</small>
-                            <small class="text-muted d-block">Today, 8:45 AM</small>
+                    <div class="lab-result-item">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-danger p-2 rounded-circle me-3">
+                                <i class="fas fa-exclamation-triangle text-white"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Sarah Johnson</h6>
+                                <small class="text-muted">Cholesterol Panel - High LDL</small>
+                                <small class="text-muted d-block">Today, 8:45 AM</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary">Review</button>
                         </div>
-                        <button class="btn btn-sm btn-outline-primary">Review</button>
                     </div>
-                    <div class="d-flex align-items-center">
-                        <div class="bg-warning p-2 rounded-circle me-3"><i class="fas fa-clock text-white"></i></div>
-                        <div class="flex-grow-1">
-                            <h6 class="mb-0">Robert Williams</h6>
-                            <small class="text-muted">Metabolic Panel - Pending</small>
-                            <small class="text-muted d-block">Yesterday, 1:15 PM</small>
+                    
+                    <div class="lab-result-item">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-warning p-2 rounded-circle me-3">
+                                <i class="fas fa-clock text-white"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">Robert Williams</h6>
+                                <small class="text-muted">Metabolic Panel - Pending</small>
+                                <small class="text-muted d-block">Yesterday, 1:15 PM</small>
+                            </div>
+                            <button class="btn btn-sm btn-outline-secondary">View</button>
                         </div>
-                        <button class="btn btn-sm btn-outline-secondary">View</button>
                     </div>
                 </div>
             </div>
