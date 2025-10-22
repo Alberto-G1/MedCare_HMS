@@ -50,7 +50,7 @@ def register_view(request):
                 message = f"New staff registration: {user.username} ({role}) is awaiting approval."
                 admins = AccountUserProfile.objects.filter(role='ADMIN', user__is_active=True)
                 for admin_profile in admins:
-                    create_notification(recipient=admin_profile.user, message=message, link=reverse('pending_staff_list'))
+                    create_notification(recipient=admin_profile.user, message=message, link=reverse('accounts:pending_staff_list'))
             # --- END NOTIFICATION LOGIC ---
 
             messages.success(request, 'Registration successful!')
