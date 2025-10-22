@@ -24,60 +24,211 @@
     {% block extra_head %}{% endblock %}
     
     <style>
-        /* Shared base styles that adapt to theme */
+        /* Patient Theme Color Variables */
         :root {
-            --shared-bg-light: #F8FAFC;
-            --shared-bg-white: #FFFFFF;
-            --shared-text-dark: #1E293B;
-            --shared-text-muted: #64748B;
-            --shared-border-light: #E2E8F0;
+            --primary-teal: #0E7490;
+            --primary-dark-teal: #0C4A6E;
+            --sky-blue: #0284C7;
+            --light-sky-blue: #38BDF8;
+            --accent-blue: #14B8A6;
+            --accent-green: #22C55E;
+            --accent-orange: #F97316;
+            --background-light: #F1F5F9;
+            --background-white: #FFFFFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+            --border-light: #E2E8F0;
+        }
+        
+        * {
+            font-family: 'Poppins', sans-serif;
         }
         
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--shared-bg-light);
-            color: var(--shared-text-dark);
+            background-color: var(--background-light);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
-        /* Adaptive navbar that changes based on theme */
+        .content-wrapper {
+            flex: 1;
+        }
+        
+        /* Enhanced Navbar with Patient Theme */
         .navbar-adaptive {
-            background: linear-gradient(135deg, var(--theme-primary, #0E7490) 0%, var(--theme-primary-dark, #0C4A6E) 100%);
-            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+            padding: 0.75rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
         }
         
-        .navbar-adaptive .navbar-brand,
-        .navbar-adaptive .nav-link {
+        /* Add padding to body to prevent content from hiding behind fixed navbar */
+        body {
+            padding-top: 76px;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .navbar-logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 8px;
+        }
+        
+        .navbar-adaptive .navbar-brand {
             color: white !important;
+            font-weight: 700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .navbar-adaptive .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
+            padding: 0.75rem 1rem !important;
+            border-radius: 8px;
+            margin: 0 4px;
+            transition: all 0.3s ease;
         }
         
         .navbar-adaptive .nav-link:hover {
-            color: var(--theme-primary-light, #67E8F9) !important;
+            background-color: rgba(135, 206, 235, 0.2);
+            color: white !important;
+            transform: translateY(-1px);
         }
         
-        /* Adaptive content container */
+        .navbar-adaptive .nav-link.active {
+            background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+            color: white !important;
+        }
+        
+        /* User Profile Dropdown */
+        .user-profile-nav {
+            position: relative;
+        }
+        
+        .user-profile-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            background: transparent;
+        }
+        
+        .user-profile-toggle:hover {
+            background-color: rgba(135, 206, 235, 0.2);
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: var(--accent-blue);
+            transition: all 0.3s ease;
+        }
+        
+        .user-avatar:hover {
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            padding: 0.75rem;
+            min-width: 220px;
+        }
+        
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-teal);
+        }
+        
+        .dropdown-item i {
+            width: 18px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        .dropdown-item:hover i {
+            color: var(--primary-teal);
+        }
+        
+        .dropdown-divider {
+            margin: 0.5rem 0;
+            border-color: var(--border-light);
+        }
+        
+        /* Content Area */
         .content-adaptive {
             min-height: calc(100vh - 76px);
             padding: 2rem 0;
         }
         
-        /* Adaptive cards */
+        /* Enhanced Cards with Patient Theme */
         .card-adaptive {
-            background: var(--shared-bg-white);
-            border: 1px solid rgba(var(--theme-primary), 0.1);
+            background: var(--background-white);
+            border: 1px solid var(--border-light);
             border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
             transition: all 0.3s ease;
         }
         
         .card-adaptive:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+            border-color: rgba(14, 116, 144, 0.3);
         }
         
-        /* Adaptive buttons */
+        /* Enhanced Buttons */
         .btn-adaptive-primary {
-            background: linear-gradient(135deg, var(--theme-primary, #0E7490) 0%, var(--theme-primary-dark, #0C4A6E) 100%);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
             border: none;
             color: white;
             font-weight: 600;
@@ -87,33 +238,107 @@
         }
         
         .btn-adaptive-primary:hover {
-            background: var(--theme-primary-dark, #0C4A6E);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, var(--primary-dark-teal) 0%, #083344 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 116, 144, 0.3);
             color: white;
         }
         
         .btn-adaptive-secondary {
             background: transparent;
-            border: 2px solid var(--theme-primary, #0E7490);
-            color: var(--theme-primary, #0E7490);
+            border: 2px solid var(--primary-teal);
+            color: var(--primary-teal);
             font-weight: 500;
-            padding: 0.5rem 1.25rem;
-            border-radius: 6px;
+            padding: 0.65rem 1.25rem;
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
         
         .btn-adaptive-secondary:hover {
-            background: var(--theme-primary, #0E7490);
+            background: var(--primary-teal);
             color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 116, 144, 0.2);
         }
         
-        /* Footer */
+        /* Footer with Patient Theme */
         .footer-adaptive {
-            background: var(--shared-text-dark);
+            background: linear-gradient(135deg, var(--primary-dark-teal) 0%, #083344 100%);
             color: white;
-            padding: 2rem 0;
+            padding: 3rem 0 1.5rem;
             margin-top: auto;
+        }
+        
+        .footer-adaptive a {
+            color: var(--light-sky-blue);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-adaptive a:hover {
+            color: var(--accent-orange);
+        }
+        
+        .footer-adaptive h5 {
+            color: white;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            background: var(--accent-blue);
+            transform: translateY(-3px);
+        }
+        
+        /* Mobile Sidebar */
+        @media (max-width: 991px) {
+            .mobile-sidebar {
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 280px;
+                height: 100vh;
+                background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+                z-index: 1040;
+                transition: left 0.3s ease;
+                padding-top: 2rem;
+                overflow-y: auto;
+            }
+            
+            .mobile-sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.5);
+                z-index: 1039;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+            
+            .user-info {
+                display: none;
+            }
         }
         
         /* Responsive design */
@@ -121,105 +346,306 @@
             .content-adaptive {
                 padding: 1rem 0;
             }
+            
+            .navbar-brand {
+                font-size: 1.25rem !important;
+            }
+            
+            .navbar-logo {
+                height: 40px;
+                width: 40px;
+            }
+        }
+        
+        /* Alert/Message Styling */
+        .alert {
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .alert-success {
+            background-color: rgba(34, 197, 94, 0.1);
+            color: #22C55E;
+        }
+        
+        .alert-info {
+            background-color: rgba(14, 116, 144, 0.1);
+            color: var(--primary-teal);
+        }
+        
+        .alert-warning {
+            background-color: rgba(249, 115, 22, 0.1);
+            color: var(--accent-orange);
+        }
+        
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #EF4444;
         }
     </style>
 </head>
 <body class="{% get_user_theme %}">
-    <!-- Adaptive Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-adaptive">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="{% url 'accounts:dashboard_redirect' %}">
-                <i class="fas fa-heartbeat me-2"></i>MedCare HMS
-            </a>
-            
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'accounts:dashboard_redirect' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'chat:thread_list' %}">
-                            <i class="fas fa-comments me-1"></i>Messages
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'notifications:notification_list' %}">
-                            <i class="fas fa-bell me-1"></i>Notifications
-                        </a>
-                    </li>
-                </ul>
+    <div class="content-wrapper">
+        <!-- Adaptive Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-adaptive">
+            <div class="container">
+                <a class="navbar-brand" href="{% url 'accounts:dashboard_redirect' %}">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>MedCare HMS</span>
+                </a>
                 
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-                            {% profile_image user size="30" css_class="rounded-circle me-2" %}
-                            <span>{{ user.get_full_name|default:user.username }}</span>
-                            <small class="ms-1 opacity-75">({% get_user_role_display %})</small>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li>
-                                {% if user.is_authenticated %}
-                                    {% if user.groups.all.0.name == 'Doctors' %}
-                                        <a class="dropdown-item" href="{% url 'doctors:doctor_profile' %}">
-                                            <i class="fas fa-user me-2"></i>Profile
-                                        </a>
-                                    {% elif user.groups.all.0.name == 'Patients' %}
-                                        <a class="dropdown-item" href="{% url 'patients:patient_profile' %}">
-                                            <i class="fas fa-user me-2"></i>Profile
-                                        </a>
-                                    {% elif user.groups.all.0.name == 'Receptionists' %}
-                                        <a class="dropdown-item" href="{% url 'receptionist:receptionist_profile' %}">
-                                            <i class="fas fa-user me-2"></i>Profile
-                                        </a>
-                                    {% else %}
-                                        <a class="dropdown-item" href="#">
-                                            <i class="fas fa-user me-2"></i>Profile
-                                        </a>
+                <button class="navbar-toggler border-0" type="button" id="mobileMenuToggle">
+                    <i class="fas fa-bars text-white"></i>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'accounts:dashboard_redirect' %}">
+                                <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'chat:thread_list' %}">
+                                <i class="fas fa-comments me-1"></i>Messages
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'notifications:notification_list' %}">
+                                <i class="fas fa-bell me-1"></i>Notifications
+                            </a>
+                        </li>
+                    </ul>
+                    
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                                {% profile_image user size="30" css_class="user-avatar" %}
+                                <span class="ms-2">{{ user.get_full_name|default:user.username }}</span>
+                                <small class="ms-1 opacity-75">({% get_user_role_display %})</small>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    {% if user.is_authenticated %}
+                                        {% if user.groups.all.0.name == 'Doctors' %}
+                                            <a class="dropdown-item" href="{% url 'doctors:doctor_profile' %}">
+                                                <i class="fas fa-user"></i>Profile
+                                            </a>
+                                        {% elif user.groups.all.0.name == 'Patients' %}
+                                            <a class="dropdown-item" href="{% url 'patients:patient_profile' %}">
+                                                <i class="fas fa-user"></i>Profile
+                                            </a>
+                                        {% elif user.groups.all.0.name == 'Receptionists' %}
+                                            <a class="dropdown-item" href="{% url 'receptionist:receptionist_profile' %}">
+                                                <i class="fas fa-user"></i>Profile
+                                            </a>
+                                        {% else %}
+                                            <a class="dropdown-item" href="#">
+                                                <i class="fas fa-user"></i>Profile
+                                            </a>
+                                        {% endif %}
                                     {% endif %}
-                                {% endif %}
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a></li>
-                        </ul>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                                        <i class="fas fa-sign-out-alt"></i>Logout
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Sidebar -->
+        <div class="mobile-sidebar d-lg-none" id="mobileSidebar">
+            <div class="sidebar-content p-3">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="logo-container">
+                        <i class="fas fa-heartbeat text-white" style="font-size: 1.5rem;"></i>
+                        <span class="logo-text" style="font-size: 1.2rem; color: white; font-weight: 700;">MedCare HMS</span>
+                    </div>
+                    <button class="btn-close btn-close-white" id="closeMobileSidebar"></button>
+                </div>
+                
+                {% if user.is_authenticated %}
+                <div class="d-flex align-items-center gap-3 mb-4 p-2 rounded" style="background: rgba(255,255,255,0.1);">
+                    {% profile_image user size="50" css_class="user-avatar" %}
+                    <div style="color: white;">
+                        <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                        <div class="user-role">{% get_user_role_display %}</div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'accounts:dashboard_redirect' %}">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'chat:thread_list' %}">
+                            <i class="fas fa-comments me-2"></i>Messages
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'notifications:notification_list' %}">
+                            <i class="fas fa-bell me-2"></i>Notifications
+                        </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item mt-3">
+                        {% if user.groups.all.0.name == 'Doctors' %}
+                            <a class="nav-link text-white" href="{% url 'doctors:doctor_profile' %}">
+                                <i class="fas fa-user me-2"></i>My Profile
+                            </a>
+                        {% elif user.groups.all.0.name == 'Patients' %}
+                            <a class="nav-link text-white" href="{% url 'patients:patient_profile' %}">
+                                <i class="fas fa-user me-2"></i>My Profile
+                            </a>
+                        {% elif user.groups.all.0.name == 'Receptionists' %}
+                            <a class="nav-link text-white" href="{% url 'receptionist:receptionist_profile' %}">
+                                <i class="fas fa-user me-2"></i>My Profile
+                            </a>
+                        {% endif %}
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
-    </nav>
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Main Content -->
-    <div class="content-adaptive">
-        <div class="container">
-            <!-- Messages Display -->
-            {% include 'components/messages.html' %}
-            
-            {% block content %}
-            <div class="text-center py-5">
-                <h2>Welcome to MedCare HMS</h2>
-                <p class="text-muted">Professional Healthcare Management System</p>
+        <!-- Main Content -->
+        <div class="content-adaptive">
+            <div class="container">
+                <!-- Messages Display -->
+                {% include 'components/messages.html' %}
+                
+                {% block content %}
+                <div class="text-center py-5">
+                    <h2>Welcome to MedCare HMS</h2>
+                    <p class="text-muted">Professional Healthcare Management System</p>
+                </div>
+                {% endblock %}
             </div>
-            {% endblock %}
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer-adaptive mt-auto">
-        <div class="container text-center">
-            <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS | Professional Healthcare Solutions</p>
-            <p class="mb-0 small">Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
+    <!-- Enhanced Footer -->
+    <footer class="footer-adaptive">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-3">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="fas fa-heartbeat" style="font-size: 1.5rem;"></i>
+                        <h5 class="mb-0">MedCare HMS</h5>
+                    </div>
+                    <p class="mb-3" style="font-size: 0.95rem; opacity: 0.9;">Professional Healthcare Management System providing comprehensive care solutions.</p>
+                    <div class="social-links">
+                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <h5>Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="{% url 'accounts:dashboard_redirect' %}">Dashboard</a></li>
+                        <li class="mb-2"><a href="{% url 'chat:thread_list' %}">Messages</a></li>
+                        <li class="mb-2"><a href="{% url 'notifications:notification_list' %}">Notifications</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3">
+                    <h5>Contact</h5>
+                    <p class="mb-2"><i class="fas fa-phone me-2"></i>+1 (555) 123-4567</p>
+                    <p class="mb-2"><i class="fas fa-envelope me-2"></i>support@medcarehms.com</p>
+                    <p class="mb-2"><i class="fas fa-clock me-2"></i>24/7 Support</p>
+                </div>
+            </div>
+            <hr style="border-color: rgba(255,255,255,0.2); margin: 1.5rem 0;">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
+                    <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS | Professional Healthcare Solutions</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <p class="mb-0 small">Designed and Created by the CSE ⚡ Finalists THE WONAs</p>
+                </div>
+            </div>
         </div>
     </footer>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const closeMobileSidebar = document.getElementById('closeMobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            // Mobile sidebar toggle
+            if (mobileMenuToggle) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileSidebar.classList.toggle('show');
+                    sidebarOverlay.classList.toggle('show');
+                });
+            }
+
+            // Close mobile sidebar
+            if (closeMobileSidebar) {
+                closeMobileSidebar.addEventListener('click', function() {
+                    mobileSidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                });
+            }
+
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', function() {
+                    mobileSidebar.classList.remove('show');
+                    this.classList.remove('show');
+                });
+            }
+
+            // Profile image fallback
+            function setupProfileImageFallback() {
+                const profileImages = document.querySelectorAll('.user-avatar');
+                profileImages.forEach(function(img) {
+                    img.addEventListener('error', function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const size = 100;
+                        
+                        canvas.width = size;
+                        canvas.height = size;
+                        
+                        ctx.fillStyle = '#0E7490';
+                        ctx.fillRect(0, 0, size, size);
+                        
+                        ctx.fillStyle = '#FFFFFF';
+                        ctx.font = 'bold ' + (size / 2.5) + 'px Poppins, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('U', size / 2, size / 2);
+                        
+                        this.src = canvas.toDataURL();
+                    });
+                });
+            }
+
+            setupProfileImageFallback();
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>
