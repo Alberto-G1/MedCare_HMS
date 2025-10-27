@@ -117,6 +117,15 @@ def dashboard_redirect_view(request):
 @login_required
 @admin_required
 def admin_dashboard(request):
+    from patients.models import Appointment, MedicalRecord
+    from billing.models import Bill
+    from prescriptions.models import Prescription
+    from management.models import Department, Room
+    from chat.models import ChatMessage
+    from django.db.models import Sum, Count, Q
+    from django.utils import timezone
+    from datetime import timedelta
+    
     # Count of active users by role
     active_doctors_count = UserProfile.objects.filter(role='DOCTOR', user__is_active=True).count()
     active_receptionists_count = UserProfile.objects.filter(role='RECEPTIONIST', user__is_active=True).count()
@@ -128,7 +137,7 @@ def admin_dashboard(request):
         user__is_active=False
     ).count()
 
-    # --- NEW: CALCULATIONS MOVED FROM TEMPLATE TO VIEW ---
+    # Total users calculation
     total_users = active_doctors_count + active_receptionists_count + active_patients_count
 
     if total_users > 0:
@@ -136,22 +145,120 @@ def admin_dashboard(request):
         doctor_percent = int((active_doctors_count / total_users) * 100)
         receptionist_percent = int((active_receptionists_count / total_users) * 100)
     else:
-        # Avoid division by zero if there are no users
         patient_percent = 0
         doctor_percent = 0
         receptionist_percent = 0
 
+    # === APPOINTMENTS STATISTICS ===
+    today = timezone.now().date()
+    total_appointments = Appointment.objects.count()
+    pending_appointments = Appointment.objects.filter(status='Pending').count()
+    approved_appointments = Appointment.objects.filter(status='Approved').count()
+    completed_appointments = Appointment.objects.filter(status='Completed').count()
+    todays_appointments = Appointment.objects.filter(appointment_date=today).count()
+    
+    # === BILLING STATISTICS ===
+    total_bills = Bill.objects.count()
+    unpaid_bills = Bill.objects.filter(status='Unpaid').count()
+    paid_bills = Bill.objects.filter(status='Paid').count()
+    total_revenue = Bill.objects.filter(status='Paid').aggregate(total=Sum('amount_paid'))['total'] or 0
+    pending_revenue = Bill.objects.filter(status__in=['Unpaid', 'Partially Paid']).aggregate(total=Sum('total_amount'))['total'] or 0
+    
+    # === PRESCRIPTIONS STATISTICS ===
+    total_prescriptions = Prescription.objects.count()
+    active_prescriptions = Prescription.objects.filter(status='ACTIVE').count()
+    completed_prescriptions = Prescription.objects.filter(status='COMPLETED').count()
+    
+    # === MEDICAL RECORDS STATISTICS ===
+    total_medical_records = MedicalRecord.objects.count()
+    recent_medical_records = MedicalRecord.objects.filter(
+        record_date__gte=today - timedelta(days=7)
+    ).count()
+    
+    # === DEPARTMENT & ROOM STATISTICS ===
+    total_departments = Department.objects.filter(is_active=True).count()
+    total_rooms = Room.objects.filter(is_active=True).count()
+    available_rooms = Room.objects.filter(status='AVAILABLE', is_active=True).count()
+    occupied_rooms = Room.objects.filter(status='OCCUPIED', is_active=True).count()
+    
+    # === CHAT/MESSAGE STATISTICS ===
+    total_messages = ChatMessage.objects.count()
+    recent_messages = ChatMessage.objects.filter(
+        timestamp__gte=timezone.now() - timedelta(days=1)
+    ).count()
+    
+    # === RECENT ACTIVITY ===
+    recent_appointments = Appointment.objects.select_related('patient__user', 'doctor__user').order_by('-created_at')[:5]
+    recent_bills = Bill.objects.select_related('patient__user').order_by('-created_at')[:5]
+    
+    # === SYSTEM HEALTH METRICS ===
+    # Appointments trend (last 7 days)
+    appointments_last_week = Appointment.objects.filter(
+        created_at__gte=timezone.now() - timedelta(days=7)
+    ).count()
+    
+    # Revenue trend (last 30 days)
+    revenue_last_month = Bill.objects.filter(
+        status='Paid',
+        created_at__gte=timezone.now() - timedelta(days=30)
+    ).aggregate(total=Sum('amount_paid'))['total'] or 0
+    
+    # New patients (last 30 days)
+    new_patients_count = UserProfile.objects.filter(
+        role='PATIENT',
+        user__date_joined__gte=timezone.now() - timedelta(days=30)
+    ).count()
+
     context = {
+        # User Statistics
         'active_doctors_count': active_doctors_count,
         'active_receptionists_count': active_receptionists_count,
         'active_patients_count': active_patients_count,
         'pending_staff_count': pending_staff_count,
-        
-        # Add the new calculated values to the context
         'total_users': total_users,
-        'patient_percent': patient_percent,
-        'doctor_percent': doctor_percent,
-        'receptionist_percent': receptionist_percent,
+        'patient_percentage': patient_percent,
+        'doctor_percentage': doctor_percent,
+        'receptionist_percentage': receptionist_percent,
+        'new_patients_count': new_patients_count,
+        
+        # Appointment Statistics
+        'total_appointments': total_appointments,
+        'pending_appointments': pending_appointments,
+        'approved_appointments': approved_appointments,
+        'completed_appointments': completed_appointments,
+        'todays_appointments': todays_appointments,
+        'appointments_last_week': appointments_last_week,
+        
+        # Billing Statistics
+        'total_bills': total_bills,
+        'unpaid_bills': unpaid_bills,
+        'paid_bills': paid_bills,
+        'total_revenue': total_revenue,
+        'pending_revenue': pending_revenue,
+        'revenue_last_month': revenue_last_month,
+        
+        # Prescription Statistics
+        'total_prescriptions': total_prescriptions,
+        'active_prescriptions': active_prescriptions,
+        'completed_prescriptions': completed_prescriptions,
+        
+        # Medical Records
+        'total_medical_records': total_medical_records,
+        'recent_medical_records': recent_medical_records,
+        
+        # Department & Room Statistics
+        'total_departments': total_departments,
+        'total_rooms': total_rooms,
+        'available_rooms': available_rooms,
+        'occupied_rooms': occupied_rooms,
+        
+        # Chat Statistics
+        'total_messages': total_messages,
+        'recent_messages': recent_messages,
+        
+        # Recent Activity
+        'recent_appointments': recent_appointments,
+        'recent_bills': recent_bills,
     }
     
     return render(request, 'accounts/admin_dashboard.html', context)
@@ -301,12 +408,29 @@ def patient_dashboard(request):
 @admin_required
 def staff_management_list(request):
     """ Main view, shows ONLY ACTIVE staff """
+    from doctors.models import DoctorProfile
+    from receptionist.models import ReceptionistProfile
+    
     staff_profiles = UserProfile.objects.filter(
-        role__in=['DOCTOR', 'RECEPTIONIST'],
+        role__in=['DOCTOR', 'RECEPTIONIST', 'ADMIN'],
         user__is_active=True
     ).select_related('user').order_by('user__username')
     
-    return render(request, 'accounts/staff_management_list.html', {'staff_profiles': staff_profiles})
+    # Calculate statistics
+    total_staff = staff_profiles.count()
+    total_doctors = staff_profiles.filter(role='DOCTOR').count()
+    total_receptionists = staff_profiles.filter(role='RECEPTIONIST').count()
+    total_admins = staff_profiles.filter(role='ADMIN').count()
+    
+    context = {
+        'staff_profiles': staff_profiles,
+        'total_staff': total_staff,
+        'total_doctors': total_doctors,
+        'total_receptionists': total_receptionists,
+        'total_admins': total_admins,
+    }
+    
+    return render(request, 'accounts/staff_management_list.html', context)
 
 
 @admin_required
@@ -358,6 +482,16 @@ class StaffDetailView(DetailView):
     model = User
     template_name = 'accounts/staff_detail.html'
     context_object_name = 'staff_member'
+    
+    def get_queryset(self):
+        """Optimize query by prefetching related profile data"""
+        return User.objects.select_related(
+            'userprofile'
+        ).prefetch_related(
+            'doctorprofile__department',
+            'doctorprofile__availability_slots',
+            'receptionistprofile__department'
+        )
 
 @method_decorator(admin_required, name='dispatch')
 class StaffUpdateView(SuccessMessageMixin, UpdateView):

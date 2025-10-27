@@ -1,36 +1,340 @@
-{% extends 'base_admin.html' %}
+﻿{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    .deactivated-wrapper {
+        padding: 2rem;
+        animation: fadeIn 0.8s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header {
+        background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 50%, #D1D5DB 100%);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        margin-bottom: 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(107, 114, 128, 0.3);
+        animation: slideDown 0.6s ease;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .page-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    .alert-warning-box {
+        background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3);
+        animation: slideIn 0.8s ease 0.2s backwards;
+    }
+    
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .alert-icon {
+        font-size: 2rem;
+        animation: shake 2s ease infinite;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        animation: scaleUp 0.8s ease 0.3s backwards;
+    }
+    
+    @keyframes scaleUp {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+        padding: 1.75rem 2.5rem;
+        color: white;
+    }
+    
+    .table-header h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .deactivated-table thead {
+        background: linear-gradient(180deg, #F9FAFB 0%, #F3F4F6 100%);
+    }
+    
+    .deactivated-table thead th {
+        padding: 1.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        color: #374151;
+        border: none;
+    }
+    
+    .deactivated-table tbody td {
+        padding: 1.5rem;
+        vertical-align: middle;
+        border: none;
+        opacity: 0.8;
+    }
+    
+    .deactivated-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    
+    .deactivated-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(107, 114, 128, 0.05) 0%, rgba(255, 255, 255, 1) 12%);
+        transform: translateX(8px);
+        opacity: 1;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%);
+        color: white;
+        box-shadow: 0 5px 20px rgba(107, 114, 128, 0.3);
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: white;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        opacity: 0.7;
+    }
+    
+    .role-badge.doctor {
+        background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%);
+        color: white;
+    }
+    
+    .role-badge.receptionist {
+        background: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
+        color: white;
+    }
+    
+    .action-btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0.25rem;
+    }
+    
+    .btn-reactivate {
+        background: linear-gradient(135deg, #22C55E, #4ADE80);
+    }
+    
+    .btn-view {
+        background: linear-gradient(135deg, #0284C7, #38BDF8);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+    
+    .empty-icon {
+        font-size: 5rem;
+        color: #D1D5DB;
+        margin-bottom: 2rem;
+        animation: float 3s ease infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .empty-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-back {
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(14, 116, 144, 0.3);
+        color: white;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Deactivated Staff Members</h2>
-    <a href="{% url 'accounts:staff_management_list' %}" class="btn btn-primary">Back to Active Staff</a>
-</div>
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Role</th>
-                <th>Last Login</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for profile in staff_profiles %}
-            <tr>
-                <td>{{ profile.user.username }}</td>
-                <td>{{ profile.get_role_display }}</td>
-                <td>{{ profile.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
-                <td>
-                    <a href="{% url 'accounts:toggle_staff_status' profile.user.id %}" class="btn btn-sm btn-success" title="Re-activate"><i class="fas fa-power-off"></i> Re-activate</a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">No staff accounts have been deactivated.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<div class="deactivated-wrapper">
+    <a href="{% url 'accounts:staff_management_list' %}" class="btn-back">
+        <i class="fas fa-arrow-left"></i>
+        <span>Back to Staff Management</span>
+    </a>
+    
+    <div class="page-header">
+        <h1><i class="fas fa-user-slash"></i> Deactivated Staff</h1>
+        <p><i class="fas fa-archive"></i> View and manage deactivated staff accounts</p>
+    </div>
+    
+    <div class="alert-warning-box">
+        <i class="fas fa-exclamation-triangle alert-icon"></i>
+        <div>
+            <strong>Inactive Accounts</strong>
+            <p style="margin: 0.25rem 0 0 0; opacity: 0.9;">These staff members have been deactivated and cannot access the system. You can reactivate them anytime.</p>
+        </div>
+    </div>
+    
+    <div class="table-container">
+        <div class="table-header">
+            <h4><i class="fas fa-list-ul"></i> Deactivated Staff List</h4>
+        </div>
+        
+        <div class="table-responsive">
+            {% if staff_profiles %}
+            <table class="table deactivated-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-image"></i> Photo</th>
+                        <th><i class="fas fa-user"></i> Name</th>
+                        <th><i class="fas fa-envelope"></i> Email</th>
+                        <th><i class="fas fa-briefcase"></i> Role</th>
+                        <th><i class="fas fa-phone"></i> Contact</th>
+                        <th><i class="fas fa-sign-in-alt"></i> Last Login</th>
+                        <th><i class="fas fa-flag"></i> Status</th>
+                        <th class="text-center"><i class="fas fa-cog"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in staff_profiles %}
+                    <tr>
+                        <td>
+                            {% if profile.role == 'DOCTOR' and profile.user.doctorprofile.profile_picture %}
+                                <img src="{{ profile.user.doctorprofile.profile_picture.url }}" alt="{{ profile.user.username }}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(50%);">
+                            {% elif profile.role == 'RECEPTIONIST' and profile.user.receptionistprofile.profile_picture %}
+                                <img src="{{ profile.user.receptionistprofile.profile_picture.url }}" alt="{{ profile.user.username }}" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(50%);">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Default" style="width: 50px; height: 50px; border-radius: 12px; object-fit: cover; box-shadow: 0 4px 12px rgba(0,0,0,0.1); filter: grayscale(50%);">
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ profile.user.get_full_name|default:profile.user.username }}</strong></td>
+                        <td>{{ profile.user.email|default:"No email" }}</td>
+                        <td>
+                            {% if profile.role == 'DOCTOR' %}
+                                <span class="role-badge doctor"><i class="fas fa-user-md"></i> Doctor</span>
+                            {% elif profile.role == 'RECEPTIONIST' %}
+                                <span class="role-badge receptionist"><i class="fas fa-user-tie"></i> Receptionist</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ profile.contact|default:"Not set" }}</td>
+                        <td>{{ profile.user.last_login|date:"M d, Y"|default:"Never" }}</td>
+                        <td>
+                            <span class="status-badge">
+                                <span class="status-dot"></span>
+                                Deactivated
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'accounts:staff_detail' profile.user.pk %}" class="action-btn btn-view" title="View Details">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <a href="{% url 'accounts:toggle_staff_status' profile.user.pk %}" class="action-btn btn-reactivate" title="Reactivate Staff" onclick="return confirm('Reactivate this staff member?')">
+                                <i class="fas fa-undo"></i> Reactivate
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h3 class="empty-title">No Deactivated Staff</h3>
+                <p style="color: #64748b; font-size: 1.1rem;">All staff accounts are currently active.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}

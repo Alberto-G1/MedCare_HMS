@@ -1,173 +1,1705 @@
 {% extends 'base_admin.html' %}
 {% load static %}
 
+{% block extra_head %}
+<style>
+    /* ==================== ULTRA-MODERN STAT CARDS WITH 3D DEPTH ==================== */
+    .stat-card {
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: none;
+        position: relative;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        transform-style: preserve-3d;
+    }
+    
+    /* Rainbow animated gradient borders */
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        border-radius: 24px;
+        background: linear-gradient(45deg, 
+            #0E7490, 
+            #0284C7, 
+            #14B8A6,
+            #22C55E,
+            #F97316,
+            #A855F7,
+            #0E7490
+        );
+        background-size: 400% 400%;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        animation: gradientShift 10s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        25% { background-position: 100% 50%; }
+        50% { background-position: 100% 100%; }
+        75% { background-position: 0% 100%; }
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-18px) rotateX(8deg) scale(1.04);
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25),
+                    0 0 50px rgba(14, 116, 144, 0.4);
+    }
+    
+    /* Floating SVG patterns */
+    .stat-card-bg {
+        position: absolute;
+        top: -25px;
+        right: -25px;
+        width: 200px;
+        height: 200px;
+        opacity: 0.06;
+        transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events: none;
+        filter: drop-shadow(0 0 30px currentColor);
+    }
+    
+    .stat-card:hover .stat-card-bg {
+        opacity: 0.14;
+        transform: scale(1.2) rotate(30deg);
+        filter: drop-shadow(0 0 40px currentColor);
+    }
+    
+    /* Unique gradient cards */
+    .stat-card.primary { 
+        background: linear-gradient(135deg, 
+            rgba(2, 132, 199, 0.1) 0%, 
+            rgba(56, 189, 248, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    .stat-card.success { 
+        background: linear-gradient(135deg, 
+            rgba(34, 197, 94, 0.1) 0%, 
+            rgba(134, 239, 172, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    .stat-card.warning { 
+        background: linear-gradient(135deg, 
+            rgba(249, 115, 22, 0.1) 0%, 
+            rgba(251, 146, 60, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    .stat-card.danger { 
+        background: linear-gradient(135deg, 
+            rgba(239, 68, 68, 0.1) 0%, 
+            rgba(252, 165, 165, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    .stat-card.info { 
+        background: linear-gradient(135deg, 
+            rgba(14, 116, 144, 0.1) 0%, 
+            rgba(20, 184, 166, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    .stat-card.purple { 
+        background: linear-gradient(135deg, 
+            rgba(168, 85, 247, 0.1) 0%, 
+            rgba(192, 132, 252, 0.05) 40%,
+            rgba(255, 255, 255, 0.98) 70%
+        );
+    }
+    
+    /* Particle effects */
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+            radial-gradient(circle at 20% 30%, rgba(14, 116, 144, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 80% 70%, rgba(34, 197, 94, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 50% 50%, rgba(249, 115, 22, 0.12) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+        animation: particleFloat 4s ease-in-out infinite;
+    }
+    
+    .stat-card:hover::after {
+        opacity: 1;
+    }
+    
+    @keyframes particleFloat {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(-10px, -10px); }
+        50% { transform: translate(10px, 5px); }
+        75% { transform: translate(-5px, 10px); }
+    }
+    
+    /* ==================== SPECTACULAR METRIC ICONS ==================== */
+    .metric-icon {
+        width: 80px;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 24px;
+        font-size: 32px;
+        position: relative;
+        animation: float 5s ease-in-out infinite;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        transition: all 0.5s ease;
+    }
+    
+    /* Orbiting rings */
+    .metric-icon::before,
+    .metric-icon::after {
+        content: '';
+        position: absolute;
+        border: 2px solid currentColor;
+        border-radius: 26px;
+        opacity: 0.2;
+    }
+    
+    .metric-icon::before {
+        top: -6px;
+        left: -6px;
+        right: -6px;
+        bottom: -6px;
+        animation: orbit 4s linear infinite;
+    }
+    
+    .metric-icon::after {
+        top: -10px;
+        left: -10px;
+        right: -10px;
+        bottom: -10px;
+        animation: orbit 6s linear infinite reverse;
+    }
+    
+    @keyframes orbit {
+        0% { transform: rotate(0deg) scale(1); opacity: 0.2; }
+        50% { transform: rotate(180deg) scale(1.15); opacity: 0.05; }
+        100% { transform: rotate(360deg) scale(1); opacity: 0.2; }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px) rotate(0deg); }
+        25% { transform: translateY(-10px) translateX(5px) rotate(2deg); }
+        50% { transform: translateY(0px) translateX(10px) rotate(0deg); }
+        75% { transform: translateY(10px) translateX(5px) rotate(-2deg); }
+    }
+    
+    .stat-card:hover .metric-icon {
+        animation: float 2s ease-in-out infinite, spin3d 1s ease;
+        transform: scale(1.15);
+        box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+    }
+    
+    @keyframes spin3d {
+        0% { transform: perspective(800px) rotateY(0deg); }
+        100% { transform: perspective(800px) rotateY(360deg); }
+    }
+    
+    /* ==================== DYNAMIC COUNTER TEXT ==================== */
+    .stat-value {
+        font-size: 3rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, 
+            #0E7490 0%, 
+            #0284C7 30%,
+            #14B8A6 60%,
+            #22C55E 100%
+        );
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: gradientMove 4s ease infinite;
+        filter: drop-shadow(0 2px 4px rgba(14, 116, 144, 0.3));
+    }
+    
+    @keyframes gradientMove {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    /* Pulsing indicator */
+    .stat-indicator {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-left: 12px;
+        position: relative;
+        animation: pulse-glow 2.5s ease-in-out infinite;
+        box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+    }
+    
+    .stat-indicator::before {
+        content: '';
+        position: absolute;
+        top: -4px;
+        left: -4px;
+        right: -4px;
+        bottom: -4px;
+        border-radius: 50%;
+        border: 2px solid currentColor;
+        opacity: 0.3;
+        animation: ripple 2.5s ease-in-out infinite;
+    }
+    
+    @keyframes pulse-glow {
+        0%, 100% { 
+            opacity: 1; 
+            transform: scale(1); 
+            box-shadow: 0 0 20px currentColor, 0 0 40px currentColor;
+        }
+        50% { 
+            opacity: 0.5; 
+            transform: scale(1.4); 
+            box-shadow: 0 0 30px currentColor, 0 0 60px currentColor;
+        }
+    }
+    
+    @keyframes ripple {
+        0% { transform: scale(1); opacity: 0.3; }
+        100% { transform: scale(2); opacity: 0; }
+    }
+    
+    /* ==================== MAGICAL DASHBOARD HEADER ==================== */
+    .dashboard-header {
+        background: linear-gradient(135deg, 
+            #0E7490 0%, 
+            #0284C7 35%,
+            #14B8A6 70%,
+            #0C4A6E 100%
+        );
+        background-size: 300% 300%;
+        animation: headerGradient 10s ease infinite;
+        border-radius: 30px;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: visible;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+        z-index: 1;
+    }
+    
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    /* Animated wave layers */
+    .dashboard-header::before,
+    .dashboard-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 140px;
+        z-index: 0;
+    }
+    
+    .dashboard-header::before {
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,50 Q300,10 600,50 T1200,50 L1200,120 L0,120 Z' fill='rgba(255,255,255,0.12)'%3E%3Canimate attributeName='d' dur='7s' repeatCount='indefinite' values='M0,50 Q300,10 600,50 T1200,50 L1200,120 L0,120 Z;M0,50 Q300,90 600,50 T1200,50 L1200,120 L0,120 Z;M0,50 Q300,10 600,50 T1200,50 L1200,120 L0,120 Z'/%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+        background-size: cover;
+    }
+    
+    .dashboard-header::after {
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M0,70 Q300,30 600,70 T1200,70 L1200,120 L0,120 Z' fill='rgba(255,255,255,0.06)'%3E%3Cranimate attributeName='d' dur='9s' repeatCount='indefinite' values='M0,70 Q300,30 600,70 T1200,70 L1200,120 L0,120 Z;M0,70 Q300,100 600,70 T1200,70 L1200,120 L0,120 Z;M0,70 Q300,30 600,70 T1200,70 L1200,120 L0,120 Z'/%3E%3C/path%3E%3C/svg%3E") no-repeat bottom;
+        background-size: cover;
+    }
+    
+    /* Floating particles */
+    .header-particles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .particle {
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        animation: particleRise linear infinite;
+    }
+    
+    @keyframes particleRise {
+        0% { 
+            transform: translateY(120%) translateX(0) scale(0);
+            opacity: 0;
+        }
+        10% { opacity: 1; }
+        90% { opacity: 1; }
+        100% { 
+            transform: translateY(-120%) translateX(var(--particle-drift, 50px)) scale(1.2);
+            opacity: 0;
+        }
+    }
+    
+    /* ==================== ENHANCED STATUS BREAKDOWN CARDS ==================== */
+    .status-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid transparent;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .status-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+        opacity: 0.8;
+    }
+    
+    .status-card::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, var(--card-color-1) 0%, transparent 70%);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+    }
+    
+    .status-card:hover::after {
+        opacity: 0.1;
+    }
+    
+    .status-card:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        border-color: var(--card-color-1);
+    }
+    
+    .status-card-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        margin: 0 auto 1.5rem;
+        position: relative;
+        animation: iconPulse 3s ease-in-out infinite;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+    }
+    
+    .status-card-icon::before {
+        content: '';
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        right: -8px;
+        bottom: -8px;
+        border-radius: 24px;
+        background: inherit;
+        opacity: 0.3;
+        filter: blur(12px);
+        z-index: -1;
+    }
+    
+    .status-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.25rem;
+        margin-bottom: 0.75rem;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .status-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--item-color);
+        transform: scaleY(0);
+        transition: transform 0.4s ease;
+    }
+    
+    .status-item:hover::before {
+        transform: scaleY(1);
+    }
+    
+    .status-item:hover {
+        transform: translateX(8px);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 1) 100%);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .status-item-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: #475569;
+    }
+    
+    .status-item-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        background: var(--item-color);
+        color: white;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .status-item-value {
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--item-color) 0%, var(--item-color-dark) 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .status-card-title {
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+    
+    /* ==================== ACTIVITY ITEMS WITH ADVANCED ANIMATIONS ==================== */
+    .activity-item {
+        padding: 20px;
+        border-left: 4px solid #e5e7eb;
+        margin-bottom: 16px;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border-radius: 0 18px 18px 0;
+        background: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .activity-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(180deg, 
+            #0E7490, 
+            #0284C7,
+            #14B8A6,
+            #22C55E
+        );
+        background-size: 100% 300%;
+        transform: scaleY(0);
+        transform-origin: bottom;
+        transition: transform 0.5s ease;
+        animation: borderGradient 4s linear infinite;
+    }
+    
+    @keyframes borderGradient {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 0% 100%; }
+    }
+    
+    .activity-item:hover::before {
+        transform: scaleY(1);
+        transform-origin: top;
+    }
+    
+    .activity-item::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(14, 116, 144, 0.12) 0%, transparent 70%);
+        transform: translate(-50%, -50%);
+        transition: width 0.7s ease, height 0.7s ease;
+    }
+    
+    .activity-item:hover::after {
+        width: 500px;
+        height: 500px;
+    }
+    
+    .activity-item:hover {
+        border-left-color: transparent;
+        background: linear-gradient(90deg, 
+            rgba(14, 116, 144, 0.1) 0%, 
+            rgba(255, 255, 255, 1) 35%
+        );
+        transform: translateX(15px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* ==================== ENHANCED PROGRESS BARS ==================== */
+    .progress {
+        height: 16px;
+        border-radius: 14px;
+        overflow: visible;
+        background: rgba(0, 0, 0, 0.06);
+        position: relative;
+        box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.12);
+    }
+    
+    .progress-bar {
+        position: relative;
+        overflow: hidden;
+        border-radius: 14px;
+        transition: width 2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+    }
+    
+    .progress-bar::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 50%;
+        background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, transparent 100%);
+        border-radius: 14px 14px 0 0;
+    }
+    
+    .progress-bar::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            rgba(255,255,255,0.4) 30%,
+            rgba(255,255,255,0.7) 50%,
+            rgba(255,255,255,0.4) 70%,
+            transparent 100%
+        );
+        animation: shimmer 3s infinite;
+    }
+    
+    @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(200%); }
+    }
+    
+    .progress-bar {
+        box-shadow: 0 0 20px currentColor, 
+                    inset 0 2px 0 rgba(255, 255, 255, 0.6);
+    }
+    
+    /* ==================== CARD CONTAINERS ==================== */
+    .card {
+        border: none;
+        border-radius: 24px;
+        box-shadow: 0 6px 30px rgba(0, 0, 0, 0.09),
+                    0 0 0 1px rgba(0, 0, 0, 0.03);
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60%;
+        background: linear-gradient(180deg, 
+            rgba(255, 255, 255, 0.9) 0%, 
+            transparent 100%
+        );
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    
+    .card:hover::before {
+        opacity: 1;
+    }
+    
+    .card:hover {
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.18),
+                    0 0 0 1px rgba(14, 116, 144, 0.15);
+        transform: translateY(-8px) scale(1.01);
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        padding: 1.75rem 2rem;
+        background: transparent;
+        position: relative;
+    }
+    
+    .card-header::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 2rem;
+        right: 2rem;
+        height: 3px;
+        background: linear-gradient(90deg, 
+            #0E7490, 
+            #0284C7, 
+            transparent
+        );
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        border-radius: 2px;
+    }
+    
+    .card:hover .card-header::after {
+        opacity: 1;
+    }
+    
+    /* ==================== BADGE EFFECTS ==================== */
+    .badge {
+        padding: 0.7rem 1.4rem;
+        border-radius: 14px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.3px;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+    
+    .badge::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .badge:hover::before {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .badge:hover {
+        transform: scale(1.08);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* ==================== QUICK ACTION BUTTONS ==================== */
+    .quick-action-btn {
+        position: relative;
+        overflow: hidden;
+        border-radius: 20px;
+        padding: 1.1rem 1.75rem;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        border: 2px solid transparent;
+        font-weight: 700;
+        z-index: 1;
+    }
+    
+    .quick-action-btn::before {
+        content: '';
+        position: absolute;
+        top: -60%;
+        left: -60%;
+        width: 220%;
+        height: 220%;
+        background: linear-gradient(45deg, 
+            transparent 20%, 
+            rgba(255, 255, 255, 0.9) 50%, 
+            transparent 80%
+        );
+        transform: translateX(-120%) translateY(-120%) rotate(45deg);
+        transition: transform 0.7s ease;
+        z-index: -1;
+    }
+    
+    .quick-action-btn:hover::before {
+        transform: translateX(120%) translateY(120%) rotate(45deg);
+    }
+    
+    .quick-action-btn:hover {
+        transform: translateY(-6px) scale(1.04);
+        border-color: rgba(14, 116, 144, 0.4);
+        box-shadow: 0 12px 35px rgba(14, 116, 144, 0.25);
+    }
+    
+    /* Dropdown menu styling */
+    .dropdown-menu {
+        animation: dropdownSlide 0.3s ease-out;
+        z-index: 9999 !important;
+        position: absolute !important;
+    }
+    
+    .dropdown {
+        position: relative;
+        z-index: 1000;
+    }
+    
+    @keyframes dropdownSlide {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .dropdown-item {
+        transition: all 0.3s ease;
+        border-radius: 10px;
+        margin: 0 8px;
+        white-space: nowrap;
+    }
+    
+    .dropdown-item:hover {
+        background: linear-gradient(135deg, 
+            rgba(14, 116, 144, 0.1) 0%, 
+            rgba(20, 184, 166, 0.1) 100%);
+        transform: translateX(5px);
+        padding-left: 1.5rem !important;
+    }
+    
+    /* ==================== STAGGERED ANIMATIONS ==================== */
+    .animate-in {
+        animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9) rotateX(20deg);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotateX(0deg);
+        }
+    }
+    
+    .animate-in:nth-child(1) { animation-delay: 0.05s; }
+    .animate-in:nth-child(2) { animation-delay: 0.1s; }
+    .animate-in:nth-child(3) { animation-delay: 0.15s; }
+    .animate-in:nth-child(4) { animation-delay: 0.2s; }
+    .animate-in:nth-child(5) { animation-delay: 0.25s; }
+    .animate-in:nth-child(6) { animation-delay: 0.3s; }
+    .animate-in:nth-child(7) { animation-delay: 0.35s; }
+    .animate-in:nth-child(8) { animation-delay: 0.4s; }
+    
+    /* ==================== GLOW EFFECTS ==================== */
+    .glow-effect {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .glow-effect::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 110%;
+        height: 110%;
+        border-radius: inherit;
+        background: inherit;
+        filter: blur(30px);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        z-index: -1;
+        pointer-events: none;
+    }
+    
+    .glow-effect:hover::after {
+        opacity: 0.8;
+    }
+    
+    .glow-effect i {
+        position: relative;
+        z-index: 2;
+    }
+    
+    /* ==================== COLOR UTILITIES ==================== */
+    .text-purple { color: #A855F7 !important; }
+    .bg-purple { background-color: #A855F7 !important; }
+    
+    /* Enhanced Badge Variants */
+    .bg-pending-subtle { 
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important; 
+        color: #92400e !important; 
+        box-shadow: 0 3px 10px rgba(249, 115, 22, 0.25);
+    }
+    .bg-approved-subtle { 
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important; 
+        color: #1e3a8a !important; 
+        box-shadow: 0 3px 10px rgba(37, 99, 235, 0.25);
+    }
+    .bg-completed-subtle { 
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important; 
+        color: #065f46 !important; 
+        box-shadow: 0 3px 10px rgba(34, 197, 94, 0.25);
+    }
+    .bg-rejected-subtle { 
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important; 
+        color: #991b1b !important; 
+        box-shadow: 0 3px 10px rgba(239, 68, 68, 0.25);
+    }
+    .bg-cancelled-subtle { 
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%) !important; 
+        color: #374151 !important; 
+        box-shadow: 0 3px 10px rgba(107, 114, 128, 0.25);
+    }
+    .bg-unpaid-subtle { 
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important; 
+        color: #991b1b !important; 
+        box-shadow: 0 3px 10px rgba(239, 68, 68, 0.25);
+    }
+    .bg-paid-subtle { 
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important; 
+        color: #065f46 !important; 
+        box-shadow: 0 3px 10px rgba(34, 197, 94, 0.25);
+    }
+    .bg-partially-subtle { 
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important; 
+        color: #92400e !important; 
+        box-shadow: 0 3px 10px rgba(249, 115, 22, 0.25);
+    }
+    
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 768px) {
+        .stat-card {
+            margin-bottom: 1.5rem;
+        }
+        
+        .metric-icon {
+            width: 70px;
+            height: 70px;
+            font-size: 28px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+        }
+        
+        .dashboard-header {
+            padding: 2rem;
+            border-radius: 24px;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-    <!-- Dashboard Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="h2 fw-bold text-custom-dark">Admin Dashboard</h1>
-            <p class="text-muted">Welcome, Admin! Here you can manage the entire system.</p>
+    <!-- Ultra-Modern Dashboard Header with Particles -->
+    <div class="dashboard-header animate-in">
+        <!-- Floating Particles -->
+        <div class="header-particles">
+            <div class="particle" style="left: 10%; animation-duration: 12s; --particle-drift: 30px;"></div>
+            <div class="particle" style="left: 25%; animation-duration: 15s; --particle-drift: -40px; animation-delay: 2s;"></div>
+            <div class="particle" style="left: 45%; animation-duration: 11s; --particle-drift: 50px; animation-delay: 4s;"></div>
+            <div class="particle" style="left: 60%; animation-duration: 14s; --particle-drift: -30px; animation-delay: 1s;"></div>
+            <div class="particle" style="left: 75%; animation-duration: 13s; --particle-drift: 45px; animation-delay: 3s;"></div>
+            <div class="particle" style="left: 90%; animation-duration: 16s; --particle-drift: -35px; animation-delay: 5s;"></div>
         </div>
-        <div class="d-flex">
-            <div class="btn-group">
-                <button class="btn btn-primary-custom dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    <i class="fas fa-cog me-2"></i>Quick Actions
+        
+        <div class="d-flex justify-content-between align-items-center flex-wrap position-relative" style="z-index: 2;">
+            <div>
+                <h1 class="h2 fw-bold mb-2">
+                    <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
+                </h1>
+                <p class="mb-0 opacity-85">
+                    <i class="fas fa-clock me-2"></i>Last updated: <span id="currentTime"></span>
+                    <span class="stat-indicator bg-success"></span>
+                </p>
+            </div>
+            <div class="d-flex gap-2 mt-3 mt-md-0">
+                <button class="btn btn-light quick-action-btn" onclick="location.reload()">
+                    <i class="fas fa-sync-alt me-2"></i>Refresh
                 </button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{% url 'accounts:staff_management_list' %}"><i class="fas fa-users me-2"></i>Manage Staff</a></li>
-                    <li><a class="dropdown-item" href="{% url 'management:department_list' %}"><i class="fas fa-building me-2"></i>Manage Departments</a></li>
-                    <li><a class="dropdown-item" href="{% url 'management:room_list' %}"><i class="fas fa-door-open me-2"></i>Manage Rooms</a></li>
-                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-light quick-action-btn dropdown-toggle" type="button" id="quickActionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-cog me-2"></i>Quick Actions
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="quickActionsDropdown" style="border-radius: 18px; min-width: 250px;">
+                        <li><a class="dropdown-item py-2" href="{% url 'accounts:staff_management_list' %}">
+                            <i class="fas fa-users me-3 text-primary"></i>Manage Staff
+                        </a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'management:department_list' %}">
+                            <i class="fas fa-building me-3 text-info"></i>Manage Departments
+                        </a></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'management:room_list' %}">
+                            <i class="fas fa-door-open me-3 text-success"></i>Manage Rooms
+                        </a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item py-2" href="{% url 'reports:reports_dashboard' %}">
+                            <i class="fas fa-chart-line me-3 text-warning"></i>View Analytics
+                        </a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Stats Overview Cards -->
+    <!-- KEY METRICS ROW 1 - Users & Staff with Advanced SVG Backgrounds -->
     <div class="row mb-4">
-        <!-- Active Doctors Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-body">
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card primary h-100">
+                <!-- Dynamic SVG Pattern -->
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0E7490;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#0284C7;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad1)" d="M47.1,-57.1C59.9,-45.6,68.4,-29.2,71.5,-11.9C74.6,5.4,72.3,23.6,63.3,38.9C54.3,54.2,38.6,66.6,21.1,71.1C3.6,75.6,-15.7,72.2,-32.8,64.4C-49.9,56.6,-64.8,44.4,-72.1,28.4C-79.4,12.4,-79.1,-7.4,-72.8,-24.4C-66.5,-41.4,-54.2,-55.6,-39.8,-66.3C-25.4,-77,-12.7,-84.2,2.1,-86.6C16.9,-89,33.8,-68.6,47.1,-57.1Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Active Doctors</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ active_doctors_count }}</h2>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Active Doctors</h6>
+                            <h2 class="stat-value mb-1">{{ active_doctors_count }}</h2>
+                            <small class="text-muted fw-semibold">
+                                <i class="fas fa-heartbeat me-1 text-danger"></i>Medical professionals
+                            </small>
                         </div>
-                        <div class="bg-custom-accent p-3 rounded-circle">
-                            <i class="fas fa-user-doctor fa-2x text-custom-dark"></i>
+                        <div class="metric-icon bg-primary bg-opacity-15 text-primary glow-effect">
+                            <i class="fas fa-user-doctor"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Active Receptionists Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-body">
+
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card info h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0E7490;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#14B8A6;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad2)" d="M39.9,-52.3C51.5,-42.2,60.5,-29.1,65.4,-14.3C70.3,0.5,71.1,17,65.3,31.2C59.5,45.4,47.1,57.3,32.6,63.4C18.1,69.5,1.5,69.8,-14.8,66.8C-31.1,63.8,-47.1,57.5,-57.8,46.1C-68.5,34.7,-73.9,18.1,-73.4,1.9C-72.9,-14.3,-66.5,-30.1,-56.3,-41.3C-46.1,-52.5,-32.1,-59.1,-18.1,-61.4C-4.1,-63.7,9.9,-61.7,22.4,-56.8C34.9,-51.9,28.3,-62.4,39.9,-52.3Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Active Receptionists</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ active_receptionists_count }}</h2>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Active Receptionists</h6>
+                            <h2 class="stat-value mb-1">{{ active_receptionists_count }}</h2>
+                            <small class="text-muted fw-semibold">
+                                <i class="fas fa-briefcase me-1 text-info"></i>Front desk team
+                            </small>
                         </div>
-                        <div class="bg-custom-accent p-3 rounded-circle">
-                            <i class="fas fa-user-tie fa-2x text-custom-dark"></i>
+                        <div class="metric-icon bg-info bg-opacity-15 text-info glow-effect">
+                            <i class="fas fa-user-tie"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Active Patients Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-body">
+
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card success h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#22C55E;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#86EFAC;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad3)" d="M44.3,-54.9C56.6,-44.1,65.3,-29.2,68.4,-13.2C71.5,2.8,69,19.8,61.3,34.3C53.6,48.8,40.7,60.8,25.5,66.9C10.3,73,-7.2,73.2,-23.1,68.1C-39,63,-53.3,52.6,-61.5,38.4C-69.7,24.2,-71.8,6.2,-69.3,-10.9C-66.8,-28,-59.7,-44.2,-48.3,-55.2C-36.9,-66.2,-21.2,-71.9,-5.1,-66C11,-60.1,32,-65.7,44.3,-54.9Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Total Patients</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ active_patients_count }}</h2>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Total Patients</h6>
+                            <h2 class="stat-value mb-1">{{ active_patients_count }}</h2>
+                            <small class="text-success fw-bold">
+                                <i class="fas fa-arrow-up me-1"></i>+{{ new_patients_count }} this month
+                            </small>
                         </div>
-                        <div class="bg-custom-accent p-3 rounded-circle">
-                            <i class="fas fa-user-injured fa-2x text-custom-dark"></i>
+                        <div class="metric-icon bg-success bg-opacity-15 text-success glow-effect">
+                            <i class="fas fa-user-injured"></i>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <!-- Pending Approvals Card -->
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-body">
+
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card warning h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad4" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#F97316;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#FB923C;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad4)" d="M42.7,-56.3C54.9,-47.2,64.5,-33.4,68.7,-18.1C72.9,-2.8,71.7,13.9,65.3,28.5C58.9,43.1,47.3,55.6,33.2,62.1C19.1,68.6,2.5,69.1,-13.7,66.3C-29.9,63.5,-45.7,57.4,-56.8,46.6C-67.9,35.8,-74.3,20.3,-74.8,4.5C-75.3,-11.3,-70,-27.4,-60.1,-39.7C-50.2,-52,-35.7,-60.5,-21.2,-68.1C-6.7,-75.7,8.8,-82.4,22.9,-81.2C37,-80,30.5,-65.4,42.7,-56.3Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <h6 class="card-subtitle mb-2 text-muted">Pending Approvals</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ pending_staff_count }}</h2>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Pending Approvals</h6>
+                            <h2 class="stat-value mb-1">{{ pending_staff_count }}</h2>
+                            {% if pending_staff_count > 0 %}
+                            <a href="{% url 'accounts:pending_staff_list' %}" class="btn btn-warning btn-sm mt-2 px-3" style="border-radius: 10px; font-weight: 700;">
+                                <i class="fas fa-check-circle me-1"></i>Review Now
+                            </a>
+                            {% else %}
+                            <small class="text-success fw-bold">
+                                <i class="fas fa-check-circle me-1"></i>All approved
+                            </small>
+                            {% endif %}
                         </div>
-                        <div class="bg-custom-accent p-3 rounded-circle">
-                            <i class="fas fa-user-clock fa-2x text-custom-dark"></i>
+                        <div class="metric-icon bg-warning bg-opacity-15 text-warning glow-effect">
+                            <i class="fas fa-user-clock"></i>
                         </div>
-                    </div>
-                    <div class="mt-3">
-                        <a href="{% url 'accounts:pending_staff_list' %}" class="btn btn-warning btn-sm">
-                            <i class="fas fa-exclamation-circle me-1"></i>Review Now
-                        </a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Quick Links & System Overview -->
-    <div class="row">
-        <!-- Quick Links -->
-        <div class="col-xl-6 col-md-12 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-header card-header-custom">
-                    <h5 class="mb-0"><i class="fas fa-link me-2"></i>Quick Navigation</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        <a href="{% url 'accounts:staff_management_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div><i class="fas fa-users fa-fw me-3 text-primary"></i>Manage Active Staff</div><i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="{% url 'accounts:pending_staff_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div><i class="fas fa-user-clock fa-fw me-3 text-warning"></i>Manage Pending Approvals</div><span class="badge bg-warning rounded-pill">{{ pending_staff_count }}</span>
-                        </a>
-                        <a href="{% url 'management:department_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div><i class="fas fa-building fa-fw me-3 text-info"></i>Configure Departments</div><i class="fas fa-arrow-right"></i>
-                        </a>
-                        <a href="{% url 'management:room_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                            <div><i class="fas fa-door-open fa-fw me-3 text-secondary"></i>Configure Rooms</div><i class="fas fa-arrow-right"></i>
-                        </a>
+    <!-- KEY METRICS ROW 2 - Appointments & Billing -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card purple h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad5" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#A855F7;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#C084FC;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad5)" d="M41.2,-49.8C52.3,-39.4,59.4,-25.9,62.8,-11.3C66.2,3.3,65.9,18.9,59.3,32.1C52.7,45.3,39.8,56.1,25.2,61.4C10.6,66.7,-5.7,66.5,-20.5,61.4C-35.3,56.3,-48.6,46.3,-57.1,33.1C-65.6,19.9,-69.3,3.5,-67.4,-12.1C-65.5,-27.7,-58,-42.5,-46.6,-52.8C-35.2,-63.1,-19.9,-68.9,-4.6,-63.5C10.7,-58.1,30.1,-60.2,41.2,-49.8Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Today's Appointments</h6>
+                            <h2 class="stat-value mb-1">{{ appointments_today }}</h2>
+                            <small class="text-muted fw-semibold">
+                                <i class="fas fa-calendar-day me-1 text-purple"></i>Scheduled for today
+                            </small>
+                        </div>
+                        <div class="metric-icon bg-purple bg-opacity-15 text-purple glow-effect">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- System Overview -->
-        <div class="col-xl-6 col-md-12 mb-4">
-            <div class="card card-custom border-0 h-100">
-                <div class="card-header card-header-custom">
-                    <h5 class="mb-0"><i class="fas fa-chart-pie me-2"></i>System Users Overview</h5>
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card primary h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad6" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#0284C7;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#38BDF8;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad6)" d="M38.6,-48.9C49.7,-39.2,58.4,-26.6,62.4,-12.5C66.4,1.6,65.7,17.2,59.2,30.3C52.7,43.4,40.4,54,26.5,60.1C12.6,66.2,-2.9,67.8,-17.8,64.2C-32.7,60.6,-46.9,51.8,-56.3,39.4C-65.7,27,-70.3,11,-69.1,-4.8C-67.9,-20.6,-60.9,-36.2,-49.9,-45.6C-38.9,-55,-24,-58.2,-9.6,-57.8C4.8,-57.4,27.5,-58.6,38.6,-48.9Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Total Appointments</h6>
+                            <h2 class="stat-value mb-1">{{ total_appointments }}</h2>
+                            <small class="text-primary fw-bold">
+                                <i class="fas fa-chart-line me-1"></i>{{ appointments_last_week }} this week
+                            </small>
+                        </div>
+                        <div class="metric-icon bg-primary bg-opacity-15 text-primary glow-effect">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card success h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad7" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#22C55E;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#4ADE80;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad7)" d="M43.8,-54.2C56.2,-44.3,65.5,-30.1,69.3,-14.7C73.1,0.7,71.4,17.3,64.2,31.4C57,45.5,44.3,57.1,29.8,63.5C15.3,69.9,-0.9,71.1,-16.4,67.2C-31.9,63.3,-46.7,54.3,-56.8,41.5C-66.9,28.7,-72.3,12.1,-71.5,-4.1C-70.7,-20.3,-63.7,-36.1,-52.5,-45.6C-41.3,-55.1,-26,-58.3,-11.2,-60.8C3.6,-63.3,31.4,-64.1,43.8,-54.2Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Total Revenue</h6>
+                            <h2 class="stat-value mb-1">UGX {{ total_revenue|floatformat:0|default:"0" }}</h2>
+                            <small class="text-success fw-bold">
+                                <i class="fas fa-money-bill-wave me-1"></i>All time
+                            </small>
+                        </div>
+                        <div class="metric-icon bg-success bg-opacity-15 text-success glow-effect">
+                            <i class="fas fa-sack-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card stat-card danger h-100">
+                <svg class="stat-card-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="grad8" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#FCA5A5;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#grad8)" d="M40.1,-51.6C51.8,-41.4,60.8,-27.6,65.1,-12.3C69.4,3,69,19.8,62.7,33.8C56.4,47.8,44.2,59,30.3,64.9C16.4,70.8,0.8,71.4,-14.5,68.3C-29.8,65.2,-44.8,58.4,-55.6,47.2C-66.4,36,-73,20.4,-73.7,4.5C-74.4,-11.4,-69.2,-27.6,-59.4,-39.4C-49.6,-51.2,-35.2,-58.6,-20.5,-63.7C-5.8,-68.8,9.2,-71.6,22.8,-68.5C36.4,-65.4,28.4,-61.8,40.1,-51.6Z" transform="translate(100 100)" />
+                </svg>
+                <div class="card-body position-relative">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted mb-2 fw-bold text-uppercase" style="letter-spacing: 1px; font-size: 0.7rem;">Pending Revenue</h6>
+                            <h2 class="stat-value mb-1">UGX {{ pending_revenue|floatformat:0|default:"0" }}</h2>
+                            <small class="text-danger fw-bold">
+                                <i class="fas fa-exclamation-circle me-1"></i>{{ unpaid_bills_count }} unpaid bills
+                            </small>
+                        </div>
+                        <div class="metric-icon bg-danger bg-opacity-15 text-danger glow-effect">
+                            <i class="fas fa-money-bill-transfer"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATUS BREAKDOWN CARDS - REDESIGNED -->
+    <div class="row mb-4">
+        <!-- Appointment Status Card -->
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card status-card" style="--card-color-1: #0284C7; --card-color-2: #0EA5E9;">
+                <div class="status-card-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Appointment Status
+                </div>
+                <div class="status-card-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%); color: white;">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <div class="status-item" style="--item-color: #F59E0B; --item-color-dark: #D97706;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <span>Pending</span>
+                        </div>
+                        <div class="status-item-value">{{ pending_appointments }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #0284C7; --item-color-dark: #0369A1;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <span>Approved</span>
+                        </div>
+                        <div class="status-item-value">{{ approved_appointments }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #10B981; --item-color-dark: #059669;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <span>Completed</span>
+                        </div>
+                        <div class="status-item-value">{{ completed_appointments }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Prescriptions Card -->
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card status-card" style="--card-color-1: #10B981; --card-color-2: #34D399;">
+                <div class="status-card-title">
+                    <i class="fas fa-prescription-bottle me-2"></i>Prescriptions
+                </div>
+                <div class="status-card-icon" style="background: linear-gradient(135deg, #10B981 0%, #34D399 100%); color: white;">
+                    <i class="fas fa-pills"></i>
+                </div>
+                <div>
+                    <div class="status-item" style="--item-color: #8B5CF6; --item-color-dark: #7C3AED;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <span>Total</span>
+                        </div>
+                        <div class="status-item-value">{{ total_prescriptions }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #10B981; --item-color-dark: #059669;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                                <i class="fas fa-heartbeat"></i>
+                            </div>
+                            <span>Active</span>
+                        </div>
+                        <div class="status-item-value">{{ active_prescriptions }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #6B7280; --item-color-dark: #4B5563;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%);">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span>Completed</span>
+                        </div>
+                        <div class="status-item-value">{{ completed_prescriptions }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Facility Status Card -->
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card status-card" style="--card-color-1: #14B8A6; --card-color-2: #2DD4BF;">
+                <div class="status-card-title">
+                    <i class="fas fa-building me-2"></i>Facility Status
+                </div>
+                <div class="status-card-icon" style="background: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%); color: white;">
+                    <i class="fas fa-hospital"></i>
+                </div>
+                <div>
+                    <div class="status-item" style="--item-color: #14B8A6; --item-color-dark: #0F766E;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #14B8A6 0%, #0F766E 100%);">
+                                <i class="fas fa-building-user"></i>
+                            </div>
+                            <span>Departments</span>
+                        </div>
+                        <div class="status-item-value">{{ total_departments }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #10B981; --item-color-dark: #059669;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                            <span>Available Rooms</span>
+                        </div>
+                        <div class="status-item-value">{{ available_rooms }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #F59E0B; --item-color-dark: #D97706;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                                <i class="fas fa-door-closed"></i>
+                            </div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="status-item-value">{{ occupied_rooms }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Records & Messages Card -->
+        <div class="col-xl-3 col-md-6 mb-4 animate-in">
+            <div class="card status-card" style="--card-color-1: #A855F7; --card-color-2: #C084FC;">
+                <div class="status-card-title">
+                    <i class="fas fa-chart-bar me-2"></i>Records & Messages
+                </div>
+                <div class="status-card-icon" style="background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%); color: white;">
+                    <i class="fas fa-file-medical"></i>
+                </div>
+                <div>
+                    <div class="status-item" style="--item-color: #8B5CF6; --item-color-dark: #7C3AED;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <span>Total Records</span>
+                        </div>
+                        <div class="status-item-value">{{ total_medical_records }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #10B981; --item-color-dark: #059669;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">
+                                <i class="fas fa-calendar-week"></i>
+                            </div>
+                            <span>Recent (7d)</span>
+                        </div>
+                        <div class="status-item-value">{{ recent_medical_records }}</div>
+                    </div>
+                    <div class="status-item" style="--item-color: #F59E0B; --item-color-dark: #D97706;">
+                        <div class="status-item-label">
+                            <div class="status-item-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                                <i class="fas fa-comment-dots"></i>
+                            </div>
+                            <span>Messages (24h)</span>
+                        </div>
+                        <div class="status-item-value">{{ recent_messages }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER DISTRIBUTION & RECENT ACTIVITY -->
+    <div class="row mb-4">
+        <!-- User Distribution -->
+        <div class="col-xl-4 mb-4 animate-in">
+            <div class="card h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-users me-2 text-primary"></i>User Distribution
+                    </h5>
                 </div>
                 <div class="card-body">
-                    {% if total_users > 0 %}
-                        <h6 class="text-muted mb-3">User Distribution by Role (Total Active: {{ total_users }})</h6>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Patients</span>
-                                <span>{{ patient_percent }}%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ patient_percent }}%"></div>
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-semibold text-muted">Patients</span>
+                            <strong class="text-success">{{ patient_percentage }}%</strong>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ patient_percentage }}%" aria-valuenow="{{ patient_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-semibold text-muted">Doctors</span>
+                            <strong class="text-primary">{{ doctor_percentage }}%</strong>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-primary" role="progressbar" style="width: {{ doctor_percentage }}%" aria-valuenow="{{ doctor_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="fw-semibold text-muted">Receptionists</span>
+                            <strong class="text-info">{{ receptionist_percentage }}%</strong>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar" style="width: {{ receptionist_percentage }}%" aria-valuenow="{{ receptionist_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Appointments -->
+        <div class="col-xl-8 mb-4 animate-in">
+            <div class="card h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-calendar-alt me-2 text-primary"></i>Recent Appointments
+                    </h5>
+                    <a href="{% url 'receptionist:appointment_list' %}" class="btn btn-sm btn-outline-primary" style="border-radius: 12px;">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_appointments %}
+                        {% for appointment in recent_appointments %}
+                        <div class="activity-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1 fw-bold">{{ appointment.patient.user.get_full_name }}</h6>
+                                    <p class="mb-1 text-muted small">
+                                        <i class="fas fa-user-doctor me-1"></i>Dr. {{ appointment.doctor.user.get_full_name }}
+                                    </p>
+                                    <p class="mb-0 text-muted small">
+                                        <i class="fas fa-calendar me-1"></i>{{ appointment.appointment_date|date:"M d, Y" }}
+                                        <i class="fas fa-clock ms-2 me-1"></i>{{ appointment.appointment_time|time:"g:i A" }}
+                                    </p>
+                                </div>
+                                <span class="badge bg-{{ appointment.status|lower }}-subtle">{{ appointment.status }}</span>
                             </div>
                         </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Doctors</span>
-                                <span>{{ doctor_percent }}%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ doctor_percent }}%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Receptionists</span>
-                                <span>{{ receptionist_percent }}%</span>
-                            </div>
-                            <div class="progress" style="height: 8px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ receptionist_percent|default:'0' }}%"></div>
-                            </div>
-                        </div>
+                        {% endfor %}
                     {% else %}
-                        <div class="text-center py-4">
-                            <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">No active users in the system yet.</h5>
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-calendar-xmark fa-3x mb-3 opacity-50"></i>
+                            <p class="mb-0">No recent appointments</p>
                         </div>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- RECENT BILLS & SYSTEM HEALTH -->
+    <div class="row mb-4">
+        <!-- Recent Bills -->
+        <div class="col-xl-8 mb-4 animate-in">
+            <div class="card h-100">
+                <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-file-invoice-dollar me-2 text-success"></i>Recent Bills
+                    </h5>
+                    <a href="{% url 'billing:bill_list' %}" class="btn btn-sm btn-outline-success" style="border-radius: 12px;">
+                        View All <i class="fas fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_bills %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Patient</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for bill in recent_bills %}
+                                    <tr>
+                                        <td>
+                                            <div class="fw-semibold">{{ bill.patient.user.get_full_name }}</div>
+                                            <small class="text-muted">{{ bill.description|truncatewords:5 }}</small>
+                                        </td>
+                                        <td class="fw-bold text-success">UGX {{ bill.total_amount|floatformat:0 }}</td>
+                                        <td class="text-muted">{{ bill.created_at|date:"M d, Y" }}</td>
+                                        <td><span class="badge bg-{{ bill.status|lower }}-subtle">{{ bill.status }}</span></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-receipt fa-3x mb-3 opacity-50"></i>
+                            <p class="mb-0">No recent bills</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- System Health Indicators -->
+        <div class="col-xl-4 mb-4 animate-in">
+            <div class="card h-100">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-heartbeat me-2 text-danger"></i>System Health
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <i class="fas fa-calendar-check text-primary fa-2x"></i>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="mb-0 fw-bold text-primary">{{ appointments_last_week }}</h3>
+                                <small class="text-muted">Appointments (7 days)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <i class="fas fa-money-bill-wave text-success fa-2x"></i>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="mb-0 fw-bold text-success">UGX {{ revenue_last_month|floatformat:0|default:"0" }}</h3>
+                                <small class="text-muted">Revenue (30 days)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <i class="fas fa-user-plus text-info fa-2x"></i>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="mb-0 fw-bold text-info">{{ new_patients_count }}</h3>
+                                <small class="text-muted">New Patients (30 days)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-0">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <i class="fas fa-comments text-warning fa-2x"></i>
+                            </div>
+                            <div class="text-end">
+                                <h3 class="mb-0 fw-bold text-warning">{{ total_messages }}</h3>
+                                <small class="text-muted">Total Messages</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUICK NAVIGATION -->
+    <div class="row mb-4">
+        <div class="col-12 animate-in">
+            <div class="card">
+                <div class="card-header bg-transparent">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-rocket me-2 text-primary"></i>Quick Navigation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-xl-3 col-md-6">
+                            <a href="{% url 'accounts:staff_management_list' %}" class="btn btn-primary quick-action-btn w-100 py-3">
+                                <i class="fas fa-users-cog fa-2x mb-2"></i>
+                                <div class="fw-bold">Staff Management</div>
+                                <small class="opacity-75">Manage doctors & receptionists</small>
+                            </a>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <a href="{% url 'receptionist:appointment_list' %}" class="btn btn-info quick-action-btn w-100 py-3">
+                                <i class="fas fa-calendar-alt fa-2x mb-2"></i>
+                                <div class="fw-bold">Appointments</div>
+                                <small class="opacity-75">View & manage appointments</small>
+                            </a>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <a href="{% url 'billing:bill_list' %}" class="btn btn-success quick-action-btn w-100 py-3">
+                                <i class="fas fa-file-invoice-dollar fa-2x mb-2"></i>
+                                <div class="fw-bold">Billing</div>
+                                <small class="opacity-75">Financial overview & bills</small>
+                            </a>
+                        </div>
+                        <div class="col-xl-3 col-md-6">
+                            <a href="{% url 'reports:reports_dashboard' %}" class="btn btn-warning quick-action-btn w-100 py-3">
+                                <i class="fas fa-chart-line fa-2x mb-2"></i>
+                                <div class="fw-bold">Analytics</div>
+                                <small class="opacity-75">Reports & insights</small>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
 </div>
+
+<script>
+    // Update current time
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleString('en-US', { 
+            month: 'short', 
+            day: 'numeric', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        document.getElementById('currentTime').textContent = timeString;
+    }
+    updateTime();
+    setInterval(updateTime, 1000); // Update every second
+    
+    // Counter animation for stat values
+    document.querySelectorAll('.stat-value').forEach(element => {
+        const target = parseInt(element.textContent.replace(/[^0-9]/g, ''));
+        if (isNaN(target)) return;
+        
+        let current = 0;
+        const increment = target / 50;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = element.textContent.includes('UGX') ? 
+                    'UGX ' + target.toLocaleString() : target;
+                clearInterval(timer);
+            } else {
+                element.textContent = element.textContent.includes('UGX') ? 
+                    'UGX ' + Math.ceil(current).toLocaleString() : Math.ceil(current);
+            }
+        }, 20);
+    });
+    
+    // Progress bar animation on load
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(() => {
+            document.querySelectorAll('.progress-bar').forEach(bar => {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(() => {
+                    bar.style.width = width;
+                }, 100);
+            });
+        }, 500);
+    });
+</script>
 {% endblock %}
