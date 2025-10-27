@@ -22,7 +22,7 @@
                 <td>{{ profile.get_role_display }}</td>
                 <td>{{ profile.user.last_login|date:"Y-m-d H:i"|default:"Never" }}</td>
                 <td>
-                    <a href="{% url 'toggle_staff_status' profile.user.id %}" class="btn btn-sm btn-success" title="Re-activate"><i class="fas fa-power-off"></i> Re-activate</a>
+                    <a href="{% url 'accounts:toggle_staff_status' profile.user.id %}" class="btn btn-sm btn-success" title="Re-activate"><i class="fas fa-power-off"></i> Re-activate</a>
                 </td>
             </tr>
             {% empty %}
