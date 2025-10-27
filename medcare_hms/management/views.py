@@ -7,6 +7,7 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.utils.decorators import method_decorator
 from accounts.decorators import admin_required
 from .models import Department, Room
+from django.http import JsonResponse
 
 @method_decorator(admin_required, name='dispatch')
 class DepartmentListView(ListView):
@@ -15,6 +16,14 @@ class DepartmentListView(ListView):
     context_object_name = 'departments'
     # By default, order by name and show active ones first
     queryset = Department.objects.all().order_by('-is_active', 'name')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        departments = context['departments']
+        context['total_count'] = departments.count()
+        context['active_count'] = departments.filter(is_active=True).count()
+        context['inactive_count'] = departments.filter(is_active=False).count()
+        return context
 
 @method_decorator(admin_required, name='dispatch')
 class DepartmentCreateView(SuccessMessageMixin, CreateView):
@@ -23,6 +32,33 @@ class DepartmentCreateView(SuccessMessageMixin, CreateView):
     template_name = 'management/department_form.html'
     success_url = reverse_lazy('management:department_list')
     success_message = "Department '%(name)s' was created successfully."
+    
+    def form_valid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            department = form.save()
+            return JsonResponse({
+                'success': True,
+                'message': f"Department '{department.name}' was created successfully.",
+                'department_id': department.pk
+            })
+        else:
+            # Regular form submission
+            return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = [str(error) for error in error_list]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            })
+        else:
+            # Regular form submission
+            return super().form_invalid(form)
 
 @method_decorator(admin_required, name='dispatch')
 class DepartmentUpdateView(SuccessMessageMixin, UpdateView):
@@ -30,6 +66,34 @@ class DepartmentUpdateView(SuccessMessageMixin, UpdateView):
     form_class = DepartmentForm # <-- USE OUR CUSTOM FORM
     template_name = 'management/department_form.html'
     success_url = reverse_lazy('management:department_list')
+    
+    def form_valid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            department = form.save()
+            return JsonResponse({
+                'success': True,
+                'message': f"Department '{department.name}' was updated successfully.",
+                'department_id': department.pk
+            })
+        else:
+            # Regular form submission
+            messages.success(self.request, f"Department '{form.instance.name}' was updated successfully.")
+            return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = [str(error) for error in error_list]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            })
+        else:
+            # Regular form submission
+            return super().form_invalid(form)
     success_message = "Department '%(name)s' was updated successfully."
 
 @admin_required
@@ -60,6 +124,17 @@ class RoomListView(ListView):
     template_name = 'management/room_list.html'
     context_object_name = 'rooms'
     queryset = Room.objects.select_related('department').order_by('department__name', 'room_number')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        rooms = context['rooms']
+        context['total_count'] = rooms.count()
+        context['available_count'] = rooms.filter(status='AVAILABLE').count()
+        context['occupied_count'] = rooms.filter(status='OCCUPIED').count()
+        context['maintenance_count'] = rooms.filter(status='MAINTENANCE').count()
+        context['active_count'] = rooms.filter(is_active=True).count()
+        context['active_departments'] = Department.objects.filter(is_active=True).order_by('name')
+        return context
 
 @method_decorator(admin_required, name='dispatch')
 class RoomCreateView(SuccessMessageMixin, CreateView):
@@ -68,6 +143,33 @@ class RoomCreateView(SuccessMessageMixin, CreateView):
     template_name = 'management/room_form.html'
     success_url = reverse_lazy('management:room_list')
     success_message = "Room '%(room_number)s' in department '%(department)s' was created successfully."
+    
+    def form_valid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            room = form.save()
+            return JsonResponse({
+                'success': True,
+                'message': f"Room '{room.room_number}' in department '{room.department.name}' was created successfully.",
+                'room_id': room.pk
+            })
+        else:
+            # Regular form submission
+            return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = [str(error) for error in error_list]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            })
+        else:
+            # Regular form submission
+            return super().form_invalid(form)
 
 @method_decorator(admin_required, name='dispatch')
 class RoomUpdateView(SuccessMessageMixin, UpdateView):
@@ -76,6 +178,34 @@ class RoomUpdateView(SuccessMessageMixin, UpdateView):
     template_name = 'management/room_form.html'
     success_url = reverse_lazy('management:room_list')
     success_message = "Room '%(room_number)s' was updated successfully."
+    
+    def form_valid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            room = form.save()
+            return JsonResponse({
+                'success': True,
+                'message': f"Room '{room.room_number}' was updated successfully.",
+                'room_id': room.pk
+            })
+        else:
+            # Regular form submission
+            messages.success(self.request, f"Room '{form.instance.room_number}' was updated successfully.")
+            return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        if self.request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # AJAX request
+            errors = {}
+            for field, error_list in form.errors.items():
+                errors[field] = [str(error) for error in error_list]
+            return JsonResponse({
+                'success': False,
+                'errors': errors
+            })
+        else:
+            # Regular form submission
+            return super().form_invalid(form)
 
 @admin_required
 def room_toggle_active(request, pk):
