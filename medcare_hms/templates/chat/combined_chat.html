@@ -1677,23 +1677,21 @@
         });
     }
 
-    // Mobile navigation - Show chat view on mobile when thread is active
-    {% if active_thread %}
-    if (window.innerWidth <= 768) {
-        // On mobile, hide sidebar when viewing a thread
-        const sidebar = document.querySelector('.chat-sidebar');
-        if (sidebar) {
-            sidebar.classList.remove('show-mobile');
+    // Mobile navigation - Show chat view on mobile based on whether a thread is active
+    (function() {
+        const isThreadActive = !!document.querySelector('.chat-main-header');
+        if (window.innerWidth <= 768) {
+            const sidebar = document.querySelector('.chat-sidebar');
+            if (sidebar) {
+                if (isThreadActive) {
+                    // On mobile, hide sidebar when viewing a thread
+                    sidebar.classList.remove('show-mobile');
+                } else {
+                    // On mobile, show sidebar when no thread is selected
+                    sidebar.classList.add('show-mobile');
+                }
+            }
         }
-    }
-    {% else %}
-    if (window.innerWidth <= 768) {
-        // On mobile, show sidebar when no thread is selected
-        const sidebar = document.querySelector('.chat-sidebar');
-        if (sidebar) {
-            sidebar.classList.add('show-mobile');
-        }
-    }
-    {% endif %}
+    })();
 </script>
 {% endblock %}
