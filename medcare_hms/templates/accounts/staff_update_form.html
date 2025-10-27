@@ -10,7 +10,7 @@
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit" class="btn btn-success">Save Changes</button>
-            <a href="{% url 'staff_management_list' %}" class="btn btn-secondary">Cancel</a>
+            <a href="{% url 'accounts:staff_management_list' %}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>

@@ -6,50 +6,210 @@
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
 <style>
+    /* Enhanced Card Styles */
     .card-custom {
         border: none;
-        border-radius: 12px;
+        border-radius: 16px;
         box-shadow: 0 2px 12px rgba(15, 23, 42, 0.08);
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+        background: #fff;
+    }
+    
+    .card-custom::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent
+        );
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
     }
     
     .card-custom:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.15);
+        transform: translateY(-8px);
+        box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+    }
+    
+    .card-custom:hover::before {
+        transform: translateX(100%);
     }
     
     .card-header-custom {
         background: linear-gradient(135deg, #0E7490 0%, #0C4A6E 100%);
         color: white;
-        border-radius: 12px 12px 0 0 !important;
-        padding: 1rem 1.5rem;
+        border-radius: 16px 16px 0 0 !important;
+        padding: 1.25rem 1.5rem;
         font-weight: 600;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .card-header-custom::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+        pointer-events: none;
+    }
+    
+    .card-header-custom h5 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .card-header-custom i {
+        font-size: 1.2rem;
+        opacity: 0.9;
     }
     
     .chart-container {
         position: relative;
-        height: 300px;
-        padding: 1rem;
+        height: 320px;
+        padding: 1.5rem;
     }
     
+    /* Enhanced KPI Cards */
     .kpi-card {
         text-align: center;
-        padding: 1.5rem 1rem;
+        padding: 1.75rem 1.25rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(14, 116, 144, 0.05) 0%, transparent 70%);
+        pointer-events: none;
+        transition: all 0.5s ease;
+    }
+    
+    .card-custom:hover .kpi-card::before {
+        top: -30%;
+        right: -30%;
+    }
+    
+    .kpi-icon-wrapper {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 1rem;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-custom:hover .kpi-icon-wrapper {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .kpi-icon-wrapper i {
+        font-size: 1.5rem;
+        color: white;
+        z-index: 1;
+    }
+    
+    /* Gradient backgrounds for KPI icons */
+    .kpi-card:nth-child(1) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #22C55E 0%, #16a34a 100%);
+    }
+    
+    .kpi-card:nth-child(2) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #14B8A6 0%, #0891b2 100%);
+    }
+    
+    .kpi-card:nth-child(3) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #F97316 0%, #ea580c 100%);
+    }
+    
+    .kpi-card:nth-child(4) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #A855F7 0%, #9333ea 100%);
+    }
+    
+    .kpi-card:nth-child(5) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #0284C7 0%, #0369a1 100%);
+    }
+    
+    .kpi-card:nth-child(6) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #22C55E 0%, #16a34a 100%);
+    }
+    
+    .kpi-card:nth-child(7) .kpi-icon-wrapper {
+        background: linear-gradient(135deg, #EF4444 0%, #dc2626 100%);
     }
     
     .kpi-card h6 {
         color: #64748B;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 0.5rem;
+        letter-spacing: 1px;
+        margin-bottom: 0.75rem;
         font-weight: 600;
+        position: relative;
+        z-index: 1;
     }
     
     .kpi-card h4 {
         color: #0E7490;
-        font-size: 1.75rem;
+        font-size: 1.85rem;
         margin: 0;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+        transition: all 0.3s ease;
+    }
+    
+    .card-custom:hover .kpi-card h4 {
+        transform: scale(1.05);
+        color: #0C4A6E;
+    }
+    
+    /* Badge for trend indicators */
+    .trend-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 6px;
+        margin-top: 0.5rem;
+        font-weight: 600;
+    }
+    
+    .trend-badge.positive {
+        background: rgba(34, 197, 94, 0.15);
+        color: #16a34a;
+    }
+    
+    .trend-badge.negative {
+        background: rgba(239, 68, 68, 0.15);
+        color: #dc2626;
     }
     
     .loading-spinner {
@@ -65,23 +225,152 @@
         border: 0.3rem solid #f3f4f6;
         border-top-color: #0E7490;
     }
+    
+    /* Page header enhancements */
+    .page-header {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.05) 0%, rgba(12, 74, 110, 0.05) 100%);
+        padding: 2rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        border-left: 4px solid #0E7490;
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .page-header h1 {
+        color: #0E7490;
+        font-weight: 700;
+        font-size: 1.85rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .page-header h1 i {
+        font-size: 1.5rem;
+    }
+    
+    .page-header p {
+        color: #64748B;
+        margin: 0;
+        font-size: 0.95rem;
+    }
+    
+    /* Stagger animation for cards */
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .kpi-cards-row > div {
+        animation: slideInUp 0.6s ease-out backwards;
+    }
+    
+    .kpi-cards-row > div:nth-child(1) { animation-delay: 0.1s; }
+    .kpi-cards-row > div:nth-child(2) { animation-delay: 0.15s; }
+    .kpi-cards-row > div:nth-child(3) { animation-delay: 0.2s; }
+    .kpi-cards-row > div:nth-child(4) { animation-delay: 0.25s; }
+    .kpi-cards-row > div:nth-child(5) { animation-delay: 0.3s; }
+    .kpi-cards-row > div:nth-child(6) { animation-delay: 0.35s; }
+    .kpi-cards-row > div:nth-child(7) { animation-delay: 0.4s; }
+    
+    .charts-row > div {
+        animation: slideInUp 0.6s ease-out backwards;
+    }
+    
+    .charts-row > div:nth-child(1) { animation-delay: 0.5s; }
+    .charts-row > div:nth-child(2) { animation-delay: 0.6s; }
+    
+    /* Chart card loading state */
+    .chart-loading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 320px;
+        gap: 1rem;
+    }
+    
+    .chart-loading .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3rem;
+        border-color: #0E7490;
+        border-right-color: transparent;
+    }
+    
+    .chart-loading p {
+        color: #64748B;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 991.98px) {
+        .page-header {
+            padding: 1.5rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .chart-container {
+            height: 280px;
+            padding: 1rem;
+        }
+        
+        .kpi-card {
+            padding: 1.25rem 1rem;
+        }
+        
+        .kpi-card h4 {
+            font-size: 1.5rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .kpi-icon-wrapper {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .kpi-icon-wrapper i {
+            font-size: 1.25rem;
+        }
+        
+        .chart-container {
+            height: 240px;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h2 fw-bold text-custom-dark">Reports & Analytics</h1>
-        <p class="text-muted">An overview of the hospital's performance.</p>
-    </div>
+<!-- Enhanced Page Header -->
+<div class="page-header">
+    <h1>
+        <i class="fas fa-chart-line"></i>
+        Reports & Analytics
+    </h1>
+    <p>Comprehensive insights into hospital performance, revenue, and patient care metrics</p>
 </div>
 
 <!-- KPI Stat Cards (AJAX populated) -->
-<div class="row mb-4" id="kpi-cards">
-    <div class="col-md-3 col-lg-2 mb-3">
+<div class="row kpi-cards-row mb-4" id="kpi-cards">
+    <div class="col-md-6 col-lg-3 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
-                <h6>Total Appts</h6>
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h6>Total Appointments</h6>
                 <h4 class="fw-bold" id="kpi-total-appts">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -90,9 +379,12 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-lg-2 mb-3">
+    <div class="col-md-6 col-lg-3 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-check-circle"></i>
+                </div>
                 <h6>Completed</h6>
                 <h4 class="fw-bold" id="kpi-completed-appts">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -102,9 +394,12 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-lg-2 mb-3">
+    <div class="col-md-6 col-lg-3 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-times-circle"></i>
+                </div>
                 <h6>Cancelled</h6>
                 <h4 class="fw-bold" id="kpi-cancelled-appts">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -114,10 +409,13 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3 col-lg-2 mb-3">
+    <div class="col-md-6 col-lg-3 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
-                <h6>Active Rx</h6>
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-prescription-bottle-alt"></i>
+                </div>
+                <h6>Active Prescriptions</h6>
                 <h4 class="fw-bold" id="kpi-active-rx">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -126,10 +424,17 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 col-lg-2 mb-3">
+</div>
+
+<!-- Second Row of KPI Cards -->
+<div class="row kpi-cards-row mb-4">
+    <div class="col-md-4 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
-                <h6>New Patients</h6>
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h6>New Patients (30 Days)</h6>
                 <h4 class="fw-bold" id="kpi-new-patients">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -138,9 +443,12 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 col-lg-2 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
                 <h6>Total Revenue</h6>
                 <h4 class="fw-bold" id="kpi-total-revenue">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
@@ -150,10 +458,13 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4 col-lg-2 mb-3">
+    <div class="col-md-4 mb-3">
         <div class="card card-custom h-100">
             <div class="card-body kpi-card">
-                <h6>Outstanding</h6>
+                <div class="kpi-icon-wrapper">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <h6>Outstanding Balance</h6>
                 <h4 class="fw-bold" id="kpi-outstanding-revenue">
                     <div class="spinner-border spinner-border-sm text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
@@ -165,12 +476,12 @@
 </div>
 
 <!-- Charts Row -->
-<div class="row">
+<div class="row charts-row">
     <!-- Appointments Chart -->
     <div class="col-lg-6 mb-4">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom">
-                <h5 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Appointments per Month</h5>
+                <h5><i class="fas fa-calendar-check"></i>Appointments per Month</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -183,7 +494,7 @@
     <div class="col-lg-6 mb-4">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom">
-                <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Revenue per Month (Paid Bills)</h5>
+                <h5><i class="fas fa-money-bill-wave"></i>Revenue per Month</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -195,11 +506,11 @@
 </div>
 
 <!-- Second Row of Charts -->
-<div class="row">
+<div class="row charts-row">
     <div class="col-lg-6 mb-4">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom">
-                <h5 class="mb-0"><i class="fas fa-user-md me-2"></i>Revenue by Doctor (Top 10)</h5>
+                <h5><i class="fas fa-user-md"></i>Revenue by Doctor (Top 10)</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">
@@ -211,7 +522,7 @@
     <div class="col-lg-6 mb-4">
         <div class="card card-custom h-100">
             <div class="card-header card-header-custom">
-                <h5 class="mb-0"><i class="fas fa-prescription-bottle-alt me-2"></i>Prescription Activity</h5>
+                <h5><i class="fas fa-prescription-bottle-alt"></i>Prescription Activity</h5>
             </div>
             <div class="card-body">
                 <div class="chart-container">

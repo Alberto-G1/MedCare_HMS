@@ -1,41 +1,676 @@
-{% extends 'base_admin.html' %}
+﻿{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    /* ==================== ROOT VARIABLES ==================== */
+    :root {
+        --primary-teal: #0E7490;
+        --sky-blue: #0284C7;
+        --accent-blue: #14B8A6;
+        --accent-green: #22C55E;
+        --accent-purple: #A855F7;
+    }
+    
+    /* ==================== MAIN WRAPPER ==================== */
+    .staff-management-wrapper {
+        padding: 2rem;
+        animation: fadeIn 0.8s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 50%, var(--accent-blue) 100%);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        margin-bottom: 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.3);
+        animation: slideDown 0.6s ease;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(-30px, 30px); }
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .page-header p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* ==================== STATISTICS CARDS ==================== */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+        animation: scaleUp 0.6s ease backwards;
+    }
+    
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+    .stat-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes scaleUp {
+        from { opacity: 0; transform: scale(0.8) translateY(30px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+    }
+    
+    .stat-card.teal { --gradient-start: #0E7490; --gradient-end: #14B8A6; }
+    .stat-card.blue { --gradient-start: #0284C7; --gradient-end: #38BDF8; }
+    .stat-card.green { --gradient-start: #22C55E; --gradient-end: #4ADE80; }
+    .stat-card.purple { --gradient-start: #A855F7; --gradient-end: #C084FC; }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        color: white;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ==================== FILTER SECTION ==================== */
+    .filter-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        animation: slideIn 0.8s ease 0.5s backwards;
+    }
+    
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .filter-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .filter-header h4 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin: 0;
+    }
+    
+    .filter-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        align-items: end;
+    }
+    
+    .form-group label {
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.9rem;
+    }
+    
+    .form-control {
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary-teal);
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+    }
+    
+    .btn-filter {
+        background: linear-gradient(135deg, var(--primary-teal), var(--accent-blue));
+        color: white;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(14, 116, 144, 0.3);
+    }
+    
+    /* ==================== TABLE SECTION ==================== */
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        animation: scaleUp 0.8s ease 0.6s backwards;
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        padding: 1.75rem 2.5rem;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .table-header h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .table-actions {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-action {
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .btn-action:hover {
+        background: white;
+        color: var(--primary-teal);
+        transform: translateY(-2px);
+    }
+    
+    .staff-table {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .staff-table thead {
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    
+    .staff-table thead th {
+        padding: 1.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        color: #334155;
+        border: none;
+    }
+    
+    .staff-table tbody td {
+        padding: 1.5rem;
+        vertical-align: middle;
+        border: none;
+        color: #475569;
+    }
+    
+    .staff-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+    }
+    
+    .staff-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(14, 116, 144, 0.05) 0%, rgba(255, 255, 255, 1) 12%);
+        transform: translateX(8px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .profile-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .profile-img:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+    
+    .status-badge.active {
+        background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+        color: white;
+        box-shadow: 0 5px 20px rgba(34, 197, 94, 0.3);
+    }
+    
+    .status-badge.inactive {
+        background: linear-gradient(135deg, #EF4444 0%, #F87171 100%);
+        color: white;
+        box-shadow: 0 5px 20px rgba(239, 68, 68, 0.3);
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: white;
+        animation: blink 2s ease-in-out infinite;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    .role-badge {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+    }
+    
+    .role-badge.doctor {
+        background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%);
+        color: white;
+    }
+    
+    .role-badge.receptionist {
+        background: linear-gradient(135deg, #14B8A6 0%, #2DD4BF 100%);
+        color: white;
+    }
+    
+    .role-badge.admin {
+        background: linear-gradient(135deg, #A855F7 0%, #C084FC 100%);
+        color: white;
+    }
+    
+    .action-btn {
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 0 0.25rem;
+    }
+    
+    .btn-view {
+        background: linear-gradient(135deg, #0284C7, #38BDF8);
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, #F59E0B, #FBBF24);
+    }
+    
+    .btn-toggle {
+        background: linear-gradient(135deg, #EF4444, #F87171);
+    }
+    
+    .btn-toggle.activate {
+        background: linear-gradient(135deg, #22C55E, #4ADE80);
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+    
+    .empty-icon {
+        font-size: 5rem;
+        color: #cbd5e1;
+        margin-bottom: 2rem;
+        animation: float 3s ease infinite;
+    }
+    
+    .empty-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+    
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @media (max-width: 768px) {
+        .staff-management-wrapper {
+            padding: 1rem;
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+        }
+        
+        .stats-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .filter-controls {
+            grid-template-columns: 1fr;
+        }
+        
+        .table-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Active Staff Members</h2>
-    <div>
-        <a href="{% url 'accounts:pending_staff_list' %}" class="btn btn-warning">View Pending Staff</a>
-        <a href="{% url 'accounts:deactivated_staff_list' %}" class="btn btn-secondary">View Deactivated Staff</a>
+<div class="staff-management-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-users-cog"></i> Staff Management</h1>
+        <p><i class="fas fa-clipboard-list"></i> Manage and monitor all staff members across the hospital</p>
     </div>
-</div>
-<div class="table-responsive">
-    <table class="table table-striped table-hover">
-        <thead>
-            <tr>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for profile in staff_profiles %}
-            <tr>
-                <td>{{ profile.user.username }}</td>
-                <td>{{ profile.user.email }}</td>
-                <td>{{ profile.get_role_display }}</td>
-                <td>
-                    <a href="{% url 'accounts:staff_detail' profile.user.pk %}" class="btn btn-sm btn-info" title="View Details"><i class="fas fa-eye"></i></a>
-                    <a href="{% url 'accounts:staff_update' profile.user.pk %}" class="btn btn-sm btn-primary" title="Update"><i class="fas fa-edit"></i></a>
-                    <a href="{% url 'accounts:toggle_staff_status' profile.user.id %}" class="btn btn-sm btn-danger" title="Deactivate"><i class="fas fa-trash-alt"></i></a>
-                </td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">No active staff members found.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-row">
+        <div class="stat-card teal">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-value">{{ total_staff|default:0 }}</div>
+            <div class="stat-label">Total Staff</div>
+        </div>
+        
+        <div class="stat-card blue">
+            <div class="stat-icon">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <div class="stat-value">{{ total_doctors|default:0 }}</div>
+            <div class="stat-label">Doctors</div>
+        </div>
+        
+        <div class="stat-card green">
+            <div class="stat-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <div class="stat-value">{{ total_receptionists|default:0 }}</div>
+            <div class="stat-label">Receptionists</div>
+        </div>
+        
+        <div class="stat-card purple">
+            <div class="stat-icon">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div class="stat-value">{{ total_admins|default:0 }}</div>
+            <div class="stat-label">Admins</div>
+        </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="filter-card">
+        <div class="filter-header">
+            <i class="fas fa-filter" style="color: var(--primary-teal); font-size: 1.5rem;"></i>
+            <h4>Filter Staff</h4>
+        </div>
+        
+        <form method="get" action="">
+            <div class="filter-controls">
+                <div class="form-group">
+                    <label for="search"><i class="fas fa-search"></i> Search by Name</label>
+                    <input type="text" id="search" name="search" class="form-control" placeholder="Enter staff name..." value="{{ request.GET.search }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="role"><i class="fas fa-briefcase"></i> Filter by Role</label>
+                    <select id="role" name="role" class="form-control">
+                        <option value="">All Roles</option>
+                        <option value="DOCTOR" {% if request.GET.role == 'DOCTOR' %}selected{% endif %}>Doctor</option>
+                        <option value="RECEPTIONIST" {% if request.GET.role == 'RECEPTIONIST' %}selected{% endif %}>Receptionist</option>
+                        <option value="ADMIN" {% if request.GET.role == 'ADMIN' %}selected{% endif %}>Admin</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="status"><i class="fas fa-toggle-on"></i> Filter by Status</label>
+                    <select id="status" name="status" class="form-control">
+                        <option value="">All Status</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn-filter">
+                        <i class="fas fa-search"></i>
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Staff Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h4><i class="fas fa-list"></i> Staff Directory</h4>
+            <div class="table-actions">
+                <a href="{% url 'accounts:pending_staff_list' %}" class="btn-action">
+                    <i class="fas fa-clock"></i> Pending Staff
+                </a>
+                <a href="{% url 'accounts:deactivated_staff_list' %}" class="btn-action">
+                    <i class="fas fa-user-slash"></i> Deactivated Staff
+                </a>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            {% if staff_profiles %}
+            <table class="table staff-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-image"></i> Photo</th>
+                        <th><i class="fas fa-user"></i> Name</th>
+                        <th><i class="fas fa-envelope"></i> Email</th>
+                        <th><i class="fas fa-briefcase"></i> Role</th>
+                        <th><i class="fas fa-phone"></i> Contact</th>
+                        <th><i class="fas fa-calendar-check"></i> Joined</th>
+                        <th><i class="fas fa-toggle-on"></i> Status</th>
+                        <th class="text-center"><i class="fas fa-cog"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in staff_profiles %}
+                    <tr>
+                        <td>
+                            {% if profile.role == 'DOCTOR' and profile.user.doctorprofile.profile_picture %}
+                                <img src="{{ profile.user.doctorprofile.profile_picture.url }}" alt="{{ profile.user.username }}" class="profile-img">
+                            {% elif profile.role == 'RECEPTIONIST' and profile.user.receptionistprofile.profile_picture %}
+                                <img src="{{ profile.user.receptionistprofile.profile_picture.url }}" alt="{{ profile.user.username }}" class="profile-img">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Default" class="profile-img">
+                            {% endif %}
+                        </td>
+                        <td><strong>{{ profile.user.get_full_name|default:profile.user.username }}</strong></td>
+                        <td>{{ profile.user.email|default:"No email" }}</td>
+                        <td>
+                            {% if profile.role == 'DOCTOR' %}
+                                <span class="role-badge doctor"><i class="fas fa-user-md"></i> Doctor</span>
+                            {% elif profile.role == 'RECEPTIONIST' %}
+                                <span class="role-badge receptionist"><i class="fas fa-user-tie"></i> Receptionist</span>
+                            {% elif profile.role == 'ADMIN' %}
+                                <span class="role-badge admin"><i class="fas fa-user-shield"></i> Admin</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ profile.contact|default:"Not set" }}</td>
+                        <td>{{ profile.user.date_joined|date:"M d, Y" }}</td>
+                        <td>
+                            {% if profile.user.is_active %}
+                                <span class="status-badge active">
+                                    <span class="status-dot"></span>
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="status-badge inactive">
+                                    <span class="status-dot"></span>
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'accounts:staff_detail' profile.user.pk %}" class="action-btn btn-view" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'accounts:staff_update' profile.user.pk %}" class="action-btn btn-edit" title="Edit Staff">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'accounts:toggle_staff_status' profile.user.pk %}" 
+                               class="action-btn btn-toggle {% if not profile.user.is_active %}activate{% endif %}" 
+                               title="{% if profile.user.is_active %}Deactivate{% else %}Activate{% endif %} Staff"
+                               onclick="return confirm('{% if profile.user.is_active %}Deactivate{% else %}Activate{% endif %} this staff member?')">
+                                <i class="fas fa-{% if profile.user.is_active %}ban{% else %}check{% endif %}"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-users-slash"></i>
+                </div>
+                <h3 class="empty-title">No Staff Found</h3>
+                <p style="color: #64748b; font-size: 1.1rem;">No staff members match your current filters. Try adjusting your search criteria.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 {% endblock %}
