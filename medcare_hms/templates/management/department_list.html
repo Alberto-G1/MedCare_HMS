@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Manage Departments</h2>
-    <a href="{% url 'department_create' %}" class="btn btn-primary">Add New Department</a>
+    <a href="{% url 'management:department_create' %}" class="btn btn-primary">Add New Department</a>
 </div>
 <table class="table table-striped table-hover">
     <thead>
@@ -27,11 +27,11 @@
             </td>
             <td>{{ department.description|default:"N/A" }}</td>
             <td>
-                <a href="{% url 'department_update' department.pk %}" class="btn btn-sm btn-info">Edit</a>
+                <a href="{% url 'management:department_update' department.pk %}" class="btn btn-sm btn-info">Edit</a>
                 {% if department.is_active %}
-                    <a href="{% url 'department_toggle_active' department.pk %}" class="btn btn-sm btn-warning">Deactivate</a>
+                    <a href="{% url 'management:department_toggle_active' department.pk %}" class="btn btn-sm btn-warning">Deactivate</a>
                 {% else %}
-                    <a href="{% url 'department_toggle_active' department.pk %}" class="btn btn-sm btn-success">Activate</a>
+                    <a href="{% url 'management:department_toggle_active' department.pk %}" class="btn btn-sm btn-success">Activate</a>
                 {% endif %}
             </td>
         </tr>

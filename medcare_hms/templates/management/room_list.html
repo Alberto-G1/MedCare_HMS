@@ -3,7 +3,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Manage Rooms</h2>
-    <a href="{% url 'room_create' %}" class="btn btn-primary">Add New Room</a>
+    <a href="{% url 'management:room_create' %}" class="btn btn-primary">Add New Room</a>
 </div>
 <table class="table table-striped table-hover">
     <thead>
@@ -41,11 +41,11 @@
                 {% endif %}
             </td>
             <td>
-                <a href="{% url 'room_update' room.pk %}" class="btn btn-sm btn-info">Edit</a>
+                <a href="{% url 'management:room_update' room.pk %}" class="btn btn-sm btn-info">Edit</a>
                 {% if room.is_active %}
-                    <a href="{% url 'room_toggle_active' room.pk %}" class="btn btn-sm btn-warning">Deactivate</a>
+                    <a href="{% url 'management:room_toggle_active' room.pk %}" class="btn btn-sm btn-warning">Deactivate</a>
                 {% else %}
-                    <a href="{% url 'room_toggle_active' room.pk %}" class="btn btn-sm btn-success">Activate</a>
+                    <a href="{% url 'management:room_toggle_active' room.pk %}" class="btn btn-sm btn-success">Activate</a>
                 {% endif %}
             </td>
         </tr>

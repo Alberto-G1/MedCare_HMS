@@ -26,6 +26,7 @@
             --accent-blue: #14B8A6;
             --accent-green: #22C55E;
             --accent-orange: #F97316;
+            --accent-purple: #A855F7;
             --background-light: #F1F5F9;
             --background-white: #FFFFFF;
             --text-dark: #1E293B;
@@ -36,6 +37,47 @@
             --shadow-light: rgba(15, 23, 42, 0.08);
             --shadow-medium: rgba(15, 23, 42, 0.15);
             --shadow-strong: rgba(15, 23, 42, 0.25);
+        }
+
+        /* Page Transition Animations */
+        @keyframes slideInFromRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
         }
 
         * {
@@ -64,9 +106,22 @@
             bottom: 0;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
-            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Decorative gradient overlay for sidebar */
+        .sidebar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, transparent 100%);
+            pointer-events: none;
+            z-index: 1;
         }
 
         .sidebar.collapsed {
@@ -93,6 +148,13 @@
             gap: 0.85rem;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-brand:hover img {
+            transform: scale(1.05) rotate(5deg);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
 
         .sidebar-brand img {
@@ -101,6 +163,7 @@
             border-radius: 12px;
             object-fit: cover;
             box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .brand-text {
@@ -108,6 +171,10 @@
             font-weight: 700;
             letter-spacing: -0.5px;
             transition: all 0.3s ease;
+            background: linear-gradient(135deg, #fff 0%, var(--light-sky-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .sidebar.collapsed .brand-text {
@@ -118,6 +185,8 @@
 
         .nav-section {
             margin: 1.5rem 0;
+            position: relative;
+            z-index: 2;
         }
 
         .nav-section-title {
@@ -149,15 +218,20 @@
             border-radius: 12px;
             font-size: 0.9rem;
             position: relative;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0 0.75rem 0.35rem;
+            overflow: visible;
         }
 
         .menu-link:hover {
             background: rgba(255, 255, 255, 0.15);
             color: #fff;
-            transform: translateX(6px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transform: translateX(8px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-link:hover .menu-icon {
+            animation: pulse 0.6s ease-in-out;
         }
 
         .menu-link.active {
@@ -165,6 +239,7 @@
             color: #fff;
             font-weight: 600;
             box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            transform: translateX(4px);
         }
 
         .menu-link.active::before {
@@ -174,9 +249,64 @@
             top: 50%;
             transform: translateY(-50%);
             width: 4px;
-            height: 20px;
+            height: 28px;
             background: var(--accent-orange);
             border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-orange);
+        }
+
+        .menu-link.active::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Tooltip for collapsed sidebar */
+        .menu-link::before {
+            content: attr(data-tooltip);
+            position: absolute;
+            left: calc(100% + 15px);
+            top: 50%;
+            transform: translateY(-50%) scale(0.8);
+            background: rgba(30, 41, 59, 0.95);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .sidebar.collapsed .menu-link:hover::before {
+            opacity: 1;
+            transform: translateY(-50%) scale(1);
+        }
+
+        /* Arrow for tooltip */
+        .sidebar.collapsed .menu-link:hover::after {
+            content: '';
+            position: absolute;
+            left: calc(100% + 7px);
+            top: 50%;
+            transform: translateY(-50%) rotate(45deg);
+            width: 8px;
+            height: 8px;
+            background: rgba(30, 41, 59, 0.95);
+            z-index: 9999;
+            opacity: 1;
+            animation: none;
         }
 
         .menu-icon {
@@ -184,6 +314,7 @@
             text-align: center;
             font-size: 1.1rem;
             flex-shrink: 0;
+            transition: all 0.3s ease;
         }
 
         .menu-text {
@@ -202,6 +333,10 @@
             padding: 0.85rem;
         }
 
+        .sidebar.collapsed .menu-link.active::after {
+            display: none;
+        }
+
         /* Professional Top Bar */
         .topbar {
             position: sticky;
@@ -213,8 +348,9 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 2px 20px var(--shadow-light);
+            box-shadow: 0 2px 20px var(--shadow-medium);
             height: var(--header-height);
+            animation: slideInFromRight 0.5s ease-out;
         }
 
         .topbar-left {
@@ -229,20 +365,22 @@
             color: #fff;
             padding: 0.6rem;
             border-radius: 10px;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             font-size: 1.1rem;
         }
 
         .sidebar-toggle:hover {
             background: rgba(255, 255, 255, 0.25);
-            transform: scale(1.05);
+            transform: scale(1.05) rotate(90deg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .topbar-title {
             font-size: 1.2rem;
             font-weight: 600;
             margin: 0;
+            animation: fadeInUp 0.6s ease-out;
         }
 
         .topbar-right {
@@ -258,12 +396,18 @@
             padding: 0.6rem;
             border-radius: 10px;
             position: relative;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
 
         .notification-btn:hover {
             background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .notification-btn:hover i {
+            animation: pulse 0.6s ease-in-out;
         }
 
         .notification-badge {
@@ -278,6 +422,7 @@
             min-width: 18px;
             text-align: center;
             font-weight: 600;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         .user-dropdown {
@@ -293,12 +438,14 @@
             display: flex;
             align-items: center;
             gap: 0.6rem;
-            transition: all 0.25s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
 
         .user-toggle:hover {
             background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .user-avatar {
@@ -307,6 +454,12 @@
             border-radius: 8px;
             object-fit: cover;
             border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .user-toggle:hover .user-avatar {
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.1);
         }
 
         .user-info {
@@ -336,9 +489,10 @@
             color: var(--text-dark);
             border-radius: 12px;
             padding: 1rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             display: none;
             z-index: 1001;
+            animation: fadeInUp 0.3s ease-out;
         }
 
         .user-menu::before {
@@ -367,6 +521,7 @@
             height: 40px;
             border-radius: 10px;
             object-fit: cover;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .user-menu a {
@@ -378,14 +533,19 @@
             display: flex;
             gap: 0.6rem;
             align-items: center;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             margin: 0.2rem 0;
         }
 
         .user-menu a:hover {
-            background: #f8fafc;
-            color: var(--primary-teal);
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+            color: white;
             transform: translateX(4px);
+            box-shadow: 0 2px 8px rgba(14, 116, 144, 0.3);
+        }
+
+        .user-menu a:hover i {
+            animation: pulse 0.6s ease-in-out;
         }
 
         .user-menu .divider {
@@ -411,7 +571,18 @@
         .main-content {
             flex: 1;
             padding: 2rem;
+            animation: slideInFromRight 0.6s ease-out;
         }
+
+        /* Add stagger animation for child elements */
+        .main-content > * {
+            animation: fadeInUp 0.7s ease-out backwards;
+        }
+
+        .main-content > *:nth-child(1) { animation-delay: 0.1s; }
+        .main-content > *:nth-child(2) { animation-delay: 0.2s; }
+        .main-content > *:nth-child(3) { animation-delay: 0.3s; }
+        .main-content > *:nth-child(4) { animation-delay: 0.4s; }
 
         /* Professional Footer */
         footer {
@@ -420,6 +591,7 @@
             padding: 1.5rem 2rem 1rem;
             text-align: center;
             font-size: 0.85rem;
+            box-shadow: 0 -2px 20px var(--shadow-light);
         }
 
         /* Dashboard Components */
@@ -436,12 +608,52 @@
             border-radius: 16px;
             box-shadow: 0 2px 12px var(--shadow-light);
             border-left: 4px solid var(--accent-green);
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.4),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px var(--shadow-medium);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px var(--shadow-medium);
+            border-left-width: 6px;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-card:nth-child(1) {
+            border-left-color: var(--accent-green);
+        }
+
+        .stat-card:nth-child(2) {
+            border-left-color: var(--accent-blue);
+        }
+
+        .stat-card:nth-child(3) {
+            border-left-color: var(--accent-orange);
+        }
+
+        .stat-card:nth-child(4) {
+            border-left-color: var(--accent-purple);
         }
 
         .stat-icon {
@@ -455,6 +667,28 @@
             margin-bottom: 1rem;
             background: linear-gradient(135deg, var(--sky-blue) 0%, var(--accent-blue) 100%);
             color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover .stat-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.4);
+        }
+
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, var(--accent-green) 0%, #16a34a 100%);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #0891b2 100%);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #ea580c 100%);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, var(--accent-purple) 0%, #9333ea 100%);
         }
 
         .stat-value {
@@ -523,11 +757,11 @@
         <!-- Dashboard Section -->
         <div class="nav-section">
             <div class="nav-section-title">Dashboard</div>
-            <a href="{% url 'accounts:admin_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+            <a href="{% url 'accounts:admin_dashboard' %}" class="menu-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" data-tooltip="Overview">
                 <span class="menu-icon"><i class="fas fa-tachometer-alt"></i></span>
                 <span class="menu-text">Overview</span>
             </a>
-            <a href="{% url 'reports:reports_dashboard' %}" class="menu-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}">
+            <a href="{% url 'reports:reports_dashboard' %}" class="menu-link {% if request.resolver_match.app_name == 'reports' %}active{% endif %}" data-tooltip="Analytics & Reports">
                 <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
                 <span class="menu-text">Analytics & Reports</span>
             </a>
@@ -536,15 +770,15 @@
         <!-- User Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">User Management</div>
-            <a href="{% url 'accounts:staff_management_list' %}" class="menu-link">
+            <a href="{% url 'accounts:staff_management_list' %}" class="menu-link" data-tooltip="All Staff">
                 <span class="menu-icon"><i class="fas fa-users"></i></span>
                 <span class="menu-text">All Staff</span>
             </a>
-            <a href="{% url 'accounts:pending_staff_list' %}" class="menu-link">
+            <a href="{% url 'accounts:pending_staff_list' %}" class="menu-link" data-tooltip="Pending Approvals">
                 <span class="menu-icon"><i class="fas fa-user-clock"></i></span>
                 <span class="menu-text">Pending Approvals</span>
             </a>
-            <a href="{% url 'accounts:deactivated_staff_list' %}" class="menu-link">
+            <a href="{% url 'accounts:deactivated_staff_list' %}" class="menu-link" data-tooltip="Deactivated Staff">
                 <span class="menu-icon"><i class="fas fa-user-slash"></i></span>
                 <span class="menu-text">Deactivated Staff</span>
             </a>
@@ -553,15 +787,15 @@
         <!-- Hospital Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">Hospital Management</div>
-            <a href="{% url 'management:department_list' %}" class="menu-link">
+            <a href="{% url 'management:department_list' %}" class="menu-link" data-tooltip="Departments">
                 <span class="menu-icon"><i class="fas fa-sitemap"></i></span>
                 <span class="menu-text">Departments</span>
             </a>
-            <a href="{% url 'management:room_list' %}" class="menu-link">
+            <a href="{% url 'management:room_list' %}" class="menu-link" data-tooltip="Rooms">
                 <span class="menu-icon"><i class="fas fa-bed"></i></span>
                 <span class="menu-text">Rooms</span>
             </a>
-            <a href="{% url 'patients:doctor_list' %}" class="menu-link">
+            <a href="{% url 'patients:doctor_list' %}" class="menu-link" data-tooltip="Doctors">
                 <span class="menu-icon"><i class="fas fa-user-md"></i></span>
                 <span class="menu-text">Doctors</span>
             </a>
@@ -570,11 +804,11 @@
         <!-- Financial Management Section -->
         <div class="nav-section">
             <div class="nav-section-title">Financial</div>
-            <a href="{% url 'billing:bill_list' %}" class="menu-link">
+            <a href="{% url 'billing:bill_list' %}" class="menu-link" data-tooltip="Billing">
                 <span class="menu-icon"><i class="fas fa-file-invoice-dollar"></i></span>
                 <span class="menu-text">Billing</span>
             </a>
-            <a href="{% url 'billing:select_appointment' %}" class="menu-link">
+            <a href="{% url 'billing:select_appointment' %}" class="menu-link" data-tooltip="Create Bill">
                 <span class="menu-icon"><i class="fas fa-plus-circle"></i></span>
                 <span class="menu-text">Create Bill</span>
             </a>
@@ -583,11 +817,11 @@
         <!-- Communication Section -->
         <div class="nav-section">
             <div class="nav-section-title">Communication</div>
-            <a href="{% url 'chat:thread_list' %}" class="menu-link">
+            <a href="{% url 'chat:thread_list' %}" class="menu-link" data-tooltip="Messages">
                 <span class="menu-icon"><i class="fas fa-comments"></i></span>
                 <span class="menu-text">Messages</span>
             </a>
-            <a href="{% url 'notifications:notification_list' %}" class="menu-link">
+            <a href="{% url 'notifications:notification_list' %}" class="menu-link" data-tooltip="Notifications">
                 <span class="menu-icon"><i class="fas fa-bell"></i></span>
                 <span class="menu-text">Notifications</span>
             </a>
@@ -596,11 +830,11 @@
         <!-- System Section -->
         <div class="nav-section">
             <div class="nav-section-title">System</div>
-            <a href="{% url 'audit:audit_feed' %}" class="menu-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}">
+            <a href="{% url 'audit:audit_feed' %}" class="menu-link {% if request.resolver_match.app_name == 'audit' %}active{% endif %}" data-tooltip="Audit Logs">
                 <span class="menu-icon"><i class="fas fa-shield-halved"></i></span>
                 <span class="menu-text">Audit Logs</span>
             </a>
-            <a href="{% url 'admin:index' %}" class="menu-link">
+            <a href="{% url 'admin:index' %}" class="menu-link" data-tooltip="Django Admin">
                 <span class="menu-icon"><i class="fas fa-cogs"></i></span>
                 <span class="menu-text">Django Admin</span>
             </a>
@@ -722,6 +956,54 @@
             sidebar.classList.add('collapsed');
         }
 
+        // Active link detection based on current URL
+        const currentPath = window.location.pathname;
+        const menuLinks = document.querySelectorAll('.menu-link');
+        
+        menuLinks.forEach(link => {
+            const linkPath = new URL(link.href).pathname;
+            
+            // Remove active class from all links first
+            link.classList.remove('active');
+            
+            // Add active class if paths match or if current path starts with link path (for sub-pages)
+            if (currentPath === linkPath || (linkPath !== '/' && currentPath.startsWith(linkPath))) {
+                link.classList.add('active');
+            }
+        });
+
+        // Add click animation to menu links
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Add loading effect
+                const icon = this.querySelector('.menu-icon i');
+                if (icon) {
+                    icon.style.animation = 'pulse 0.6s ease-in-out';
+                    setTimeout(() => {
+                        icon.style.animation = '';
+                    }, 600);
+                }
+                
+                // Store clicked link for page transition
+                localStorage.setItem('lastClickedLink', this.href);
+            });
+        });
+
+        // Page transition effect
+        window.addEventListener('load', () => {
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateX(30px)';
+                
+                setTimeout(() => {
+                    mainContent.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateX(0)';
+                }, 50);
+            }
+        });
+
         // User menu toggle
         const userToggle = document.getElementById('userMenuToggle');
         const userMenu = document.getElementById('userMenu');
@@ -751,6 +1033,70 @@
                 }
             });
         }
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Notification badge pulse animation
+        const notificationBadge = document.querySelector('.notification-badge');
+        if (notificationBadge && parseInt(notificationBadge.textContent) > 0) {
+            setInterval(() => {
+                notificationBadge.style.animation = 'none';
+                setTimeout(() => {
+                    notificationBadge.style.animation = 'pulse 2s ease-in-out infinite';
+                }, 10);
+            }, 5000);
+        }
+
+        // Add ripple effect to buttons
+        document.querySelectorAll('.sidebar-toggle, .notification-btn, .user-toggle').forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s ease-out';
+                ripple.style.pointerEvents = 'none';
+                
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+                
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Add CSS for ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
     {% block extra_js %}{% endblock %}
 </body>
