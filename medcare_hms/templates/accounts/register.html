@@ -224,12 +224,114 @@
         color: white;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(14, 116, 144, 0.3);
+        position: relative;
+        overflow: hidden;
     }
     
-    .btn-primary-modern:hover {
+    .btn-primary-modern:hover:not(:disabled) {
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(14, 116, 144, 0.4);
         color: white;
+    }
+    
+    .btn-primary-modern:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+    
+    /* Loading spinner */
+    .btn-loading {
+        pointer-events: none;
+    }
+    
+    .loading-dots {
+        display: inline-block;
+        margin-left: 0.5rem;
+    }
+    
+    .loading-dots span {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background-color: white;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: dotFlashing 1.4s infinite;
+    }
+    
+    .loading-dots span:nth-child(1) {
+        animation-delay: 0s;
+    }
+    
+    .loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    .loading-dots span:nth-child(4) {
+        animation-delay: 0.6s;
+    }
+    
+    @keyframes dotFlashing {
+        0%, 80%, 100% {
+            opacity: 0.3;
+            transform: scale(0.8);
+        }
+        40% {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+    }
+    
+    /* Alert animations */
+    .modern-alert {
+        border: none;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        color: white;
+        margin-bottom: 1.5rem;
+    }
+    
+    .alert-danger {
+        background: rgba(220, 53, 69, 0.95);
+        border-left: 4px solid #dc3545;
+    }
+    
+    .alert-success {
+        background: rgba(40, 167, 69, 0.95);
+        border-left: 4px solid #28a745;
+    }
+    
+    .alert-warning {
+        background: rgba(255, 193, 7, 0.95);
+        border-left: 4px solid #ffc107;
+        color: #1E293B;
+    }
+    
+    .alert-info {
+        background: rgba(23, 162, 184, 0.95);
+        border-left: 4px solid #17a2b8;
+    }
+    
+    .modern-alert .btn-close {
+        filter: brightness(0) invert(1);
+    }
+    
+    .alert-warning .btn-close {
+        filter: none;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    
+    .animate-shake {
+        animation: shake 0.5s ease-in-out;
     }
     
     /* Checkbox */
@@ -420,6 +522,27 @@
         <form method="post" class="needs-validation" novalidate>
             {% csrf_token %}
             
+            <!-- Django Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show modern-alert animate-shake" role="alert">
+                        <div class="d-flex align-items-center">
+                            {% if message.tags == 'error' or message.tags == 'danger' %}
+                                <i class="fas fa-exclamation-triangle me-3 fs-5"></i>
+                            {% elif message.tags == 'success' %}
+                                <i class="fas fa-check-circle me-3 fs-5"></i>
+                            {% elif message.tags == 'warning' %}
+                                <i class="fas fa-exclamation-circle me-3 fs-5"></i>
+                            {% else %}
+                                <i class="fas fa-info-circle me-3 fs-5"></i>
+                            {% endif %}
+                            <div>{{ message }}</div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
             <!-- Display Non-Field Errors -->
             {% if form.non_field_errors %}
                 <div class="alert alert-danger alert-dismissible fade show modern-alert animate-shake" role="alert">
@@ -571,8 +694,15 @@
             </div>
 
             <div class="text-center my-4">
-                <button type="submit" class="btn btn-primary-modern btn-submit-custom">
-                    <i class="fas fa-user-plus me-2"></i>Create Account
+                <button type="submit" class="btn btn-primary-modern btn-submit-custom" id="registerBtn">
+                    <i class="fas fa-user-plus me-2"></i>
+                    <span class="btn-text">Create Account</span>
+                    <span class="loading-dots d-none">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
                 </button>
             </div>
         </form>
@@ -660,6 +790,38 @@
             strengthText.style.color = 'var(--accent-green)';
         }
     });
+    
+    // Loading effect on form submission
+    const registerForm = document.querySelector('form');
+    const registerBtn = document.getElementById('registerBtn');
+    
+    if (registerForm && registerBtn) {
+        registerForm.addEventListener('submit', function(e) {
+            // Check if form is valid
+            if (registerForm.checkValidity()) {
+                // Add loading state
+                registerBtn.disabled = true;
+                registerBtn.classList.add('btn-loading');
+                
+                const loadingDots = registerBtn.querySelector('.loading-dots');
+                const btnText = registerBtn.querySelector('.btn-text');
+                
+                if (loadingDots && btnText) {
+                    loadingDots.classList.remove('d-none');
+                    btnText.textContent = 'Creating Account';
+                }
+            }
+        });
+    }
+    
+    // Auto-dismiss alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
 </script>
 
 <!-- JavaScript -->
