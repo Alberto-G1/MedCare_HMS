@@ -1,45 +1,1193 @@
 {% extends 'base_admin.html' %}
+{% load static %}
+
+{% block extra_head %}
+<style>
+    /* ==================== ROOT VARIABLES ==================== */
+    :root {
+        --primary-teal: #0E7490;
+        --sky-blue: #0284C7;
+        --accent-blue: #14B8A6;
+        --accent-green: #22C55E;
+        --accent-purple: #A855F7;
+        --accent-orange: #F59E0B;
+        --accent-red: #EF4444;
+    }
+    
+    /* ==================== MAIN WRAPPER ==================== */
+    .department-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f0f9ff 100%);
+        padding: 2rem;
+        animation: fadeIn 0.8s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 50%, var(--accent-blue) 100%);
+        border-radius: 24px;
+        padding: 3rem 2.5rem;
+        margin-bottom: 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.3);
+        animation: slideDown 0.6s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+    
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 8s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-30px, 30px) scale(1.1); }
+    }
+    
+    .header-content {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .header-content h1 {
+        font-size: 2.5rem;
+        font-weight: 900;
+        margin: 0 0 0.5rem 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .header-icon {
+        font-size: 2.5rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .header-content p {
+        font-size: 1.1rem;
+        opacity: 0.95;
+        margin: 0;
+    }
+    
+    .btn-add {
+        background: white;
+        color: var(--primary-teal);
+        padding: 1rem 2rem;
+        border-radius: 14px;
+        text-decoration: none;
+        font-weight: 800;
+        font-size: 1rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        position: relative;
+        z-index: 1;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        color: var(--sky-blue);
+    }
+    
+    /* ==================== STATISTICS CARDS ==================== */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+        animation: scaleUp 0.8s ease 0.2s backwards;
+    }
+    
+    @keyframes scaleUp {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        transition: all 0.3s ease;
+        border-left: 5px solid;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card.teal { border-left-color: var(--primary-teal); }
+    .stat-card.green { border-left-color: var(--accent-green); }
+    .stat-card.red { border-left-color: var(--accent-red); }
+    
+    .stat-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+    }
+    
+    .stat-card.teal .stat-icon {
+        background: linear-gradient(135deg, var(--primary-teal), var(--accent-blue));
+    }
+    
+    .stat-card.green .stat-icon {
+        background: linear-gradient(135deg, var(--accent-green), #4ADE80);
+    }
+    
+    .stat-card.red .stat-icon {
+        background: linear-gradient(135deg, var(--accent-red), #F87171);
+    }
+    
+    .stat-details {
+        flex: 1;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 900;
+        color: #1e293b;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 0.95rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* ==================== TABLE CONTAINER ==================== */
+    .table-container {
+        background: white;
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+        animation: slideIn 0.8s ease 0.4s backwards;
+    }
+    
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateX(-30px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        padding: 1.75rem 2.5rem;
+        color: white;
+    }
+    
+    .table-header h4 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* ==================== TABLE STYLING ==================== */
+    .department-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .department-table thead {
+        background: linear-gradient(180deg, #F0F9FF 0%, #E0F2FE 100%);
+    }
+    
+    .department-table thead th {
+        padding: 1.25rem 2rem;
+        text-align: left;
+        font-weight: 800;
+        font-size: 0.85rem;
+        color: #1e293b;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 2px solid var(--primary-teal);
+    }
+    
+    .department-table tbody tr {
+        border-bottom: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .department-table tbody tr:hover {
+        background: #f8fafc;
+        transform: scale(1.01);
+    }
+    
+    .department-table tbody tr.inactive {
+        opacity: 0.6;
+        background: #f1f5f9;
+    }
+    
+    .department-table tbody td {
+        padding: 1.5rem 2rem;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+    
+    .department-table tbody td strong {
+        color: #1e293b;
+        font-size: 1.05rem;
+    }
+    
+    /* ==================== STATUS BADGES ==================== */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-badge.active {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        color: #065F46;
+    }
+    
+    .status-badge.inactive {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        color: #991B1B;
+    }
+    
+    .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        animation: blink 2s ease-in-out infinite;
+    }
+    
+    .status-badge.active .status-dot {
+        background: #22C55E;
+    }
+    
+    .status-badge.inactive .status-dot {
+        background: #EF4444;
+    }
+    
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
+    }
+    
+    /* ==================== ACTION BUTTONS ==================== */
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        padding: 0.6rem 1.25rem;
+        border-radius: 10px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-edit {
+        background: linear-gradient(135deg, var(--primary-teal), var(--accent-blue));
+        color: white;
+    }
+    
+    .btn-deactivate {
+        background: linear-gradient(135deg, #F59E0B, #FBBF24);
+        color: white;
+    }
+    
+    .btn-activate {
+        background: linear-gradient(135deg, var(--accent-green), #4ADE80);
+        color: white;
+    }
+    
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
+        text-align: center;
+        padding: 5rem 2rem;
+    }
+    
+    .empty-icon {
+        font-size: 5rem;
+        color: var(--accent-blue);
+        margin-bottom: 2rem;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .empty-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-description {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @media (max-width: 768px) {
+        .department-wrapper {
+            padding: 1rem;
+        }
+        
+        .page-header {
+            padding: 2rem 1.5rem;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .header-content h1 {
+            font-size: 2rem;
+        }
+        
+        .btn-add {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .department-table {
+            min-width: 600px;
+        }
+        
+        .department-table thead th,
+        .department-table tbody td {
+            padding: 1rem;
+        }
+    }
+    
+    /* ==================== CUSTOM MODAL STYLES ==================== */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+        padding: 20px;
+        overflow: auto;
+    }
+    
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 24px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        transform: scale(0.9) translateY(30px);
+        transition: all 0.3s ease;
+        overflow: hidden;
+        margin: auto;
+    }
+    
+    .modal-overlay.active .modal-content {
+        transform: scale(1) translateY(0);
+    }
+    
+    .modal-header {
+        padding: 2rem 2.5rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .modal-header.activate {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 50%, #6EE7B7 100%);
+    }
+    
+    .modal-header.deactivate {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 50%, #FCA5A5 100%);
+    }
+    
+    .modal-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.75rem;
+        font-weight: 900;
+        margin: 0 0 0.5rem 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .modal-header.activate h3 {
+        color: #065F46;
+    }
+    
+    .modal-header.deactivate h3 {
+        color: #991B1B;
+    }
+    
+    .modal-header .icon {
+        font-size: 2rem;
+    }
+    
+    .modal-body {
+        padding: 2rem 2.5rem;
+    }
+    
+    .department-info {
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--primary-teal);
+    }
+    
+    .department-info p {
+        margin: 0.5rem 0;
+        font-size: 0.95rem;
+        color: #475569;
+    }
+    
+    .department-info strong {
+        color: #1e293b;
+        font-weight: 700;
+    }
+    
+    .modal-message {
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .modal-message.warning {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        border-left: 4px solid #F59E0B;
+    }
+    
+    .modal-message.success {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        border-left: 4px solid #22C55E;
+    }
+    
+    .modal-message .icon {
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+    
+    .modal-message.warning .icon {
+        color: #D97706;
+    }
+    
+    .modal-message.success .icon {
+        color: #16A34A;
+    }
+    
+    .modal-message p {
+        margin: 0;
+        color: #1e293b;
+        font-weight: 600;
+        line-height: 1.6;
+    }
+    
+    .modal-footer {
+        display: flex;
+        gap: 1rem;
+        padding: 0 2.5rem 2rem 2.5rem;
+    }
+    
+    .modal-btn {
+        flex: 1;
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 800;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .modal-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-cancel {
+        background: #E2E8F0;
+        color: #475569;
+    }
+    
+    .btn-cancel:hover {
+        background: #CBD5E1;
+    }
+    
+    .btn-confirm-activate {
+        background: linear-gradient(135deg, var(--accent-green), #4ADE80);
+        color: white;
+    }
+    
+    .btn-confirm-deactivate {
+        background: linear-gradient(135deg, var(--accent-red), #F87171);
+        color: white;
+    }
+    
+    /* Body scroll lock */
+    body.modal-open {
+        overflow: hidden !important;
+        position: fixed;
+        width: 100%;
+    }
+    
+    /* ==================== FORM MODAL STYLES ==================== */
+    .form-modal .modal-content {
+        max-width: 600px;
+    }
+    
+    .form-modal .modal-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 50%, var(--accent-blue) 100%);
+        color: white;
+    }
+    
+    .form-modal .modal-header h3 {
+        color: white;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-group label .required {
+        color: var(--accent-red);
+        margin-left: 0.25rem;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1.25rem;
+        border: 2px solid #E2E8F0;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        background: white;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+    
+    .form-error {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        border-left: 4px solid var(--accent-red);
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-error ul {
+        margin: 0;
+        padding-left: 1.25rem;
+        color: #991B1B;
+        font-weight: 600;
+    }
+    
+    .form-error ul li {
+        margin: 0.25rem 0;
+    }
+    
+    .form-success {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        border-left: 4px solid var(--accent-green);
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        color: #065F46;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, var(--primary-teal), var(--accent-blue));
+        color: white;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>Manage Departments</h2>
-    <a href="{% url 'management:department_create' %}" class="btn btn-primary">Add New Department</a>
+<div class="department-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <h1>
+                <span class="header-icon">
+                    <i class="fas fa-building"></i>
+                </span>
+                Manage Departments
+            </h1>
+            <p>Organize and manage all hospital departments</p>
+        </div>
+        <a href="{% url 'management:department_create' %}" class="btn-add" onclick="event.preventDefault(); openDepartmentFormModal('create');">
+            <i class="fas fa-plus-circle"></i>
+            Add New Department
+        </a>
+    </div>
+    
+    <!-- Statistics Cards -->
+    <div class="stats-container">
+        <div class="stat-card teal">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-value">{{ total_count }}</div>
+                <div class="stat-label">Total Departments</div>
+            </div>
+        </div>
+        
+        <div class="stat-card green">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-value">{{ active_count }}</div>
+                <div class="stat-label">Active</div>
+            </div>
+        </div>
+        
+        <div class="stat-card red">
+            <div class="stat-icon">
+                <i class="fas fa-times-circle"></i>
+            </div>
+            <div class="stat-details">
+                <div class="stat-value">{{ inactive_count }}</div>
+                <div class="stat-label">Inactive</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Departments Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <h4><i class="fas fa-list"></i> All Departments</h4>
+        </div>
+        
+        {% if departments %}
+            <table class="department-table">
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-tag"></i> Department Name</th>
+                        <th><i class="fas fa-toggle-on"></i> Status</th>
+                        <th><i class="fas fa-file-alt"></i> Description</th>
+                        <th><i class="fas fa-tools"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for department in departments %}
+                    <tr class="{% if not department.is_active %}inactive{% endif %}">
+                        <td><strong>{{ department.name }}</strong></td>
+                        <td>
+                            {% if department.is_active %}
+                                <span class="status-badge active">
+                                    <span class="status-dot"></span>
+                                    Active
+                                </span>
+                            {% else %}
+                                <span class="status-badge inactive">
+                                    <span class="status-dot"></span>
+                                    Inactive
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td>{{ department.description|default:"No description provided" }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button type="button" 
+                                        class="action-btn btn-edit"
+                                        onclick="openDepartmentFormModal('edit', {{ department.pk }}, '{{ department.name|escapejs }}', '{{ department.description|default:''|escapejs }}')">
+                                    <i class="fas fa-edit"></i>
+                                    Edit
+                                </button>
+                                {% if department.is_active %}
+                                    <button type="button" 
+                                            class="action-btn btn-deactivate"
+                                            onclick="openToggleModal('{% url 'management:department_toggle_active' department.pk %}', '{{ department.name|escapejs }}', true)">
+                                        <i class="fas fa-ban"></i>
+                                        Deactivate
+                                    </button>
+                                {% else %}
+                                    <button type="button" 
+                                            class="action-btn btn-activate"
+                                            onclick="openToggleModal('{% url 'management:department_toggle_active' department.pk %}', '{{ department.name|escapejs }}', false)">
+                                        <i class="fas fa-check"></i>
+                                        Activate
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="empty-title">No Departments Yet</h3>
+                <p class="empty-description">Get started by creating your first department.</p>
+                <button type="button" class="btn-add" onclick="openDepartmentFormModal('create');">
+                    <i class="fas fa-plus-circle"></i>
+                    Create Department
+                </button>
+            </div>
+        {% endif %}
+    </div>
 </div>
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Description</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for department in departments %}
-        <tr class="{% if not department.is_active %}table-secondary text-muted{% endif %}">
-            <td>{{ department.name }}</td>
-            <td>
-                {% if department.is_active %}
-                    <span class="badge bg-success">Active</span>
-                {% else %}
-                    <span class="badge bg-danger">Inactive</span>
-                {% endif %}
-            </td>
-            <td>{{ department.description|default:"N/A" }}</td>
-            <td>
-                <a href="{% url 'management:department_update' department.pk %}" class="btn btn-sm btn-info">Edit</a>
-                {% if department.is_active %}
-                    <a href="{% url 'management:department_toggle_active' department.pk %}" class="btn btn-sm btn-warning">Deactivate</a>
-                {% else %}
-                    <a href="{% url 'management:department_toggle_active' department.pk %}" class="btn btn-sm btn-success">Activate</a>
-                {% endif %}
-            </td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="4" class="text-center">No departments found.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+
+<!-- Department Form Modal -->
+<div id="departmentFormModal" class="modal-overlay form-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>
+                <span class="icon">
+                    <i class="fas fa-building"></i>
+                </span>
+                <span id="formModalTitle">Add New Department</span>
+            </h3>
+        </div>
+        
+        <form id="departmentForm" method="post">
+            <div class="modal-body">
+                {% csrf_token %}
+                <input type="hidden" id="departmentId" name="department_id" value="">
+                
+                <div id="formErrors" class="form-error" style="display: none;">
+                    <ul id="errorList"></ul>
+                </div>
+                
+                <div id="formSuccess" class="form-success" style="display: none;">
+                    <i class="fas fa-check-circle"></i>
+                    <span id="successMessage"></span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_name">
+                        Department Name
+                        <span class="required">*</span>
+                    </label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="id_name" 
+                           name="name" 
+                           required 
+                           maxlength="100"
+                           placeholder="e.g., Cardiology, Emergency, Pediatrics">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_description">
+                        Description
+                    </label>
+                    <textarea class="form-control" 
+                              id="id_description" 
+                              name="description" 
+                              rows="4"
+                              placeholder="Enter a brief description of this department (optional)"></textarea>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="modal-btn btn-cancel" onclick="closeDepartmentFormModal()">
+                    <i class="fas fa-times"></i>
+                    Cancel
+                </button>
+                <button type="submit" class="modal-btn btn-submit">
+                    <i class="fas fa-save"></i>
+                    <span id="submitBtnText">Save Department</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Toggle Activation Modal -->
+<div id="toggleModal" class="modal-overlay">
+    <div class="modal-content">
+        <div id="modalHeader" class="modal-header">
+            <h3>
+                <span class="icon">
+                    <i id="modalIcon" class="fas"></i>
+                </span>
+                <span id="modalTitle"></span>
+            </h3>
+        </div>
+        
+        <div class="modal-body">
+            <div class="department-info">
+                <p><strong>Department:</strong> <span id="deptName"></span></p>
+            </div>
+            
+            <div id="modalMessage" class="modal-message">
+                <span class="icon">
+                    <i id="messageIcon" class="fas"></i>
+                </span>
+                <p id="messageText"></p>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="modal-btn btn-cancel" onclick="closeToggleModal()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <a id="confirmBtn" href="#" class="modal-btn">
+                <i id="confirmIcon" class="fas"></i>
+                <span id="confirmText"></span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== DEPARTMENT FORM MODAL ====================
+    function openDepartmentFormModal(mode, departmentId = null, name = '', description = '') {
+        const modal = document.getElementById('departmentFormModal');
+        const form = document.getElementById('departmentForm');
+        const modalTitle = document.getElementById('formModalTitle');
+        const submitBtnText = document.getElementById('submitBtnText');
+        const departmentIdInput = document.getElementById('departmentId');
+        const nameInput = document.getElementById('id_name');
+        const descriptionInput = document.getElementById('id_description');
+        
+        // Reset form and errors
+        form.reset();
+        hideFormErrors();
+        hideFormSuccess();
+        
+        if (mode === 'create') {
+            modalTitle.textContent = 'Add New Department';
+            submitBtnText.textContent = 'Save Department';
+            departmentIdInput.value = '';
+            form.action = "{% url 'management:department_create' %}";
+        } else if (mode === 'edit') {
+            modalTitle.textContent = 'Update Department';
+            submitBtnText.textContent = 'Update Department';
+            departmentIdInput.value = departmentId;
+            nameInput.value = name;
+            descriptionInput.value = description;
+            form.action = `/management/departments/${departmentId}/update/`;
+        }
+        
+        // Show modal
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+        
+        // Focus on name input
+        setTimeout(() => nameInput.focus(), 300);
+    }
+    
+    function closeDepartmentFormModal() {
+        const modal = document.getElementById('departmentFormModal');
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+    
+    function showFormErrors(errors) {
+        const errorDiv = document.getElementById('formErrors');
+        const errorList = document.getElementById('errorList');
+        
+        errorList.innerHTML = '';
+        
+        if (typeof errors === 'object') {
+            Object.keys(errors).forEach(field => {
+                const fieldErrors = errors[field];
+                if (Array.isArray(fieldErrors)) {
+                    fieldErrors.forEach(error => {
+                        const li = document.createElement('li');
+                        li.textContent = `${field}: ${error}`;
+                        errorList.appendChild(li);
+                    });
+                }
+            });
+        } else {
+            const li = document.createElement('li');
+            li.textContent = errors;
+            errorList.appendChild(li);
+        }
+        
+        errorDiv.style.display = 'block';
+        hideFormSuccess();
+    }
+    
+    function hideFormErrors() {
+        document.getElementById('formErrors').style.display = 'none';
+    }
+    
+    function showFormSuccess(message) {
+        const successDiv = document.getElementById('formSuccess');
+        const successMessage = document.getElementById('successMessage');
+        
+        successMessage.textContent = message;
+        successDiv.style.display = 'flex';
+        hideFormErrors();
+    }
+    
+    function hideFormSuccess() {
+        document.getElementById('formSuccess').style.display = 'none';
+    }
+    
+    // Handle form submission with AJAX
+    document.getElementById('departmentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const form = e.target;
+        const formData = new FormData(form);
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Disable button and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+        
+        fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showFormSuccess(data.message);
+                
+                // Close modal and reload page after 1.5 seconds
+                setTimeout(() => {
+                    closeDepartmentFormModal();
+                    window.location.reload();
+                }, 1500);
+            } else {
+                showFormErrors(data.errors || 'An error occurred. Please try again.');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showFormErrors('An error occurred. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        });
+    });
+    
+    // Close modal when clicking outside
+    document.getElementById('departmentFormModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeDepartmentFormModal();
+        }
+    });
+    
+    // ==================== TOGGLE ACTIVATION MODAL ====================
+    function openToggleModal(url, departmentName, isActive) {
+        const modal = document.getElementById('toggleModal');
+        const modalHeader = document.getElementById('modalHeader');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIcon = document.getElementById('modalIcon');
+        const deptName = document.getElementById('deptName');
+        const modalMessage = document.getElementById('modalMessage');
+        const messageIcon = document.getElementById('messageIcon');
+        const messageText = document.getElementById('messageText');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const confirmIcon = document.getElementById('confirmIcon');
+        const confirmText = document.getElementById('confirmText');
+        
+        // Set department name
+        deptName.textContent = departmentName;
+        
+        if (isActive) {
+            // Deactivate configuration
+            modalHeader.className = 'modal-header deactivate';
+            modalTitle.textContent = 'Deactivate Department';
+            modalIcon.className = 'fas fa-ban';
+            
+            modalMessage.className = 'modal-message warning';
+            messageIcon.className = 'fas fa-exclamation-triangle';
+            messageText.textContent = 'This department will be marked as inactive and will no longer be available for new appointments or assignments.';
+            
+            confirmBtn.className = 'modal-btn btn-confirm-deactivate';
+            confirmIcon.className = 'fas fa-ban';
+            confirmText.textContent = 'Deactivate';
+        } else {
+            // Activate configuration
+            modalHeader.className = 'modal-header activate';
+            modalTitle.textContent = 'Activate Department';
+            modalIcon.className = 'fas fa-check-circle';
+            
+            modalMessage.className = 'modal-message success';
+            messageIcon.className = 'fas fa-check-circle';
+            messageText.textContent = 'This department will be reactivated and become available for appointments and assignments.';
+            
+            confirmBtn.className = 'modal-btn btn-confirm-activate';
+            confirmIcon.className = 'fas fa-check';
+            confirmText.textContent = 'Activate';
+        }
+        
+        // Set the action URL
+        confirmBtn.href = url;
+        
+        // Show modal
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+    }
+    
+    function closeToggleModal(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        
+        const modal = document.getElementById('toggleModal');
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+    }
+    
+    // Close modal when clicking outside
+    document.getElementById('toggleModal').addEventListener('click', function(event) {
+        if (event.target === this) {
+            closeToggleModal(event);
+        }
+    });
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            const formModal = document.getElementById('departmentFormModal');
+            const toggleModal = document.getElementById('toggleModal');
+            
+            if (formModal.classList.contains('active')) {
+                closeDepartmentFormModal();
+            } else if (toggleModal.classList.contains('active')) {
+                closeToggleModal(event);
+            }
+        }
+    });
+</script>
 {% endblock %}
