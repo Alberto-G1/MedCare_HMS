@@ -487,6 +487,190 @@
             overflow-x: auto;
         }
     }
+    
+    /* ==================== CUSTOM MODAL ==================== */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(8px);
+        z-index: 999999;
+        animation: fadeIn 0.3s ease;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+        padding: 20px;
+    }
+    
+    .modal-overlay.active {
+        display: flex !important;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
+        animation: modalSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        overflow: hidden;
+        position: relative;
+        margin: auto;
+        z-index: 1000000;
+    }
+    
+    @keyframes modalSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(100px) scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .modal-header {
+        padding: 2rem 2rem 1rem 2rem;
+        text-align: center;
+    }
+    
+    .modal-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s backwards;
+    }
+    
+    @keyframes scaleIn {
+        from {
+            transform: scale(0);
+            opacity: 0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    .modal-icon.deactivate {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        color: #DC2626;
+    }
+    
+    .modal-icon.activate {
+        background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+        color: #059669;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 0.75rem;
+    }
+    
+    .modal-body {
+        padding: 0 2rem 2rem 2rem;
+        text-align: center;
+    }
+    
+    .modal-body p {
+        color: #64748b;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+    
+    .modal-staff-info {
+        background: #f8fafc;
+        border-radius: 16px;
+        padding: 1.25rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid var(--primary-teal);
+    }
+    
+    .modal-staff-info .staff-name {
+        font-weight: 700;
+        color: #0E7490;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modal-staff-info .staff-role {
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    .modal-footer {
+        padding: 0 2rem 2rem 2rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+    
+    .modal-btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 140px;
+        justify-content: center;
+    }
+    
+    .modal-btn-cancel {
+        background: #f1f5f9;
+        color: #64748b;
+    }
+    
+    .modal-btn-cancel:hover {
+        background: #e2e8f0;
+        transform: translateY(-2px);
+    }
+    
+    .modal-btn-confirm {
+        background: linear-gradient(135deg, #EF4444, #DC2626);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    .modal-btn-confirm.activate {
+        background: linear-gradient(135deg, #22C55E, #16A34A);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+    
+    .modal-btn-confirm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+    
+    .modal-btn-confirm.activate:hover {
+        box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    }
+    
+    /* Prevent body scroll when modal open */
+    body.modal-open {
+        overflow: hidden !important;
+        position: fixed;
+        width: 100%;
+    }
 </style>
 {% endblock %}
 
@@ -650,12 +834,12 @@
                             <a href="{% url 'accounts:staff_update' profile.user.pk %}" class="action-btn btn-edit" title="Edit Staff">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="{% url 'accounts:toggle_staff_status' profile.user.pk %}" 
-                               class="action-btn btn-toggle {% if not profile.user.is_active %}activate{% endif %}" 
-                               title="{% if profile.user.is_active %}Deactivate{% else %}Activate{% endif %} Staff"
-                               onclick="return confirm('{% if profile.user.is_active %}Deactivate{% else %}Activate{% endif %} this staff member?')">
+                            <button type="button"
+                                    class="action-btn btn-toggle {% if not profile.user.is_active %}activate{% endif %}" 
+                                    title="{% if profile.user.is_active %}Deactivate{% else %}Activate{% endif %} Staff"
+                                    onclick="openToggleModal('{% url 'accounts:toggle_staff_status' profile.user.pk %}', '{{ profile.user.get_full_name|default:profile.user.username }}', '{{ profile.get_role_display }}', {{ profile.user.is_active|lower }})">
                                 <i class="fas fa-{% if profile.user.is_active %}ban{% else %}check{% endif %}"></i>
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     {% endfor %}
@@ -673,4 +857,103 @@
         </div>
     </div>
 </div>
+
+<!-- Custom Confirmation Modal -->
+<div class="modal-overlay" id="toggleModal" onclick="closeToggleModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div class="modal-icon" id="modalIcon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 id="modalTitle">Confirm Action</h3>
+        </div>
+        <div class="modal-body">
+            <p id="modalMessage">Are you sure you want to proceed?</p>
+            <div class="modal-staff-info">
+                <div class="staff-name" id="modalStaffName">Staff Name</div>
+                <div class="staff-role" id="modalStaffRole">Role</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeToggleModal()">
+                <i class="fas fa-times"></i>
+                Cancel
+            </button>
+            <button type="button" class="modal-btn modal-btn-confirm" id="modalConfirmBtn" onclick="confirmToggle()">
+                <i class="fas fa-check"></i>
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let toggleUrl = '';
+
+function openToggleModal(url, staffName, staffRole, isActive) {
+    toggleUrl = url;
+    const modal = document.getElementById('toggleModal');
+    const modalIcon = document.getElementById('modalIcon');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMessage = document.getElementById('modalMessage');
+    const confirmBtn = document.getElementById('modalConfirmBtn');
+    const iconElement = modalIcon.querySelector('i');
+    
+    document.getElementById('modalStaffName').textContent = staffName;
+    document.getElementById('modalStaffRole').textContent = staffRole;
+    
+    if (isActive) {
+        // Deactivate action
+        modalIcon.classList.remove('activate');
+        modalIcon.classList.add('deactivate');
+        confirmBtn.classList.remove('activate');
+        
+        iconElement.className = 'fas fa-user-slash';
+        modalTitle.textContent = 'Deactivate Staff Member';
+        modalMessage.textContent = 'This staff member will lose access to the system. You can reactivate them later.';
+        confirmBtn.innerHTML = '<i class="fas fa-ban"></i> Deactivate';
+    } else {
+        // Activate action
+        modalIcon.classList.remove('deactivate');
+        modalIcon.classList.add('activate');
+        confirmBtn.classList.add('activate');
+        
+        iconElement.className = 'fas fa-user-check';
+        modalTitle.textContent = 'Activate Staff Member';
+        modalMessage.textContent = 'This staff member will regain access to the system and can resume their duties.';
+        confirmBtn.innerHTML = '<i class="fas fa-check"></i> Activate';
+    }
+    
+    modal.classList.add('active');
+    document.body.classList.add('modal-open');
+}
+
+function closeToggleModal(event) {
+    // Close only if clicking overlay or cancel button
+    if (!event || event.target.id === 'toggleModal') {
+        const modal = document.getElementById('toggleModal');
+        modal.classList.remove('active');
+        document.body.classList.remove('modal-open');
+        toggleUrl = '';
+    }
+}
+
+function confirmToggle() {
+    if (toggleUrl) {
+        window.location.href = toggleUrl;
+    }
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        const modal = document.getElementById('toggleModal');
+        if (modal && modal.classList.contains('active')) {
+            closeToggleModal();
+        }
+    }
+});
+</script>
 {% endblock %}
