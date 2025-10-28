@@ -955,11 +955,11 @@
         </div>
         
         <div class="modal-footer">
-            <button type="button" class="modal-btn btn-cancel" onclick="closeToggleModal()">
+            <button type="button" class="modal-btn btn-cancel" onclick="closeToggleModal(event)">
                 <i class="fas fa-times"></i>
                 Cancel
             </button>
-            <a id="confirmBtn" href="#" class="modal-btn">
+            <a id="confirmBtn" href="#" class="modal-btn" onclick="event.preventDefault();">
                 <i id="confirmIcon" class="fas"></i>
                 <span id="confirmText"></span>
             </a>
@@ -1151,8 +1151,19 @@
             confirmText.textContent = 'Activate';
         }
         
-        // Set the action URL
+        // Set the action URL and add click handler
         confirmBtn.href = url;
+        
+        // Remove any existing click handlers
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        // Add new click handler
+        newConfirmBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Navigate to the URL to perform the action
+            window.location.href = url;
+        });
         
         // Show modal
         modal.classList.add('active');

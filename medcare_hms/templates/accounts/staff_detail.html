@@ -1042,11 +1042,11 @@
         </div>
         
         <div class="modal-footer">
-            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeToggleModal()">
+            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeToggleModal(event)">
                 <i class="fas fa-times"></i>
                 Cancel
             </button>
-            <a id="modalConfirmBtn" href="#" class="modal-btn modal-btn-confirm">
+            <a id="modalConfirmBtn" href="#" class="modal-btn modal-btn-confirm" onclick="event.preventDefault();">
                 <i class="fas fa-check"></i>
                 <span id="modalConfirmText">Confirm</span>
             </a>
@@ -1100,8 +1100,19 @@ function openToggleModal(url, staffName, staffRole, isActivating) {
     modalStaffName.textContent = staffName;
     modalStaffRole.innerHTML = '<i class="fas fa-user-tag"></i><span>' + staffRole + '</span>';
     
-    // Set confirm button URL
+    // Set confirm button URL and add click handler
     modalConfirmBtn.href = modalTargetUrl;
+    
+    // Remove any existing click handlers
+    const newConfirmBtn = modalConfirmBtn.cloneNode(true);
+    modalConfirmBtn.parentNode.replaceChild(newConfirmBtn, modalConfirmBtn);
+    
+    // Add new click handler
+    newConfirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Navigate to the URL to perform the action
+        window.location.href = modalTargetUrl;
+    });
     
     // Show modal
     modal.classList.add('active');

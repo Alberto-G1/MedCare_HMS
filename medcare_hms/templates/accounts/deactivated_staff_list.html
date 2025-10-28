@@ -580,11 +580,11 @@
         </div>
         
         <div class="modal-footer">
-            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeReactivateModal()">
+            <button type="button" class="modal-btn modal-btn-cancel" onclick="closeReactivateModal(event)">
                 <i class="fas fa-times"></i>
                 Cancel
             </button>
-            <a id="modalConfirmBtn" href="#" class="modal-btn modal-btn-confirm">
+            <a id="modalConfirmBtn" href="#" class="modal-btn modal-btn-confirm" onclick="event.preventDefault();">
                 <i class="fas fa-undo"></i>
                 Yes, Reactivate
             </a>
@@ -606,8 +606,19 @@ function openReactivateModal(url, staffName, staffRole) {
     modalStaffName.textContent = staffName;
     modalStaffRole.textContent = staffRole;
     
-    // Set confirm button URL
+    // Set confirm button URL and add click handler
     modalConfirmBtn.href = modalTargetUrl;
+    
+    // Remove any existing click handlers
+    const newConfirmBtn = modalConfirmBtn.cloneNode(true);
+    modalConfirmBtn.parentNode.replaceChild(newConfirmBtn, modalConfirmBtn);
+    
+    // Add new click handler
+    newConfirmBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Navigate to the URL to perform the action
+        window.location.href = modalTargetUrl;
+    });
     
     // Show modal
     modal.classList.add('active');

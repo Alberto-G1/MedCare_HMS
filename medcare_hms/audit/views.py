@@ -66,7 +66,7 @@ def audit_feed(request):
     if export == 'csv':
         # Hard cap to prevent memory blow-up; could allow a higher cap or stream
         max_rows = 5000
-        rows = q[:max_rows]
+        rows = list(q[:max_rows])  # Convert to list to get count and iterate
         response = HttpResponse(content_type='text/csv')
         filename_parts = ["audit"]
         if start_date_str:
@@ -82,13 +82,15 @@ def audit_feed(request):
                 log.created_at.isoformat(),
                 log.action,
                 log.actor.username if log.actor else '',
-                log.target_model,
-                log.target_id,
-                log.summary,
-                log.correlation_id,
+                log.target_model or '',
+                log.target_id or '',
+                log.summary or '',
+                log.correlation_id or '',
             ])
-        if q.count() > max_rows:
-            writer.writerow([f"TRUNCATED to {max_rows} rows"])
+        # Check if there are more rows than the limit
+        total_count = q.count()
+        if total_count > max_rows:
+            writer.writerow([f"TRUNCATED: Showing {max_rows} of {total_count} total rows"])
         return response
     try:
         page_size = int(request.GET.get('page_size', 50))
@@ -98,11 +100,11 @@ def audit_feed(request):
         page_size = 25
     paginator = Paginator(q, page_size)
     page_obj = paginator.get_page(request.GET.get('page'))
-    actions = SystemLog.objects.values_list('action', flat=True).distinct()
+    actions = SystemLog.objects.values_list('action', flat=True).distinct().order_by('action')
     context = {
         'page_obj': page_obj,
         'actions': actions,
-        'selected_action': action,
+        'selected_action': action or '',
         'selected_correlation_id': correlation_id or '',
         'page_size': page_size,
         'start_date': start_date_str or '',
