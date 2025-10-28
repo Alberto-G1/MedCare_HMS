@@ -795,9 +795,18 @@
                 <span class="menu-icon"><i class="fas fa-bed"></i></span>
                 <span class="menu-text">Rooms</span>
             </a>
-            <a href="{% url 'patients:doctor_list' %}" class="menu-link" data-tooltip="Doctors">
+        </div>
+
+        <!-- Staff Directory Section -->
+        <div class="nav-section">
+            <div class="nav-section-title">Staff Directory</div>
+            <a href="{% url 'management:doctor_list' %}" class="menu-link" data-tooltip="Doctors">
                 <span class="menu-icon"><i class="fas fa-user-md"></i></span>
                 <span class="menu-text">Doctors</span>
+            </a>
+            <a href="{% url 'management:receptionist_list' %}" class="menu-link" data-tooltip="Receptionists">
+                <span class="menu-icon"><i class="fas fa-user-tie"></i></span>
+                <span class="menu-text">Receptionists</span>
             </a>
         </div>
 

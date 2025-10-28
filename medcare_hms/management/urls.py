@@ -13,4 +13,8 @@ urlpatterns = [
     path('rooms/add/', views.RoomCreateView.as_view(), name='room_create'),
     path('rooms/<int:pk>/update/', views.RoomUpdateView.as_view(), name='room_update'),
     path('rooms/<int:pk>/toggle/', views.room_toggle_active, name='room_toggle_active'),
+    
+    # Staff URLs
+    path('doctors/', views.DoctorListView.as_view(), name='doctor_list'),
+    path('receptionists/', views.ReceptionistListView.as_view(), name='receptionist_list'),
 ]

@@ -8,6 +8,9 @@ from django.utils.decorators import method_decorator
 from accounts.decorators import admin_required
 from .models import Department, Room
 from django.http import JsonResponse
+from doctors.models import DoctorProfile
+from receptionist.models import ReceptionistProfile
+from django.db.models import Q
 
 @method_decorator(admin_required, name='dispatch')
 class DepartmentListView(ListView):
@@ -229,3 +232,90 @@ def room_toggle_active(request, pk):
         messages.info(request, f"Room '{room.room_number}' has been deactivated.")
         
     return redirect('management:room_list')
+
+
+# ==================== STAFF MANAGEMENT VIEWS ====================
+
+@method_decorator(admin_required, name='dispatch')
+class DoctorListView(ListView):
+    model = DoctorProfile
+    template_name = 'management/doctor_list.html'
+    context_object_name = 'doctors'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = DoctorProfile.objects.select_related('user', 'department').all()
+        
+        # Search functionality
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query) |
+                Q(specialization__icontains=search_query) |
+                Q(license_number__icontains=search_query)
+            )
+        
+        # Department filter
+        department_id = self.request.GET.get('department', '')
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+        
+        # Specialization filter
+        specialization = self.request.GET.get('specialization', '')
+        if specialization:
+            queryset = queryset.filter(specialization__icontains=specialization)
+        
+        return queryset.order_by('user__first_name', 'user__last_name')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_doctors'] = DoctorProfile.objects.count()
+        context['departments'] = Department.objects.filter(is_active=True).order_by('name')
+        context['specializations'] = DoctorProfile.objects.values_list('specialization', flat=True).distinct().order_by('specialization')
+        context['search_query'] = self.request.GET.get('search', '')
+        context['selected_department'] = self.request.GET.get('department', '')
+        context['selected_specialization'] = self.request.GET.get('specialization', '')
+        return context
+
+
+@method_decorator(admin_required, name='dispatch')
+class ReceptionistListView(ListView):
+    model = ReceptionistProfile
+    template_name = 'management/receptionist_list.html'
+    context_object_name = 'receptionists'
+    paginate_by = 12
+    
+    def get_queryset(self):
+        queryset = ReceptionistProfile.objects.select_related('user', 'department').all()
+        
+        # Search functionality
+        search_query = self.request.GET.get('search', '')
+        if search_query:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search_query) |
+                Q(user__last_name__icontains=search_query) |
+                Q(user__username__icontains=search_query)
+            )
+        
+        # Department filter
+        department_id = self.request.GET.get('department', '')
+        if department_id:
+            queryset = queryset.filter(department_id=department_id)
+        
+        # Shift filter
+        shift = self.request.GET.get('shift', '')
+        if shift:
+            queryset = queryset.filter(shift=shift)
+        
+        return queryset.order_by('user__first_name', 'user__last_name')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['total_receptionists'] = ReceptionistProfile.objects.count()
+        context['departments'] = Department.objects.filter(is_active=True).order_by('name')
+        context['shifts'] = ReceptionistProfile.SHIFT_CHOICES
+        context['search_query'] = self.request.GET.get('search', '')
+        context['selected_department'] = self.request.GET.get('department', '')
+        context['selected_shift'] = self.request.GET.get('shift', '')
+        return context
