@@ -1,0 +1,883 @@
+{% extends 'base_receptionist.html' %}
+{% load static %}
+
+{% block title %}Receptionist Dashboard - MedCare HMS{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ==================== ULTRA-MODERN RECEPTIONIST DASHBOARD ==================== */
+    
+    /* Dashboard Header */
+    .dashboard-header {
+        background: linear-gradient(135deg, var(--receptionist-primary) 0%, var(--receptionist-secondary) 100%);
+        border-radius: 28px;
+        padding: 3rem;
+        margin-bottom: 2.5rem;
+        color: white;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.25);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: float 8s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-20px, 20px) rotate(180deg); }
+    }
+    
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        letter-spacing: -1px;
+    }
+    
+    .dashboard-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+    
+    .header-badge {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        padding: 0.7rem 1.3rem;
+        border-radius: 16px;
+        font-weight: 600;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        color: white;
+    }
+    
+    .header-badge:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    /* Clean Stat Cards (No Buttons) */
+    .stat-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--card-color), var(--card-color-light));
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-card.teal {
+        --card-color: #0E7490;
+        --card-color-light: #14B8A6;
+    }
+    
+    .stat-card.cyan {
+        --card-color: #14B8A6;
+        --card-color-light: #22C55E;
+    }
+    
+    .stat-card.green {
+        --card-color: #22C55E;
+        --card-color-light: #10B981;
+    }
+    
+    .stat-card.orange {
+        --card-color: #F59E0B;
+        --card-color-light: #F97316;
+    }
+    
+    .stat-card-icon {
+        width: 70px;
+        height: 70px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        margin-bottom: 1.5rem;
+        animation: float 4s ease-in-out infinite;
+    }
+    
+    .stat-value {
+        font-size: 3rem;
+        font-weight: 800;
+        color: var(--card-color);
+        line-height: 1;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.5rem;
+    }
+    
+    .stat-description {
+        font-size: 0.9rem;
+        color: #64748b;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    /* Quick Navigation Cards */
+    .nav-card {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        gap: 1.2rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    .nav-card:hover {
+        transform: translateX(8px);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+        color: inherit;
+    }
+    
+    .nav-card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .nav-card-content h5 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+    }
+    
+    .nav-card-content p {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+    }
+    
+    .nav-card-arrow {
+        margin-left: auto;
+        color: #cbd5e1;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-card:hover .nav-card-arrow {
+        color: var(--receptionist-primary);
+        transform: translateX(5px);
+    }
+    
+    /* Activity Card */
+    .activity-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .activity-card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #f1f5f9;
+    }
+    
+    .activity-card-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:last-child {
+        border-bottom: none;
+    }
+    
+    .activity-item:hover {
+        background: #f8fafc;
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        border-radius: 12px;
+    }
+    
+    .activity-icon {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+    }
+    
+    .activity-description {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    .activity-time {
+        font-size: 0.85rem;
+        color: #94a3b8;
+        white-space: nowrap;
+    }
+    
+    /* Pending Approvals Card */
+    .pending-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .pending-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: #f8fafc;
+        border-radius: 16px;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .pending-item:hover {
+        background: #f1f5f9;
+        transform: translateX(4px);
+    }
+    
+    .pending-info {
+        flex: 1;
+    }
+    
+    .pending-patient {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 0.3rem;
+    }
+    
+    .pending-details {
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    .pending-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+    
+    .btn-action.approve {
+        background: rgba(34, 197, 94, 0.1);
+        color: #16a34a;
+    }
+    
+    .btn-action.approve:hover {
+        background: #16a34a;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    .btn-action.reject {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+    
+    .btn-action.reject:hover {
+        background: #dc2626;
+        color: white;
+        transform: scale(1.1);
+    }
+    
+    /* Section Headers */
+    .section-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+    }
+    
+    .section-title i {
+        color: var(--receptionist-primary);
+    }
+    
+    /* Appointments Table */
+    .appointments-table {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    
+    .table-modern {
+        margin-bottom: 0;
+    }
+    
+    .table-modern thead th {
+        background: #f8fafc;
+        color: #475569;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+        padding: 1rem;
+    }
+    
+    .table-modern tbody td {
+        padding: 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .table-modern tbody tr:last-child td {
+        border-bottom: none;
+    }
+    
+    .table-modern tbody tr:hover {
+        background: #f8fafc;
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.4rem 0.9rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    .status-badge.pending {
+        background: rgba(245, 158, 11, 0.1);
+        color: #d97706;
+    }
+    
+    .status-badge.approved {
+        background: rgba(34, 197, 94, 0.1);
+        color: #16a34a;
+    }
+    
+    .status-badge.completed {
+        background: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+    }
+    
+    .status-badge.cancelled {
+        background: rgba(239, 68, 68, 0.1);
+        color: #dc2626;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    
+    .empty-state-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: #94a3b8;
+    }
+    
+    .empty-state h5 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #94a3b8;
+    }
+    
+    /* Animation Classes */
+    .animate-in {
+        animation: slideInUp 0.6s ease-out forwards;
+        opacity: 0;
+    }
+    
+    .animate-in:nth-child(1) { animation-delay: 0.1s; }
+    .animate-in:nth-child(2) { animation-delay: 0.2s; }
+    .animate-in:nth-child(3) { animation-delay: 0.3s; }
+    .animate-in:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .dashboard-title {
+            font-size: 1.8rem;
+        }
+        
+        .stat-value {
+            font-size: 2.2rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="dashboard-header animate-in">
+        <div class="header-content">
+            <div class="row align-items-center">
+                <div class="col-md-7">
+                    <h1 class="dashboard-title">
+                        <i class="fas fa-hospital-user"></i>
+                        Reception Dashboard
+                    </h1>
+                    <p class="dashboard-subtitle">
+                        Welcome back, <strong>{{ user.first_name|default:user.username }}</strong>! Manage your workflow efficiently.
+                    </p>
+                </div>
+                <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                    <div class="d-flex align-items-center justify-content-md-end flex-wrap gap-2">
+                        <span class="header-badge">
+                            <i class="fas fa-clock"></i>
+                            <span id="current-time">{{ current_time|date:"h:i A" }}</span>
+                        </span>
+                        <span class="header-badge">
+                            <i class="fas fa-calendar"></i>
+                            <span id="current-date">{{ current_time|date:"F j, Y" }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-3 animate-in">
+            <div class="stat-card teal">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #0E7490, #0C4A6E);">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+                <div class="stat-value">{{ todays_appointments_count }}</div>
+                <div class="stat-label">Today's Appointments</div>
+                <div class="stat-description">
+                    <i class="fas fa-info-circle"></i>
+                    Scheduled for today
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3 animate-in">
+            <div class="stat-card cyan">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #14B8A6, #0D9488);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-value">{{ total_patients_count }}</div>
+                <div class="stat-label">Total Patients</div>
+                <div class="stat-description">
+                    <i class="fas fa-user-plus"></i>
+                    {{ new_patients_count }} new today
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3 animate-in">
+            <div class="stat-card green">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #22C55E, #166534);">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="stat-value">{{ available_doctors_count }}</div>
+                <div class="stat-label">Available Doctors</div>
+                <div class="stat-description">
+                    <i class="fas fa-check-circle"></i>
+                    Ready for consultations
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-3 animate-in">
+            <div class="stat-card orange">
+                <div class="stat-card-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="stat-value">${% if total_revenue %}{{ total_revenue|floatformat:0 }}{% else %}0{% endif %}</div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-description">
+                    <i class="fas fa-chart-line"></i>
+                    All-time collection
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation -->
+    <div class="section-header">
+        <h2 class="section-title">
+            <i class="fas fa-rocket"></i>
+            Quick Actions
+        </h2>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3 animate-in">
+            <a href="{% url 'receptionist:add_patient' %}" class="nav-card">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #14B8A6, #0D9488);">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="nav-card-content">
+                    <h5>Register New Patient</h5>
+                    <p>Add a new patient to the system</p>
+                </div>
+                <i class="fas fa-arrow-right nav-card-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 mb-3 animate-in">
+            <a href="{% url 'receptionist:book_appointment' %}" class="nav-card">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #0E7490, #0C4A6E);">
+                    <i class="fas fa-calendar-plus"></i>
+                </div>
+                <div class="nav-card-content">
+                    <h5>Book Appointment</h5>
+                    <p>Schedule a new appointment</p>
+                </div>
+                <i class="fas fa-arrow-right nav-card-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 mb-3 animate-in">
+            <a href="{% url 'receptionist:patient_list' %}" class="nav-card">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #22C55E, #166534);">
+                    <i class="fas fa-search"></i>
+                </div>
+                <div class="nav-card-content">
+                    <h5>Find Patient</h5>
+                    <p>Search patient records</p>
+                </div>
+                <i class="fas fa-arrow-right nav-card-arrow"></i>
+            </a>
+        </div>
+
+        <div class="col-md-6 mb-3 animate-in">
+            <a href="{% url 'billing:bill_list' %}" class="nav-card">
+                <div class="nav-card-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </div>
+                <div class="nav-card-content">
+                    <h5>Billing & Payments</h5>
+                    <p>Manage bills and payments</p>
+                </div>
+                <i class="fas fa-arrow-right nav-card-arrow"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Pending Approvals -->
+        <div class="col-lg-5 mb-4 animate-in">
+            <div class="pending-card">
+                <div class="activity-card-header">
+                    <h3 class="activity-card-title">
+                        <i class="fas fa-clock"></i>
+                        Pending Approvals
+                    </h3>
+                </div>
+                
+                {% if pending_appointments %}
+                    {% for appointment in pending_appointments %}
+                    <div class="pending-item">
+                        <div class="pending-info">
+                            <div class="pending-patient">{{ appointment.patient.user.get_full_name }}</div>
+                            <div class="pending-details">
+                                <i class="fas fa-calendar me-1"></i>{{ appointment.appointment_date|date:"M d, Y" }}
+                                <span class="mx-2">•</span>
+                                <i class="fas fa-clock me-1"></i>{{ appointment.appointment_time }}
+                            </div>
+                        </div>
+                        <div class="pending-actions">
+                            <a href="{% url 'receptionist:update_appointment_status' appointment.id 'Approved' %}" class="btn-action approve" title="Approve">
+                                <i class="fas fa-check"></i>
+                            </a>
+                            <form method="post" action="{% url 'receptionist:cancel_appointment' appointment.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-action reject" title="Reject">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h5>All Clear!</h5>
+                        <p>No pending appointments</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-7 mb-4 animate-in">
+            <div class="activity-card">
+                <div class="activity-card-header">
+                    <h3 class="activity-card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Today's Activity
+                    </h3>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: linear-gradient(135deg, #14B8A6, #0D9488);">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">New Patient Registrations</div>
+                        <div class="activity-description">{{ new_patients_count }} patient{{ new_patients_count|pluralize }} registered today</div>
+                    </div>
+                    <div class="activity-time">Today</div>
+                </div>
+
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: linear-gradient(135deg, #0E7490, #0C4A6E);">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Appointments Scheduled</div>
+                        <div class="activity-description">{{ todays_appointments_count }} appointment{{ todays_appointments_count|pluralize }} for today</div>
+                    </div>
+                    <div class="activity-time">Today</div>
+                </div>
+
+                {% if pending_appointments_count > 0 %}
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
+                        <i class="fas fa-hourglass-half"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Pending Approvals</div>
+                        <div class="activity-description">{{ pending_appointments_count }} appointment{{ pending_appointments_count|pluralize }} awaiting approval</div>
+                    </div>
+                    <div class="activity-time">Pending</div>
+                </div>
+                {% endif %}
+
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: linear-gradient(135deg, #22C55E, #166534);">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">Doctors Available</div>
+                        <div class="activity-description">{{ available_doctors_count }} doctor{{ available_doctors_count|pluralize }} available for consultation</div>
+                    </div>
+                    <div class="activity-time">Now</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Appointments Table -->
+    <div class="appointments-table animate-in">
+        <div class="activity-card-header">
+            <h3 class="activity-card-title">
+                <i class="fas fa-list-alt"></i>
+                Today's Appointments
+            </h3>
+        </div>
+
+        {% if todays_appointments %}
+        <div class="table-responsive">
+            <table class="table table-modern">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Time</th>
+                        <th>Department</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in todays_appointments %}
+                    <tr>
+                        <td>
+                            <strong>{{ appointment.patient.user.get_full_name }}</strong>
+                        </td>
+                        <td>{{ appointment.doctor.user.get_full_name }}</td>
+                        <td>
+                            <i class="fas fa-clock text-muted me-2"></i>
+                            {{ appointment.appointment_time }}
+                        </td>
+                        <td>{{ appointment.doctor.department.name }}</td>
+                        <td>
+                            {% if appointment.status == 'Pending' %}
+                                <span class="status-badge pending">
+                                    <i class="fas fa-hourglass-half"></i>Pending
+                                </span>
+                            {% elif appointment.status == 'Approved' %}
+                                <span class="status-badge approved">
+                                    <i class="fas fa-check"></i>Approved
+                                </span>
+                            {% elif appointment.status == 'Completed' %}
+                                <span class="status-badge completed">
+                                    <i class="fas fa-check-double"></i>Completed
+                                </span>
+                            {% else %}
+                                <span class="status-badge cancelled">
+                                    <i class="fas fa-times"></i>Cancelled
+                                </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fas fa-calendar-times"></i>
+            </div>
+            <h5>No Appointments Today</h5>
+            <p>There are no appointments scheduled for today</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Real-time clock update
+    function updateDateTime() {
+        const now = new Date();
+        const timeEl = document.getElementById('current-time');
+        const dateEl = document.getElementById('current-date');
+        
+        if (timeEl) {
+            timeEl.textContent = now.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit', 
+                hour12: true 
+            });
+        }
+        
+        if (dateEl) {
+            dateEl.textContent = now.toLocaleDateString('en-US', { 
+                month: 'long', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+    }
+    
+    // Update time every second
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
+{% endblock %}

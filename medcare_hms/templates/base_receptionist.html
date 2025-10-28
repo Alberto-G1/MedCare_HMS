@@ -34,12 +34,17 @@
             --background-white: #FFFFFF;
             --text-dark: #1E293B;
             --text-light: #64748B;
-            --sidebar-width: 280px;
+            --sidebar-width: 340px;
             --sidebar-collapsed: 75px;
-            --header-height: 85px;
+            --header-height: 110px;
             --shadow-light: rgba(15, 23, 42, 0.08);
             --shadow-medium: rgba(15, 23, 42, 0.15);
             --shadow-strong: rgba(15, 23, 42, 0.25);
+            
+            /* Receptionist Dashboard Variables */
+            --receptionist-primary: #0E7490;
+            --receptionist-secondary: #0284C7;
+            --receptionist-accent: #14B8A6;
         }
 
         * {
@@ -56,8 +61,24 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
+        
+        /* Page Content Animations (Not Sidebar) */
+        .main-content {
+            animation: contentFadeIn 0.5s ease-out;
+        }
+        
+        @keyframes contentFadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
 
-        /* Professional Sidebar */
+        /* Professional Sidebar - No Scrolling */
         .sidebar {
             width: var(--sidebar-width);
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
@@ -71,6 +92,8 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 1000;
             box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
@@ -86,6 +109,26 @@
         }
 
         .sidebar::-webkit-scrollbar-thumb {
+            background: var(--accent-green);
+            border-radius: 2px;
+        }
+        
+        /* Sidebar Content Wrapper */
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .sidebar-content::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .sidebar-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-content::-webkit-scrollbar-thumb {
             background: var(--accent-green);
             border-radius: 2px;
         }
@@ -118,6 +161,93 @@
             opacity: 0;
             width: 0;
             overflow: hidden;
+        }
+        
+        /* Sidebar User Profile Section */
+        .sidebar-user-profile {
+            padding: 1.5rem 1.25rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-user-profile:hover {
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        .sidebar-user-avatar {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.6);
+            background: var(--primary-teal);
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-user-profile:hover .sidebar-user-avatar {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .sidebar-user-info {
+            flex: 1;
+            min-width: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-user-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .sidebar-user-email {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .sidebar-user-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.3rem 0.7rem;
+            background: linear-gradient(135deg, var(--accent-green), #10B981);
+            color: white;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+        
+        .sidebar.collapsed .sidebar-user-profile {
+            flex-direction: column;
+            padding: 1rem 0.5rem;
+            gap: 0.5rem;
+        }
+        
+        .sidebar.collapsed .sidebar-user-info {
+            display: none;
+        }
+        
+        .sidebar.collapsed .sidebar-user-avatar {
+            width: 50px;
+            height: 50px;
         }
 
         .nav-section {
@@ -383,15 +513,21 @@
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.7);
             background: var(--primary-teal);
             /* Fallback background color if image fails to load */
             transition: all 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .user-toggle:hover .user-avatar {
+            transform: scale(1.08);
+            border-color: white;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
         }
 
         .user-toggle:hover .user-avatar {
@@ -664,6 +800,8 @@
                 padding: 0.75rem 0.85rem;
             }
         }
+        
+        {% block extra_css %}{% endblock %}
     </style>
 </head>
 <body class="receptionist-theme">
@@ -675,6 +813,22 @@
         <div class="sidebar-brand">
             <img src="{% static 'images/logo.png' %}" alt="MedCare Logo">
             <span class="brand-text">MedCare HMS</span>
+        </div>
+        
+        <!-- User Profile Section -->
+        <div class="sidebar-user-profile">
+            <img src="{% if request.user.receptionistprofile.profile_picture %}{{ request.user.receptionistprofile.profile_picture.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                 alt="{{ request.user.get_full_name }}" 
+                 class="sidebar-user-avatar"
+                 onerror="this.src='{% static 'images/default.jpeg' %}'">
+            <div class="sidebar-user-info">
+                <div class="sidebar-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+                <div class="sidebar-user-email">{{ request.user.email }}</div>
+                <span class="sidebar-user-role">
+                    <i class="fas fa-user-tie"></i>
+                    Receptionist
+                </span>
+            </div>
         </div>
 
         <!-- Dashboard Section -->
@@ -1017,6 +1171,36 @@
 
         // Initialize profile image fallbacks
         setupProfileImageFallback();
+        
+        // Content Area Animations Only (Not Sidebar)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add animation class only to main content
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.style.opacity = '0';
+                mainContent.style.transform = 'translateX(20px)';
+                
+                setTimeout(() => {
+                    mainContent.style.transition = 'all 0.5s ease-out';
+                    mainContent.style.opacity = '1';
+                    mainContent.style.transform = 'translateX(0)';
+                }, 100);
+            }
+            
+            // Smooth scroll behavior for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

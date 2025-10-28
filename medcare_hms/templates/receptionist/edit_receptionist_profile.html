@@ -1,18 +1,695 @@
 {% extends 'base_receptionist.html' %}
+{% load static %}
 
 {% block title %}Edit My Profile{% endblock %}
+
+{% block extra_css %}
+    /* ==================== ULTRA-MODERN EDIT FORM WITH 3D EFFECTS ==================== */
+    
+    /* Animated gradient header with particle effects */
+    .edit-profile-header {
+        background: linear-gradient(135deg, 
+            #0E7490 0%, 
+            #0284C7 50%,
+            #0E7490 100%
+        );
+        background-size: 200% 200%;
+        animation: headerPulse 15s ease infinite;
+        border-radius: 30px;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 25px 70px rgba(14, 116, 144, 0.4),
+            0 15px 35px rgba(0, 0, 0, 0.15),
+            inset 0 2px 0 rgba(255, 255, 255, 0.3);
+    }
+    
+    .edit-profile-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.08) 2px,
+            rgba(255, 255, 255, 0.08) 4px
+        );
+        animation: scanlines 20s linear infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .edit-profile-header::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(34, 197, 94, 0.2) 0%, transparent 40%);
+        animation: particleDrift 25s ease-in-out infinite;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    @keyframes headerPulse {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes scanlines {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(50%); }
+    }
+    
+    @keyframes particleDrift {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        33% { transform: translate(20px, -20px) scale(1.1); }
+        66% { transform: translate(-15px, 15px) scale(0.95); }
+    }
+    
+    /* Form sections with rainbow borders and 3D depth */
+    .form-section {
+        background: white;
+        border-radius: 28px;
+        padding: 2.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: visible;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 15px 45px rgba(0, 0, 0, 0.12),
+            0 8px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.9);
+        transform-style: preserve-3d;
+    }
+    
+    /* Animated rainbow border - DISABLED */
+    .form-section::before {
+        content: '';
+        position: absolute;
+        inset: -5px;
+        background: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #EC4899, #A855F7, #0E7490
+        );
+        border-radius: 32px;
+        z-index: -1;
+        opacity: 0;
+        filter: blur(15px);
+        transition: opacity 0.6s ease;
+        background-size: 400% 400%;
+        animation: rainbowFlow 10s ease infinite;
+    }
+    
+    /* HOVER EFFECT DISABLED */
+    .form-section:hover::before {
+        opacity: 0;
+    }
+    
+    .form-section:hover {
+        transform: translateY(-15px) scale(1.02);
+        box-shadow: 
+            0 35px 90px rgba(0, 0, 0, 0.2),
+            0 15px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    @keyframes rainbowFlow {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    /* Floating particle overlay */
+    .form-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 15% 45%, rgba(14, 116, 144, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 85% 25%, rgba(20, 184, 166, 0.12) 0%, transparent 60%),
+            radial-gradient(circle at 50% 80%, rgba(34, 197, 94, 0.08) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+        animation: orbitalFloat 20s ease-in-out infinite;
+    }
+    
+    .form-section:hover::after {
+        opacity: 1;
+    }
+    
+    @keyframes orbitalFloat {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        33% { transform: translate(15px, -15px) rotate(5deg); }
+        66% { transform: translate(-10px, 10px) rotate(-3deg); }
+    }
+    
+    /* Section titles with orbiting 3D icons */
+    .form-section-title {
+        font-size: 1.4rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #0E7490 0%, #14B8A6 50%, #22C55E 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.75rem;
+        padding-bottom: 0.85rem;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(90deg, #0E7490, #14B8A6, #22C55E, #F59E0B) 1;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    
+    .form-section-title i {
+        margin-right: 1.2rem;
+        width: 55px;
+        height: 55px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0E7490, #14B8A6, #22C55E);
+        border-radius: 50%;
+        color: white;
+        font-size: 1.2rem;
+        position: relative;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        animation: iconFloat 7s ease-in-out infinite;
+        box-shadow: 
+            0 10px 30px rgba(14, 116, 144, 0.4),
+            inset 0 2px 5px rgba(255, 255, 255, 0.3);
+    }
+    
+    /* Orbiting rings with rainbow colors */
+    .form-section-title i::before,
+    .form-section-title i::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid;
+        animation: orbit 10s linear infinite;
+    }
+    
+    .form-section-title i::before {
+        width: 75px;
+        height: 75px;
+        animation-delay: -2.5s;
+        border: 3px solid;
+        border-image: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #A855F7, #EC4899, #0E7490
+        ) 1;
+        background: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #A855F7, #EC4899, #0E7490
+        );
+        background-size: 400% 400%;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        padding: 2px;
+        animation: orbit 10s linear infinite, rainbowSpin 7s linear infinite;
+    }
+    
+    .form-section-title i::after {
+        width: 95px;
+        height: 95px;
+        animation-delay: -5s;
+        border: 3px dashed;
+        border-image: linear-gradient(
+            45deg,
+            #F97316, #EC4899, #A855F7, #0E7490,
+            #14B8A6, #22C55E, #F59E0B, #F97316
+        ) 1;
+        background: linear-gradient(
+            45deg,
+            #F97316, #EC4899, #A855F7, #0E7490,
+            #14B8A6, #22C55E, #F59E0B, #F97316
+        );
+        background-size: 400% 400%;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        padding: 2px;
+        animation: orbit 10s linear infinite reverse, rainbowSpin 9s linear infinite reverse;
+    }
+    
+    @keyframes rainbowSpin {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+    
+    .form-section:hover .form-section-title i {
+        transform: scale(1.2) rotate(360deg);
+        box-shadow: 
+            0 15px 40px rgba(14, 116, 144, 0.6),
+            inset 0 3px 8px rgba(255, 255, 255, 0.4);
+    }
+    
+    @keyframes iconFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-12px) rotate(5deg); }
+    }
+    
+    @keyframes orbit {
+        0% { transform: rotate(0deg) scale(1); opacity: 0.3; }
+        50% { opacity: 0.6; }
+        100% { transform: rotate(360deg) scale(1.15); opacity: 0.3; }
+    }
+    
+    /* Enhanced form controls with gradient focus */
+    .form-control, .form-select {
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 0.85rem 1.2rem;
+        font-size: 1rem;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        background: white;
+        position: relative;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: transparent;
+        box-shadow: 
+            0 0 0 4px rgba(14, 116, 144, 0.15),
+            0 8px 25px rgba(14, 116, 144, 0.2),
+            inset 0 2px 5px rgba(255, 255, 255, 0.5);
+        transform: translateY(-3px) scale(1.02);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border: 2px solid;
+        border-image: linear-gradient(45deg, #0E7490, #14B8A6, #22C55E) 1;
+    }
+    
+    textarea.form-control:focus {
+        transform: translateY(-5px) scale(1.01);
+    }
+    
+    /* Form labels with gradient text */
+    .form-label {
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 0.65rem;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .form-label:hover {
+        background: linear-gradient(135deg, #0E7490, #14B8A6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transform: translateX(5px);
+    }
+    
+    /* Required field indicator with pulse */
+    .required-indicator {
+        color: #EF4444;
+        margin-left: 0.3rem;
+        font-size: 1.1rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.7; transform: scale(1.2); }
+    }
+    
+    /* Help text with subtle animation */
+    .help-text {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-top: 0.4rem;
+        font-style: italic;
+        transition: all 0.3s ease;
+    }
+    
+    .help-text:hover {
+        color: #0E7490;
+        transform: translateX(3px);
+    }
+    
+    /* Error messages with shake animation */
+    .error-message {
+        color: #EF4444;
+        font-size: 0.85rem;
+        margin-top: 0.4rem;
+        display: flex;
+        align-items: center;
+        animation: shake 0.5s ease;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-10px); }
+        75% { transform: translateX(10px); }
+    }
+    
+    /* Glassmorphic action buttons with rainbow glow */
+    .btn-save {
+        background: linear-gradient(135deg, #0E7490, #14B8A6);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 10px 30px rgba(14, 116, 144, 0.3),
+            inset 0 2px 5px rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-save::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.4);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .btn-save:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 
+            0 20px 50px rgba(14, 116, 144, 0.5),
+            0 0 60px rgba(20, 184, 166, 0.4),
+            inset 0 3px 8px rgba(255, 255, 255, 0.4);
+        background: linear-gradient(135deg, #14B8A6, #22C55E);
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: rgba(255, 255, 255, 0.9);
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .btn-cancel::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #64748b, #94a3b8);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+        z-index: -1;
+    }
+    
+    .btn-cancel:hover::before {
+        width: 400px;
+        height: 400px;
+    }
+    
+    .btn-cancel:hover {
+        color: white;
+        border-color: #64748b;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(100, 116, 139, 0.3);
+    }
+    
+    /* Back button with glassmorphic effect */
+    .back-btn {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: all 0.4s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        position: relative;
+        z-index: 10;
+        cursor: pointer;
+    }
+    
+    .back-btn:hover {
+        background: rgba(255, 255, 255, 0.4);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 
+            0 8px 25px rgba(0, 0, 0, 0.2),
+            0 0 30px rgba(255, 255, 255, 0.5);
+        color: white;
+    }
+    
+    /* Staggered entrance animations */
+    .animate-in {
+        animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(60px) scale(0.9) rotateX(20deg);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1) rotateX(0deg);
+        }
+    }
+    
+    .animate-in:nth-child(1) { animation-delay: 0.1s; }
+    .animate-in:nth-child(2) { animation-delay: 0.2s; }
+    .animate-in:nth-child(3) { animation-delay: 0.3s; }
+    .animate-in:nth-child(4) { animation-delay: 0.4s; }
+{% endblock %}
+
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom"><h4 class="mb-0">Edit Profile Information</h4></div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="d-flex justify-content-end mt-4">
-                <a href="{% url 'receptionist:receptionist_profile' %}" class="btn btn-secondary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary-custom">Save Changes</button>
+<div class="container-fluid">
+    <!-- Edit Profile Header -->
+    <div class="edit-profile-header">
+        <div class="d-flex justify-content-between align-items-center" style="position: relative; z-index: 10;">
+            <div>
+                <h2 class="mb-2 fw-bold"><i class="fas fa-user-edit me-3"></i>Edit Profile Information</h2>
+                <p class="mb-0 opacity-90">Update your professional information and contact details</p>
             </div>
-        </form>
+            <a href="{% url 'receptionist:receptionist_profile' %}" class="back-btn">
+                <i class="fas fa-arrow-left me-2"></i>Back to Profile
+            </a>
+        </div>
     </div>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="row">
+            <!-- Basic Information -->
+            <div class="col-lg-6">
+                <div class="form-section animate-in">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-id-card"></i>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name <span class="text-danger">*</span></label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                            <div class="text-danger mt-1">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name <span class="text-danger">*</span></label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                            <div class="text-danger mt-1">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">Date of Birth</label>
+                        {{ form.date_of_birth }}
+                        {% if form.date_of_birth.errors %}
+                            <div class="text-danger mt-1">{{ form.date_of_birth.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.gender.id_for_label }}" class="form-label">Gender</label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}
+                            <div class="text-danger mt-1">{{ form.gender.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.national_id_passport.id_for_label }}" class="form-label">National ID / Passport Number</label>
+                        {{ form.national_id_passport }}
+                        {% if form.national_id_passport.errors %}
+                            <div class="text-danger mt-1">{{ form.national_id_passport.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Work Information -->
+            <div class="col-lg-6">
+                <div class="form-section animate-in">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-briefcase"></i>
+                        Work Information
+                    </h3>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+                        {{ form.profile_picture }}
+                        <div class="help-text">Upload a professional photo (JPG, PNG, max 5MB)</div>
+                        {% if form.profile_picture.errors %}
+                            <div class="text-danger mt-1">{{ form.profile_picture.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.department.id_for_label }}" class="form-label">Department</label>
+                        {{ form.department }}
+                        {% if form.department.errors %}
+                            <div class="text-danger mt-1">{{ form.department.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.shift.id_for_label }}" class="form-label">Work Shift</label>
+                        {{ form.shift }}
+                        {% if form.shift.errors %}
+                            <div class="text-danger mt-1">{{ form.shift.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="col-lg-6">
+                <div class="form-section animate-in">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-phone"></i>
+                        Contact Information
+                    </h3>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                        {{ form.phone_number }}
+                        {% if form.phone_number.errors %}
+                            <div class="text-danger mt-1">{{ form.phone_number.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email_address.id_for_label }}" class="form-label">Email Address</label>
+                        {{ form.email_address }}
+                        {% if form.email_address.errors %}
+                            <div class="text-danger mt-1">{{ form.email_address.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.residential_address.id_for_label }}" class="form-label">Residential Address</label>
+                        {{ form.residential_address }}
+                        <div class="help-text">Enter your full residential address</div>
+                        {% if form.residential_address.errors %}
+                            <div class="text-danger mt-1">{{ form.residential_address.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.postal_code.id_for_label }}" class="form-label">Postal Code</label>
+                        {{ form.postal_code }}
+                        {% if form.postal_code.errors %}
+                            <div class="text-danger mt-1">{{ form.postal_code.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Contact -->
+            <div class="col-lg-6">
+                <div class="form-section animate-in">
+                    <h3 class="form-section-title">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Emergency Contact
+                    </h3>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">Emergency Contact Name</label>
+                        {{ form.emergency_contact_name }}
+                        {% if form.emergency_contact_name.errors %}
+                            <div class="text-danger mt-1">{{ form.emergency_contact_name.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.emergency_contact_relationship.id_for_label }}" class="form-label">Relationship</label>
+                        {{ form.emergency_contact_relationship }}
+                        <div class="help-text">e.g., Spouse, Parent, Sibling</div>
+                        {% if form.emergency_contact_relationship.errors %}
+                            <div class="text-danger mt-1">{{ form.emergency_contact_relationship.errors }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.emergency_contact_phone.id_for_label }}" class="form-label">Emergency Contact Phone</label>
+                        {{ form.emergency_contact_phone }}
+                        {% if form.emergency_contact_phone.errors %}
+                            <div class="text-danger mt-1">{{ form.emergency_contact_phone.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="form-section">
+            <div class="d-flex justify-content-end gap-3">
+                <a href="{% url 'receptionist:receptionist_profile' %}" class="btn btn-cancel">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i>Save Changes
+                </button>
+            </div>
+        </div>
+    </form>
 </div>
 {% endblock %}

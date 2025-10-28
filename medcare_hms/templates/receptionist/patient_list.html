@@ -2,26 +2,363 @@
 
 {% block title %}Manage Patients{% endblock %}
 
+{% block extra_css %}
+    /* ==================== CLASSICAL ELEGANT PATIENT LIST ==================== */
+    
+    .patients-container {
+        animation: fadeIn 0.8s ease;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Elegant header section */
+    .patients-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(14, 116, 144, 0.25);
+        animation: slideDown 0.6s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .patients-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -5%;
+        width: 250px;
+        height: 250px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+        animation: float 15s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(-20px, 20px); }
+    }
+    
+    .patients-header-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .patients-title {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .title-icon {
+        width: 55px;
+        height: 55px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .patients-title h2 {
+        margin: 0;
+        font-weight: 700;
+        font-size: 1.75rem;
+    }
+    
+    .patients-title p {
+        margin: 0.25rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+    
+    .btn-add-patient {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .btn-add-patient:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
+    
+    /* Search section */
+    .search-card {
+        background: white;
+        border-radius: 18px;
+        padding: 1.75rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        animation: slideUp 0.6s ease 0.2s backwards;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .search-input {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 0.85rem 1.25rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+    }
+    
+    .search-input:focus {
+        background: white;
+        border-color: #0E7490;
+        box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .btn-search {
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        border: none;
+        color: white;
+        padding: 0.85rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.3);
+    }
+    
+    /* Table card */
+    .table-card {
+        background: white;
+        border-radius: 18px;
+        padding: 0;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        overflow: hidden;
+        animation: slideUp 0.6s ease 0.3s backwards;
+    }
+    
+    /* Table styling */
+    .patients-table {
+        margin: 0;
+    }
+    
+    .patients-table thead {
+        background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    }
+    
+    .patients-table thead th {
+        padding: 1.25rem 1.5rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .patients-table tbody tr {
+        transition: all 0.3s ease;
+        animation: fadeInRow 0.5s ease backwards;
+    }
+    
+    .patients-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .patients-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    .patients-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    .patients-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    .patients-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+    
+    @keyframes fadeInRow {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .patients-table tbody tr:hover {
+        background: linear-gradient(90deg, rgba(14, 116, 144, 0.05) 0%, transparent 100%);
+        transform: translateX(5px);
+    }
+    
+    .patients-table tbody td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+        color: #1e293b;
+        font-size: 0.95rem;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    
+    /* Action buttons */
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        border: none;
+        margin: 0 0.25rem;
+    }
+    
+    .action-btn-edit {
+        background: linear-gradient(135deg, #3B82F6, #2563EB);
+        color: white;
+    }
+    
+    .action-btn-edit:hover {
+        transform: translateY(-3px) rotate(5deg);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+    }
+    
+    .action-btn-chat {
+        background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+        color: white;
+    }
+    
+    .action-btn-chat:hover {
+        transform: translateY(-3px) rotate(-5deg);
+        box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        opacity: 0.3;
+        margin-bottom: 1rem;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    /* Patient name badge */
+    .patient-name {
+        font-weight: 600;
+        color: #0E7490;
+    }
+    
+    /* Username badge */
+    .username-badge {
+        background: #f1f5f9;
+        padding: 0.35rem 0.85rem;
+        border-radius: 8px;
+        font-weight: 500;
+        color: #64748b;
+        font-size: 0.9rem;
+    }
+    
+    /* Contact info */
+    .contact-info {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .contact-info i {
+        color: #0E7490;
+        font-size: 0.85rem;
+    }
+{% endblock %}
+
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="fas fa-users me-2"></i>Patient Records</h4>
-        <a href="{% url 'receptionist:add_patient' %}" class="btn btn-sky btn-sm"><i class="fas fa-user-plus me-2"></i>Register New Patient</a>
-    </div>
-    <div class="card-body">
-        <!-- Search Bar -->
-        <div class="mb-4">
-            <form method="get">
-                <div class="input-group">
-                    <input type="text" name="q" class="form-control" placeholder="Search by name, username, or contact..." value="{{ query|default:'' }}">
-                    <button class="btn btn-primary-custom" type="submit"><i class="fas fa-search"></i></button>
+<div class="patients-container">
+    <!-- Header -->
+    <div class="patients-header">
+        <div class="patients-header-content">
+            <div class="patients-title">
+                <div class="title-icon">
+                    <i class="fas fa-users"></i>
                 </div>
-            </form>
+                <div>
+                    <h2>Patient Records</h2>
+                    <p>Manage and view all registered patients</p>
+                </div>
+            </div>
+            <a href="{% url 'receptionist:add_patient' %}" class="btn-add-patient">
+                <i class="fas fa-user-plus"></i>
+                Register New Patient
+            </a>
         </div>
-        
+    </div>
+    
+    <!-- Search Section -->
+    <div class="search-card">
+        <form method="get">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control search-input" 
+                       placeholder="Search by name, username, or contact..." 
+                       value="{{ query|default:'' }}">
+                <button class="btn btn-search" type="submit">
+                    <i class="fas fa-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <!-- Patients Table -->
+    <div class="table-card">
         <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
+            <table class="table patients-table">
+                <thead>
                     <tr>
                         <th>Patient Name</th>
                         <th>Username</th>
@@ -33,17 +370,25 @@
                 <tbody>
                     {% for patient in patients %}
                     <tr>
-                        <td>{{ patient.user.get_full_name }}</td>
-                        <td>{{ patient.user.username }}</td>
-                        <td>{{ patient.user.userprofile.contact }}</td>
+                        <td><span class="patient-name">{{ patient.user.get_full_name }}</span></td>
+                        <td><span class="username-badge">{{ patient.user.username }}</span></td>
+                        <td>
+                            <div class="contact-info">
+                                <i class="fas fa-phone"></i>
+                                {{ patient.user.userprofile.contact|default:"N/A" }}
+                            </div>
+                        </td>
                         <td>{{ patient.user.email }}</td>
                         <td>
-                            <div class="btn-group">
-                                <a href="{% url 'receptionist:edit_patient' patient.pk %}" class="btn btn-sm btn-info" title="Edit Patient Details">
+                            <div class="d-flex">
+                                <a href="{% url 'receptionist:edit_patient' patient.pk %}" 
+                                   class="action-btn action-btn-edit" 
+                                   title="Edit Patient Details">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <!-- ADD THIS CHAT BUTTON -->
-                                <a href="{% url 'chat:start_chat' patient.user.id %}" class="btn btn-sm btn-primary" title="Chat with Patient">
+                                <a href="{% url 'chat:start_chat' patient.user.id %}" 
+                                   class="action-btn action-btn-chat" 
+                                   title="Chat with Patient">
                                     <i class="fas fa-comments"></i>
                                 </a>
                             </div>
@@ -51,7 +396,14 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5" class="text-center text-muted py-4">No patients found.</td>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-users-slash"></i>
+                                </div>
+                                <p class="mb-0">No patients found.</p>
+                            </div>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
