@@ -222,6 +222,7 @@ def bill_pdf_view(request, pk):
         from reportlab.lib.utils import ImageReader
         from reportlab.lib import colors
         from reportlab.lib.units import mm
+        from reportlab.platypus import Table, TableStyle
     except ImportError:
         response = HttpResponse(content_type='text/plain')
         response['Content-Disposition'] = f'attachment; filename="bill_{bill.pk}.txt"'
@@ -238,20 +239,26 @@ def bill_pdf_view(request, pk):
             lines.append(f" - {item.description} x{item.quantity} @ {item.unit_price} = {item.amount}")
         response.write("\n".join(lines))
         return response
+    
+    # Modern color scheme matching the web design
+    PRIMARY_TEAL = colors.HexColor('#0E7490')
+    SKY_BLUE = colors.HexColor('#0284C7')
+    LIGHT_BLUE = colors.HexColor('#E0F2FE')
+    GREEN = colors.HexColor('#22C55E')
+    LIGHT_GREEN = colors.HexColor('#D1FAE5')
+    RED = colors.HexColor('#EF4444')
+    LIGHT_RED = colors.HexColor('#FEE2E2')
+    ORANGE = colors.HexColor('#F59E0B')
+    LIGHT_ORANGE = colors.HexColor('#FEF3C7')
+    GRAY_700 = colors.HexColor('#374151')
+    GRAY_600 = colors.HexColor('#4B5563')
+    GRAY_200 = colors.HexColor('#E5E7EB')
+    
     buffer = io.BytesIO()
     p = canvas.Canvas(buffer, pagesize=A4)
     width, height = A4
     margin_x = 40
-    y = height - 50
-
-    # Utility draw line with auto page break
-    def draw_text(text, x, font=('Helvetica', 10), leading=16):
-        nonlocal y
-        if y < 70:
-            p.showPage(); y = height - 50
-        p.setFont(*font)
-        p.drawString(x, y, text)
-        y -= leading
+    y = height - 40
 
     # Load assets (logo + patient profile picture)
     logo_path = None
@@ -262,118 +269,243 @@ def bill_pdf_view(request, pk):
         static_logo = Path(settings.BASE_DIR) / 'static' / 'images' / 'logo.png'
         if static_logo.exists():
             logo_path = str(static_logo)
-        # Patient picture (if stored via ImageField with relative path)
+        # Patient picture
         if bill.patient.profile_picture and bill.patient.profile_picture.name:
-            # If already an absolute path-like, else join with MEDIA_ROOT
             media_candidate = Path(settings.BASE_DIR) / bill.patient.profile_picture.name
             if media_candidate.exists():
                 patient_photo_path = str(media_candidate)
+            else:
+                # Try default image
+                default_img = Path(settings.BASE_DIR) / 'static' / 'images' / 'default.jpeg'
+                if default_img.exists():
+                    patient_photo_path = str(default_img)
     except Exception:
         pass
 
-    # Header band
-    header_height = 60
-    p.setFillColorRGB(0.95, 0.95, 0.98)
-    p.rect(0, y - header_height + 20, width, header_height, fill=1, stroke=0)
-    p.setFillColorRGB(0,0,0)
-
+    # ==================== HEADER SECTION (Gradient Effect) ====================
+    # Gradient header band - Teal to Sky Blue
+    header_height = 80
+    # Draw gradient by layering rectangles with varying opacity
+    for i in range(10):
+        alpha = 1.0 - (i * 0.1)
+        r = 0.055 + (i * 0.006)  # Teal to Sky Blue
+        g = 0.455 + (i * 0.065)
+        b = 0.565
+        p.setFillColorRGB(r, g, b, alpha=0.8)
+        rect_y = y - header_height + (i * 8)
+        p.rect(0, rect_y, width, 8, fill=1, stroke=0)
+    
+    # Header content
+    p.setFillColor(colors.white)
     if logo_path:
         try:
-            p.drawImage(ImageReader(logo_path), margin_x, y - 40, width=55, height=55, preserveAspectRatio=True, mask='auto')
+            p.drawImage(ImageReader(logo_path), margin_x, y - 60, width=50, height=50, preserveAspectRatio=True, mask='auto')
         except Exception:
             pass
 
-    # Title
-    p.setFont('Helvetica-Bold', 20)
-    p.drawString(margin_x + (65 if logo_path else 0), y - 5, 'MedCare Hospital')
-    p.setFont('Helvetica', 9)
-    p.drawString(margin_x + (65 if logo_path else 0), y - 20, 'Patient Billing Statement')
-    y -= 70
+    # Company name
+    p.setFont('Helvetica-Bold', 22)
+    p.drawString(margin_x + (60 if logo_path else 0), y - 25, 'MedCare HMS')
+    p.setFont('Helvetica', 11)
+    p.drawString(margin_x + (60 if logo_path else 0), y - 42, 'Hospital Management System')
 
-    # Patient info section with optional photo box
-    info_top = y
-    photo_box_w = 80
+    # Invoice badge
+    badge_x = width - margin_x - 130
+    p.setFillColor(colors.white)
+    p.setStrokeColor(colors.white)
+    p.setLineWidth(2)
+    p.roundRect(badge_x, y - 60, 130, 50, 8, stroke=1, fill=0)
+    p.setFont('Helvetica', 9)
+    p.drawCentredString(badge_x + 65, y - 30, 'Invoice Number')
+    p.setFont('Helvetica-Bold', 16)
+    p.drawCentredString(badge_x + 65, y - 50, f"MED-{bill.pk:05d}")
+    
+    y -= header_height + 20
+
+    # ==================== BILLING INFO SECTION ====================
+    # Light blue background
+    info_box_height = 120
+    p.setFillColor(LIGHT_BLUE)
+    p.rect(margin_x - 10, y - info_box_height, width - 2*margin_x + 20, info_box_height, fill=1, stroke=0)
+    
+    # Patient section with photo
+    p.setFillColor(PRIMARY_TEAL)
+    p.setFont('Helvetica-Bold', 10)
+    p.drawString(margin_x, y - 15, 'BILLED TO')
+    
+    # Patient photo
+    photo_size = 60
     if patient_photo_path:
         try:
-            p.drawImage(ImageReader(patient_photo_path), width - margin_x - photo_box_w, y - 10, width=photo_box_w, height=photo_box_w, preserveAspectRatio=True, mask='auto')
+            p.drawImage(ImageReader(patient_photo_path), margin_x, y - 90, width=photo_size, height=photo_size, preserveAspectRatio=True, mask='auto')
         except Exception:
-            # Fallback silent
             pass
-    p.setFont('Helvetica-Bold', 12)
-    p.drawString(margin_x, y, bill.patient.user.get_full_name() or bill.patient.user.username)
-    y -= 18
+    
+    # Patient details
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica-Bold', 14)
+    p.drawString(margin_x + photo_size + 10, y - 35, bill.patient.user.get_full_name())
     p.setFont('Helvetica', 10)
-    draw_text(f"Bill Date: {bill.bill_date.strftime('%Y-%m-%d')}", margin_x)
-    if bill.due_date:
-        draw_text(f"Due Date: {bill.due_date.strftime('%Y-%m-%d')}", margin_x)
-    draw_text(f"Status: {bill.status}", margin_x)
-    draw_text(f"Payment Method: {bill.payment_method or 'N/A'}", margin_x)
+    p.setFillColor(GRAY_600)
+    p.drawString(margin_x + photo_size + 10, y - 50, bill.patient.user.email or '')
+    
+    # Invoice details (right side)
+    detail_x = width - margin_x - 200
+    p.setFillColor(PRIMARY_TEAL)
+    p.setFont('Helvetica-Bold', 10)
+    p.drawString(detail_x, y - 15, 'INVOICE DETAILS')
+    
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica', 10)
+    p.drawString(detail_x, y - 35, f"Date Issued:")
+    p.drawString(detail_x + 80, y - 35, bill.bill_date.strftime('%B %d, %Y'))
+    
+    p.drawString(detail_x, y - 52, f"Due Date:")
+    p.drawString(detail_x + 80, y - 52, bill.due_date.strftime('%B %d, %Y') if bill.due_date else 'N/A')
+    
+    p.drawString(detail_x, y - 69, f"Payment Method:")
+    p.drawString(detail_x + 80, y - 69, bill.payment_method or 'N/A')
+    
+    y -= info_box_height + 30
 
-    # Divider
-    p.setStrokeColorRGB(0.75,0.75,0.85)
-    p.setLineWidth(0.6)
-    p.line(margin_x, y, width - margin_x, y)
-    y -= 20
+    # ==================== ITEMS SECTION ====================
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica-Bold', 14)
+    p.drawString(margin_x, y, 'Bill Items')
+    y -= 25
 
     # Items table header
-    p.setFont('Helvetica-Bold', 11)
-    p.drawString(margin_x, y, 'Description')
-    p.drawString(margin_x + 250, y, 'Qty')
-    p.drawString(margin_x + 300, y, 'Unit Price')
-    p.drawString(margin_x + 400, y, 'Amount')
-    y -= 14
-    p.setLineWidth(0.4)
-    p.line(margin_x, y, width - margin_x, y)
-    y -= 10
+    p.setFillColor(PRIMARY_TEAL)
+    p.rect(margin_x, y - 20, width - 2*margin_x, 20, fill=1, stroke=0)
+    
+    p.setFillColor(colors.white)
+    p.setFont('Helvetica-Bold', 10)
+    p.drawString(margin_x + 5, y - 13, '#')
+    p.drawString(margin_x + 30, y - 13, 'Description')
+    p.drawRightString(margin_x + 300, y - 13, 'Qty')
+    p.drawRightString(margin_x + 400, y - 13, 'Unit Price')
+    p.drawRightString(width - margin_x - 5, y - 13, 'Amount')
+    y -= 25
 
+    # Items rows
     p.setFont('Helvetica', 10)
-    for item in bill.items.all():
-        if y < 100:
-            p.showPage(); y = height - 60
-            p.setFont('Helvetica-Bold', 11)
-            p.drawString(margin_x, y, 'Description')
-            p.drawString(margin_x + 250, y, 'Qty')
-            p.drawString(margin_x + 300, y, 'Unit Price')
-            p.drawString(margin_x + 400, y, 'Amount')
-            y -= 14
-            p.setFont('Helvetica', 10)
-        p.drawString(margin_x, y, item.description[:45])
-        p.drawRightString(margin_x + 280, y, str(item.quantity))
-        p.drawRightString(margin_x + 380, y, f"{item.unit_price}")
-        p.drawRightString(width - margin_x, y, f"{item.amount}")
-        y -= 16
+    for idx, item in enumerate(bill.items.all(), 1):
+        if y < 150:
+            p.showPage()
+            y = height - 60
+        
+        # Alternating row colors
+        if idx % 2 == 0:
+            p.setFillColor(colors.HexColor('#F9FAFB'))
+            p.rect(margin_x, y - 18, width - 2*margin_x, 18, fill=1, stroke=0)
+        
+        p.setFillColor(PRIMARY_TEAL)
+        p.drawString(margin_x + 5, y - 12, str(idx))
+        p.setFillColor(GRAY_700)
+        p.drawString(margin_x + 30, y - 12, item.description[:50])
+        p.drawRightString(margin_x + 300, y - 12, str(item.quantity))
+        p.drawRightString(margin_x + 400, y - 12, f"UGX {item.unit_price:,.0f}")
+        p.setFont('Helvetica-Bold', 10)
+        p.drawRightString(width - margin_x - 5, y - 12, f"UGX {item.amount:,.0f}")
+        p.setFont('Helvetica', 10)
+        y -= 20
 
-    # Summary box
-    y -= 5
-    p.setLineWidth(0.8)
-    p.setStrokeColorRGB(0.3,0.3,0.5)
-    box_height = 70
-    box_y = y - box_height + 15
-    p.roundRect(margin_x, box_y, 220, box_height, 6, stroke=1, fill=0)
-    p.setFont('Helvetica-Bold',11)
-    p.drawString(margin_x + 10, box_y + box_height - 20, 'Summary')
-    p.setFont('Helvetica',10)
-    p.drawString(margin_x + 10, box_y + box_height - 38, f"Total: {bill.total_amount}")
-    p.drawString(margin_x + 10, box_y + box_height - 54, f"Paid: {bill.amount_paid}")
-    p.drawString(margin_x + 10, box_y + box_height - 70, f"Due: {bill.amount_due}")
+    y -= 20
 
-    # Signature line
-    p.setFont('Helvetica',10)
-    p.drawString(width - margin_x - 180, box_y + box_height - 20, 'Authorized Signature: ______________________')
-    p.drawString(width - margin_x - 180, box_y + box_height - 38, f"Date: {timezone.now().strftime('%Y-%m-%d')}")
+    # ==================== TOTALS SECTION ====================
+    totals_width = 250
+    totals_x = width - margin_x - totals_width
+    
+    # Light gray background
+    p.setFillColor(colors.HexColor('#F9FAFB'))
+    totals_height = 90 if bill.status == 'Partially Paid' else 60
+    p.roundRect(totals_x, y - totals_height, totals_width, totals_height, 10, fill=1, stroke=0)
+    
+    # Subtotal
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica', 11)
+    p.drawString(totals_x + 10, y - 20, 'Subtotal:')
+    p.drawRightString(totals_x + totals_width - 10, y - 20, f"UGX {bill.total_amount:,.0f}")
+    
+    y -= 25
+    
+    # If partially paid, show paid and due
+    if bill.status == 'Partially Paid':
+        p.setFillColor(GREEN)
+        p.drawString(totals_x + 10, y - 10, 'Amount Paid:')
+        p.drawRightString(totals_x + totals_width - 10, y - 10, f"UGX {bill.amount_paid:,.0f}")
+        y -= 20
+        
+        # Amount due with red background
+        p.setFillColor(LIGHT_RED)
+        p.roundRect(totals_x + 5, y - 22, totals_width - 10, 20, 5, fill=1, stroke=0)
+        p.setFillColor(RED)
+        p.setFont('Helvetica-Bold', 11)
+        p.drawString(totals_x + 10, y - 15, 'Amount Due:')
+        p.drawRightString(totals_x + totals_width - 10, y - 15, f"UGX {bill.amount_due:,.0f}")
+        y -= 25
+    
+    # Grand total
+    p.setStrokeColor(PRIMARY_TEAL)
+    p.setLineWidth(2)
+    p.line(totals_x + 10, y, totals_x + totals_width - 10, y)
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica-Bold', 13)
+    p.drawString(totals_x + 10, y - 20, 'Total Amount:')
+    p.drawRightString(totals_x + totals_width - 10, y - 20, f"UGX {bill.total_amount:,.0f}")
+    
+    y -= 40
 
+    # ==================== STATUS AND FOOTER ====================
+    # Status badge
+    badge_width = 150
+    badge_height = 40
+    status_x = margin_x
+    
+    if bill.status == 'Paid':
+        badge_color = LIGHT_GREEN
+        text_color = colors.HexColor('#065F46')
+        icon = '✓'
+    elif bill.status == 'Unpaid':
+        badge_color = LIGHT_RED
+        text_color = colors.HexColor('#991B1B')
+        icon = '✗'
+    else:
+        badge_color = LIGHT_ORANGE
+        text_color = colors.HexColor('#92400E')
+        icon = '!'
+    
+    p.setFillColor(badge_color)
+    p.setStrokeColor(text_color)
+    p.setLineWidth(3)
+    p.roundRect(status_x, y - badge_height, badge_width, badge_height, 10, fill=1, stroke=1)
+    
+    p.setFillColor(text_color)
+    p.setFont('Helvetica-Bold', 18)
+    p.drawCentredString(status_x + badge_width/2, y - 28, f"{icon} {bill.status.upper()}")
+    
+    # Thank you message
+    p.setFillColor(GRAY_700)
+    p.setFont('Helvetica-Bold', 13)
+    p.drawRightString(width - margin_x, y - 15, 'Thank You!')
+    p.setFont('Helvetica', 10)
+    p.setFillColor(GRAY_600)
+    p.drawRightString(width - margin_x, y - 30, 'MedCare Hospital Management System')
+    
     # Footer
-    p.setFont('Helvetica-Oblique',8)
-    p.setFillColorRGB(0.4,0.4,0.4)
-    p.drawString(margin_x, 30, 'Generated by MedCare HMS — Confidential')
+    p.setFont('Helvetica', 8)
+    p.setFillColor(GRAY_600)
+    p.drawCentredString(width/2, 30, f"Generated on {bill.bill_date.strftime('%B %d, %Y')}")
 
-    p.showPage(); p.save()
-    pdf = buffer.getvalue(); buffer.close()
+    p.showPage()
+    p.save()
+    pdf = buffer.getvalue()
+    buffer.close()
 
-    # Build friendly filename: "<FirstName>'s Bill.pdf"
+    # Build friendly filename
     first_name = bill.patient.user.first_name or bill.patient.user.username
     safe_first = first_name.replace(' ', '_')
-    filename = f"{safe_first}'s Bill.pdf" if not safe_first.endswith("'s") else f"{safe_first} Bill.pdf"
+    filename = f"{safe_first}'s_Bill_MED{bill.pk:05d}.pdf"
 
     resp = HttpResponse(pdf, content_type='application/pdf')
     resp['Content-Disposition'] = f"attachment; filename=\"{filename}\""
