@@ -350,6 +350,12 @@ def receptionist_dashboard(request):
     
     # ADDITION: Get total number of patients
     total_patients_count = PatientProfile.objects.count()
+    
+    # ADDITION: Calculate total revenue from all paid bills
+    from django.db.models import Sum
+    total_revenue = Bill.objects.filter(status='Paid').aggregate(
+        total=Sum('total_amount')
+    )['total'] or 0
 
     # --- Fetching data for Actionable Lists ---
     upcoming_appointments_today = todays_appointments.order_by('appointment_time')[:10]
@@ -364,6 +370,7 @@ def receptionist_dashboard(request):
         'upcoming_appointments_today': upcoming_appointments_today,
         'pending_appointments': pending_appointments,
         'total_patients_count': total_patients_count, # Pass the new variable
+        'total_revenue': total_revenue, # Pass total revenue
         'current_time': timezone.now(),
     }
     return render(request, 'accounts/receptionist_dashboard.html', context)

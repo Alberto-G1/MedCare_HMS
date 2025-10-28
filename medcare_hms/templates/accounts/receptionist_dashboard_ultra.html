@@ -523,13 +523,6 @@
         margin: 0;
     }
     
-    /* View All Button in Section Header */
-    .section-header .btn:hover {
-        background: rgba(255, 255, 255, 0.35) !important;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-    }
-    
     .pending-card {
         background: white;
         border-radius: 24px;
@@ -962,7 +955,7 @@
                             </a>
                         </div>
                         <div class="col-lg-3 col-md-6">
-                            <a href="{% url 'billing:bill_list' %}" class="workflow-action-card">
+                            <a href="{% url 'billing:billing_home' %}" class="workflow-action-card">
                                 <div class="task-icon mb-3" style="background: linear-gradient(135deg, #F59E0B, #D97706); color: white;">
                                     <i class="fas fa-file-invoice-dollar fa-2x"></i>
                                 </div>
@@ -1097,13 +1090,10 @@
     <div class="row animate-in">
         <div class="col-12">
             <div class="appointment-table">
-                <div class="section-header d-flex justify-content-between align-items-center">
+                <div class="section-header">
                     <h3 class="section-title mb-0">
                         <i class="fas fa-calendar-alt me-2"></i>Today's Appointments
                     </h3>
-                    <a href="{% url 'receptionist:appointment_list' %}" class="btn btn-light btn-sm" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; font-weight: 600; padding: 0.6rem 1.2rem; border-radius: 12px; transition: all 0.3s ease;">
-                        <i class="fas fa-list me-2"></i>View All Appointments
-                    </a>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -1175,7 +1165,7 @@
 </div>
 
 <script>
-// Initialize time once without updates to prevent terminal noise
+// Update time every second
 function updateTime() {
     const now = new Date();
     const timeEl = document.getElementById('current-time');
@@ -1198,7 +1188,8 @@ function updateTime() {
     }
 }
 
-// Initialize once only - no setInterval to stop terminal shaking
+// Initialize
 updateTime();
+setInterval(updateTime, 1000);
 </script>
 {% endblock %}

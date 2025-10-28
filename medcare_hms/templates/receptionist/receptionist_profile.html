@@ -4,30 +4,571 @@
 
 {% block title %}My Profile{% endblock %}
 
+{% block extra_css %}
+    /* ==================== ULTRA-MODERN PROFILE WITH 3D EFFECTS ==================== */
+    
+    /* Animated gradient header with floating pattern */
+    .profile-header {
+        background: linear-gradient(135deg, 
+            #0E7490 0%, 
+            #0284C7 50%,
+            #0E7490 100%
+        );
+        background-size: 200% 200%;
+        animation: headerGradient 15s ease infinite;
+        border-radius: 30px;
+        padding: 3rem;
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 
+            0 20px 60px rgba(14, 116, 144, 0.3),
+            0 10px 30px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+    
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='rgba(255,255,255,0.08)'/%3E%3C/svg%3E");
+        opacity: 0.4;
+        animation: patternSlide 20s linear infinite;
+    }
+    
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    @keyframes patternSlide {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(60px, 60px); }
+    }
+    
+    /* Profile sections with rainbow borders and 3D depth */
+    .profile-section {
+        background: white;
+        border-radius: 28px;
+        padding: 2.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: visible;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 15px 40px rgba(0, 0, 0, 0.12),
+            0 5px 12px rgba(0, 0, 0, 0.06);
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+    
+    /* Rainbow gradient border animation - DISABLED */
+    .profile-section::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        background: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #A855F7, #0E7490, #14B8A6
+        );
+        border-radius: 30px;
+        z-index: -1;
+        opacity: 0;
+        filter: blur(12px);
+        transition: opacity 0.6s ease;
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+    
+    /* HOVER EFFECT DISABLED */
+    .profile-section:hover::before {
+        opacity: 0;
+    }
+    
+    .profile-section:hover {
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 
+            0 30px 80px rgba(0, 0, 0, 0.18),
+            0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    
+    /* Floating particle effects overlay */
+    .profile-section::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+            radial-gradient(circle at 20% 50%, rgba(14, 116, 144, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(20, 184, 166, 0.15) 0%, transparent 50%),
+            radial-gradient(circle at 40% 20%, rgba(34, 197, 94, 0.1) 0%, transparent 50%);
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+        animation: particleFloat 15s ease-in-out infinite;
+    }
+    
+    .profile-section:hover::after {
+        opacity: 1;
+    }
+    
+    @keyframes particleFloat {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(10px, -10px); }
+        50% { transform: translate(-5px, 5px); }
+        75% { transform: translate(5px, 10px); }
+    }
+    
+    /* Section titles with orbiting icons */
+    .section-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #0E7490 0%, #14B8A6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(90deg, #0E7490, #14B8A6, #22C55E) 1;
+        display: flex;
+        align-items: center;
+        position: relative;
+    }
+    
+    .section-title i {
+        margin-right: 1rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0E7490, #14B8A6);
+        border-radius: 50%;
+        color: white;
+        font-size: 1.1rem;
+        position: relative;
+        transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        animation: float 6s ease-in-out infinite;
+        box-shadow: 0 8px 25px rgba(14, 116, 144, 0.3);
+    }
+    
+    /* Orbiting ring effects */
+    .section-title i::before,
+    .section-title i::after {
+        content: '';
+        position: absolute;
+        border-radius: 50%;
+        border: 2px solid;
+        animation: orbit 8s linear infinite;
+    }
+    
+    .section-title i::before {
+        width: 70px;
+        height: 70px;
+        animation-delay: -2s;
+        border: 3px solid;
+        border-image: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #A855F7, #EC4899, #0E7490
+        ) 1;
+        background: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #F59E0B,
+            #F97316, #A855F7, #EC4899, #0E7490
+        );
+        background-size: 400% 400%;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        padding: 2px;
+        animation: orbit 8s linear infinite, rainbowSpin 6s linear infinite;
+    }
+    
+    .section-title i::after {
+        width: 90px;
+        height: 90px;
+        animation-delay: -4s;
+        border: 3px dashed;
+        border-image: linear-gradient(
+            45deg,
+            #F97316, #EC4899, #A855F7, #0E7490,
+            #14B8A6, #22C55E, #F59E0B, #F97316
+        ) 1;
+        background: linear-gradient(
+            45deg,
+            #F97316, #EC4899, #A855F7, #0E7490,
+            #14B8A6, #22C55E, #F59E0B, #F97316
+        );
+        background-size: 400% 400%;
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        padding: 2px;
+        animation: orbit 8s linear infinite reverse, rainbowSpin 8s linear infinite reverse;
+    }
+    
+    @keyframes rainbowSpin {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+    }
+    
+    .profile-section:hover .section-title i {
+        transform: scale(1.15) rotate(360deg);
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    @keyframes orbit {
+        0% { transform: rotate(0deg) scale(1); opacity: 0.2; }
+        50% { opacity: 0.4; }
+        100% { transform: rotate(360deg) scale(1.1); opacity: 0.2; }
+    }
+    
+    /* Enhanced info rows with gradient borders */
+    .info-row {
+        padding: 1.25rem 0;
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.4s ease;
+        position: relative;
+    }
+    
+    .info-row::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 2px;
+        background: linear-gradient(90deg, #0E7490, #14B8A6, #22C55E);
+        transition: width 0.5s ease;
+    }
+    
+    .info-row:hover::before {
+        width: 100%;
+    }
+    
+    .info-row:hover {
+        background: linear-gradient(90deg, rgba(14, 116, 144, 0.05) 0%, transparent 100%);
+        padding-left: 1rem;
+        transform: translateX(8px);
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 700;
+        color: #64748b;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+    
+    .info-value {
+        color: #1e293b;
+        font-size: 1.05rem;
+        font-weight: 600;
+    }
+    
+    .info-value.empty {
+        color: #94a3b8;
+        font-style: italic;
+    }
+    
+    /* 3D rotating profile avatar with rainbow border */
+    .profile-avatar {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        object-fit: cover;
+        position: relative;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        border: 5px solid white;
+        animation: avatarFloat 6s ease-in-out infinite;
+    }
+    
+    .profile-avatar:hover {
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    @keyframes avatarFloat {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-15px) rotate(5deg); }
+    }
+    
+    /* Glassmorphic edit button with rainbow glow */
+    .edit-profile-btn {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.85rem 1.8rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: all 0.4s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .edit-profile-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .edit-profile-btn:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+    
+    .edit-profile-btn:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 
+            0 8px 30px rgba(0, 0, 0, 0.2),
+            0 0 40px rgba(14, 116, 144, 0.5);
+        color: white;
+    }
+    
+    /* Animated status badges */
+    .status-badge {
+        padding: 0.7rem 1.4rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    
+    .status-badge::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+    
+    .status-badge:hover::before {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .status-badge:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    }
+    
+    /* Staggered entrance animations */
+    .animate-in {
+        animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px) scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+    
+    .animate-in:nth-child(1) { animation-delay: 0.1s; }
+    .animate-in:nth-child(2) { animation-delay: 0.2s; }
+    .animate-in:nth-child(3) { animation-delay: 0.3s; }
+    .animate-in:nth-child(4) { animation-delay: 0.4s; }
+{% endblock %}
+
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">My Receptionist Profile</h4>
-        <a href="{% url 'receptionist:edit_receptionist_profile' %}" class="btn btn-sky btn-sm"><i class="fas fa-edit me-2"></i>Edit Profile</a>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-lg-4 text-center border-end">
-                {% profile_image user size="150" css_class="profile-page-image rounded mb-3" %}
-                <h4 class="fw-bold text-custom-dark">{{ user.get_full_name }}</h4>
-                <p class="text-muted">{{ user.email }}</p>
-                {% if user.is_active %}<span class="badge bg-success">Active</span>
-                {% else %}<span class="badge bg-warning">Pending Approval</span>{% endif %}
+<div class="container-fluid">
+    <!-- Profile Header -->
+    <div class="profile-header">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                {% profile_image user size="180" css_class="profile-avatar" %}
             </div>
-            <div class="col-lg-8 ps-lg-5">
-                <dl class="row">
-                    <dt class="col-sm-4">Contact Number</dt>
-                    <dd class="col-sm-8">{{ user.userprofile.contact|default:"Not set" }}</dd>
-                    <dt class="col-sm-4">Department</dt>
-                    <dd class="col-sm-8">{{ profile.department.name|default:"Not set" }}</dd>
-                    <dt class="col-sm-4">Shift</dt>
-                    <dd class="col-sm-8">{{ profile.get_shift_display|default:"Not set" }}</dd>
-                </dl>
+            <div class="col">
+                <h2 class="mb-2 fw-bold">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="mb-2 opacity-90">
+                    <i class="fas fa-envelope me-2"></i>{{ user.email }}
+                </p>
+                <div class="d-flex align-items-center gap-3">
+                    {% if user.is_active %}
+                        <span class="status-badge bg-success"><i class="fas fa-check-circle me-2"></i>Active</span>
+                    {% else %}
+                        <span class="status-badge bg-warning"><i class="fas fa-clock me-2"></i>Pending Approval</span>
+                    {% endif %}
+                    <span class="status-badge" style="background: rgba(255, 255, 255, 0.2);">
+                        <i class="fas fa-user-tie me-2"></i>Receptionist
+                    </span>
+                </div>
+            </div>
+            <div class="col-auto">
+                <a href="{% url 'receptionist:edit_receptionist_profile' %}" class="edit-profile-btn">
+                    <i class="fas fa-edit me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Personal Information -->
+        <div class="col-lg-6">
+            <div class="profile-section animate-in">
+                <h3 class="section-title">
+                    <i class="fas fa-user"></i>
+                    Personal Information
+                </h3>
+                <div class="info-row">
+                    <div class="info-label">Date of Birth</div>
+                    <div class="info-value {% if not profile.date_of_birth %}empty{% endif %}">
+                        {{ profile.date_of_birth|date:"F d, Y"|default:"Not provided" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value {% if not profile.gender %}empty{% endif %}">
+                        {{ profile.gender|default:"Not specified" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">National ID / Passport</div>
+                    <div class="info-value {% if not profile.national_id_passport %}empty{% endif %}">
+                        {{ profile.national_id_passport|default:"Not provided" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Information -->
+        <div class="col-lg-6">
+            <div class="profile-section animate-in">
+                <h3 class="section-title">
+                    <i class="fas fa-briefcase"></i>
+                    Work Information
+                </h3>
+                <div class="info-row">
+                    <div class="info-label">Department</div>
+                    <div class="info-value {% if not profile.department %}empty{% endif %}">
+                        {{ profile.department.name|default:"Not assigned" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Work Shift</div>
+                    <div class="info-value {% if not profile.shift %}empty{% endif %}">
+                        {{ profile.get_shift_display|default:"Not assigned" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Username</div>
+                    <div class="info-value">
+                        {{ user.username }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-lg-6">
+            <div class="profile-section animate-in">
+                <h3 class="section-title">
+                    <i class="fas fa-phone"></i>
+                    Contact Information
+                </h3>
+                <div class="info-row">
+                    <div class="info-label">Phone Number</div>
+                    <div class="info-value {% if not profile.phone_number %}empty{% endif %}">
+                        {{ profile.phone_number|default:"Not provided" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email Address</div>
+                    <div class="info-value {% if not profile.email_address %}empty{% endif %}">
+                        {{ profile.email_address|default:user.email }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Residential Address</div>
+                    <div class="info-value {% if not profile.residential_address %}empty{% endif %}">
+                        {{ profile.residential_address|default:"Not provided" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Postal Code</div>
+                    <div class="info-value {% if not profile.postal_code %}empty{% endif %}">
+                        {{ profile.postal_code|default:"Not provided" }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Contact -->
+        <div class="col-lg-6">
+            <div class="profile-section animate-in">
+                <h3 class="section-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    Emergency Contact
+                </h3>
+                <div class="info-row">
+                    <div class="info-label">Contact Name</div>
+                    <div class="info-value {% if not profile.emergency_contact_name %}empty{% endif %}">
+                        {{ profile.emergency_contact_name|default:"Not provided" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Relationship</div>
+                    <div class="info-value {% if not profile.emergency_contact_relationship %}empty{% endif %}">
+                        {{ profile.emergency_contact_relationship|default:"Not specified" }}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Emergency Phone</div>
+                    <div class="info-value {% if not profile.emergency_contact_phone %}empty{% endif %}">
+                        {{ profile.emergency_contact_phone|default:"Not provided" }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
