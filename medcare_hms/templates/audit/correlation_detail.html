@@ -1,35 +1,729 @@
 {% extends 'base_admin.html' %}
-{% block title %}Correlation {{ correlation_id }} | MedCare HMS{% endblock %}
+{% load static %}
+{% block title %}Correlation Detail | MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ==================== ROOT VARIABLES ==================== */
+    :root {
+        --primary-teal: #0E7490;
+        --sky-blue: #0284C7;
+        --green: #22C55E;
+        --light-green: #10B981;
+        --purple: #A855F7;
+        --orange: #F59E0B;
+        --red: #EF4444;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ==================== MAIN WRAPPER ==================== */
+    .correlation-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        padding: 2rem 3rem;
+    }
+
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .header-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .header-text h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 0.5rem 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-text p {
+        margin: 0;
+        font-size: 1rem;
+        opacity: 0.95;
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-5px);
+        color: white;
+    }
+
+    .correlation-id-display {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .correlation-id-label {
+        font-weight: 600;
+        font-size: 0.95rem;
+        opacity: 0.9;
+    }
+
+    .correlation-id-value {
+        font-family: 'Courier New', monospace;
+        font-size: 1.1rem;
+        font-weight: 700;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        flex: 1;
+    }
+
+    /* ==================== TIMELINE CONTAINER ==================== */
+    .timeline-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+    }
+
+    /* Timeline vertical line */
+    .timeline-container::before {
+        content: '';
+        position: absolute;
+        left: 40px;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, var(--primary-teal), var(--sky-blue));
+        border-radius: 3px;
+    }
+
+    /* ==================== TIMELINE ITEM ==================== */
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2rem;
+        margin-left: 80px;
+        animation: slideUp 0.6s ease-out backwards;
+    }
+
+    .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+    .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+    .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+    .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+    .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+    .timeline-item:nth-child(n+6) { animation-delay: 0.6s; }
+
+    /* Timeline dot */
+    .timeline-dot {
+        position: absolute;
+        left: -65px;
+        top: 15px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.25rem;
+        box-shadow: var(--shadow-lg);
+        z-index: 1;
+    }
+
+    .timeline-dot.create {
+        background: linear-gradient(135deg, var(--green), var(--light-green));
+    }
+
+    .timeline-dot.update {
+        background: linear-gradient(135deg, var(--sky-blue), #60A5FA);
+    }
+
+    .timeline-dot.delete {
+        background: linear-gradient(135deg, var(--red), #F87171);
+    }
+
+    .timeline-dot.view {
+        background: linear-gradient(135deg, var(--purple), #C084FC);
+    }
+
+    /* ==================== EVENT CARD ==================== */
+    .event-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-header {
+        padding: 1.5rem 2rem;
+        background: linear-gradient(to right, var(--gray-50), white);
+        border-bottom: 2px solid var(--gray-100);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .event-header:hover {
+        background: linear-gradient(to right, var(--gray-100), var(--gray-50));
+    }
+
+    .event-header-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 0.75rem;
+    }
+
+    .event-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+
+    .event-action.create {
+        background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+        color: #065F46;
+    }
+
+    .event-action.update {
+        background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+        color: #1E40AF;
+    }
+
+    .event-action.delete {
+        background: linear-gradient(135deg, #FEE2E2, #FECACA);
+        color: #991B1B;
+    }
+
+    .event-action.view {
+        background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
+        color: #3730A3;
+    }
+
+    .event-action.default {
+        background: linear-gradient(135deg, var(--gray-200), var(--gray-300));
+        color: var(--gray-700);
+    }
+
+    .event-time {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--orange);
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+
+    .event-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+
+    .info-icon.actor {
+        background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
+        color: #3730A3;
+    }
+
+    .info-icon.target {
+        background: linear-gradient(135deg, #FED7AA, #FDBA74);
+        color: #92400E;
+    }
+
+    .info-text {
+        flex: 1;
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        color: var(--gray-600);
+        font-weight: 600;
+    }
+
+    .info-value {
+        font-size: 0.95rem;
+        color: var(--gray-800);
+        font-weight: 600;
+    }
+
+    .toggle-icon {
+        width: 36px;
+        height: 36px;
+        background: var(--gray-100);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-600);
+        transition: all 0.3s ease;
+    }
+
+    .event-header[aria-expanded="true"] .toggle-icon {
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+        transform: rotate(180deg);
+    }
+
+    /* ==================== EVENT BODY ==================== */
+    .event-body {
+        padding: 2rem;
+        background: var(--gray-50);
+    }
+
+    .event-summary {
+        margin-bottom: 1.5rem;
+    }
+
+    .summary-title {
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .summary-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    .summary-text {
+        background: white;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+        border-left: 4px solid var(--primary-teal);
+    }
+
+    .event-details {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border: 2px solid var(--gray-200);
+    }
+
+    .details-title {
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .details-icon {
+        width: 28px;
+        height: 28px;
+        background: linear-gradient(135deg, var(--orange), #FBBF24);
+        color: white;
+        border-radius: 7px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+    }
+
+    .details-content {
+        background: var(--gray-50);
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: var(--gray-700);
+        overflow-x: auto;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .details-content pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--gray-400);
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+        font-size: 1rem;
+        color: var(--gray-600);
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        33% {
+            transform: translate(30px, -30px) rotate(120deg);
+        }
+        66% {
+            transform: translate(-20px, 20px) rotate(240deg);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @media (max-width: 768px) {
+        .correlation-wrapper {
+            padding: 1rem;
+        }
+
+        .page-header {
+            padding: 2rem 1.5rem;
+            border-radius: 15px;
+        }
+
+        .header-top {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .correlation-id-display {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .correlation-id-value {
+            width: 100%;
+            font-size: 0.9rem;
+            word-break: break-all;
+        }
+
+        .timeline-container::before {
+            left: 20px;
+        }
+
+        .timeline-item {
+            margin-left: 60px;
+        }
+
+        .timeline-dot {
+            left: -45px;
+            width: 40px;
+            height: 40px;
+            font-size: 1rem;
+        }
+
+        .event-info {
+            grid-template-columns: 1fr;
+        }
+
+        .event-body {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid fade-in-up">
-  <h2 class="mb-3">Correlation Detail</h2>
-  <p class="text-muted">All events that occurred under correlation <code>{{ correlation_id }}</code></p>
-  <a href="{% url 'audit:audit_feed' %}?cid={{ correlation_id }}" class="btn btn-outline-secondary btn-sm mb-3">Back to Feed</a>
-  <div class="timeline">
-    {% for log in logs %}
-      <div class="card mb-2 shadow-sm">
-        <div class="card-body py-2">
-          <div class="d-flex justify-content-between">
-            <div>
-              <strong>{{ log.action }}</strong>
-              <small class="text-muted ms-2">{{ log.created_at|date:'Y-m-d H:i:s' }}</small><br>
-              <small>Actor: {% if log.actor %}{{ log.actor.username }}{% else %}—{% endif %} | Target: {{ log.target_model }}#{{ log.target_id }}</small>
-              {% if log.summary %}<div class="mt-1"><small>{{ log.summary }}</small></div>{% endif %}
+<div class="correlation-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-top">
+                <div class="header-left">
+                    <div class="header-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="header-text">
+                        <h1>Correlation Detail</h1>
+                        <p>Timeline of related audit events</p>
+                    </div>
+                </div>
+                <a href="{% url 'audit:audit_feed' %}?cid={{ correlation_id }}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Back to Feed
+                </a>
             </div>
-            {% if log.details %}
-              <button class="btn btn-sm btn-link" data-bs-toggle="collapse" data-bs-target="#d{{ forloop.counter }}">Details</button>
-            {% endif %}
-          </div>
-          {% if log.details %}
-          <div id="d{{ forloop.counter }}" class="collapse mt-2">
-            <pre class="small bg-light p-2 border rounded" style="max-height:240px; overflow:auto;">{{ log.details|json_script:'_ignore' }}</pre>
-          </div>
-          {% endif %}
+
+            <div class="correlation-id-display">
+                <div class="correlation-id-label">
+                    <i class="fas fa-fingerprint"></i> Correlation ID:
+                </div>
+                <div class="correlation-id-value">
+                    {{ correlation_id }}
+                </div>
+            </div>
         </div>
-      </div>
-    {% empty %}
-      <p class="text-muted">No events.</p>
-    {% endfor %}
-  </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="timeline-container">
+        {% if logs %}
+            {% for log in logs %}
+            <div class="timeline-item">
+                <!-- Timeline Dot -->
+                <div class="timeline-dot {% if log.action == 'CREATE' %}create{% elif log.action == 'UPDATE' %}update{% elif log.action == 'DELETE' %}delete{% elif log.action == 'VIEW' %}view{% endif %}">
+                    {% if log.action == 'CREATE' %}<i class="fas fa-plus"></i>
+                    {% elif log.action == 'UPDATE' %}<i class="fas fa-edit"></i>
+                    {% elif log.action == 'DELETE' %}<i class="fas fa-trash"></i>
+                    {% elif log.action == 'VIEW' %}<i class="fas fa-eye"></i>
+                    {% else %}<i class="fas fa-circle"></i>
+                    {% endif %}
+                </div>
+
+                <!-- Event Card -->
+                <div class="event-card">
+                    <div class="event-header" data-bs-toggle="collapse" data-bs-target="#d{{ forloop.counter }}" aria-expanded="false">
+                        <div class="event-header-top">
+                            <span class="event-action {% if log.action == 'CREATE' %}create{% elif log.action == 'UPDATE' %}update{% elif log.action == 'DELETE' %}delete{% elif log.action == 'VIEW' %}view{% else %}default{% endif %}">
+                                {% if log.action == 'CREATE' %}<i class="fas fa-plus"></i>
+                                {% elif log.action == 'UPDATE' %}<i class="fas fa-edit"></i>
+                                {% elif log.action == 'DELETE' %}<i class="fas fa-trash"></i>
+                                {% elif log.action == 'VIEW' %}<i class="fas fa-eye"></i>
+                                {% else %}<i class="fas fa-circle"></i>
+                                {% endif %}
+                                {{ log.action }}
+                            </span>
+                            <div class="event-time">
+                                <i class="fas fa-clock"></i>
+                                {{ log.created_at|date:'Y-m-d H:i:s' }}
+                            </div>
+                        </div>
+
+                        <div class="event-info">
+                            <div class="info-item">
+                                <div class="info-icon actor">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Actor</div>
+                                    <div class="info-value">
+                                        {% if log.actor %}{{ log.actor.username }}{% else %}<span style="color: var(--gray-400);">System</span>{% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon target">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Target</div>
+                                    <div class="info-value">
+                                        <code style="font-size: 0.9rem; color: var(--primary-teal);">{{ log.target_model }}#{{ log.target_id }}</code>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-item" style="grid-column: 1 / -1;">
+                                <div class="toggle-icon">
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="collapse" id="d{{ forloop.counter }}">
+                        <div class="event-body">
+                            {% if log.summary %}
+                            <div class="event-summary">
+                                <div class="summary-title">
+                                    <div class="summary-icon">
+                                        <i class="fas fa-align-left"></i>
+                                    </div>
+                                    Summary
+                                </div>
+                                <div class="summary-text">
+                                    {{ log.summary }}
+                                </div>
+                            </div>
+                            {% endif %}
+
+                            {% if log.details %}
+                            <div class="event-details">
+                                <div class="details-title">
+                                    <div class="details-icon">
+                                        <i class="fas fa-code"></i>
+                                    </div>
+                                    Technical Details
+                                </div>
+                                <div class="details-content">
+                                    <pre>{{ log.details }}</pre>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <div class="empty-title">No Events Found</div>
+                <p class="empty-text">No audit events found for this correlation ID.</p>
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
