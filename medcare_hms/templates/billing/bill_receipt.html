@@ -6,82 +6,598 @@
 
 {% block content %}
 <style>
-    .receipt-container {
-        max-width: 800px;
+    /* ==================== PRINT-FRIENDLY COLORS ==================== */
+    :root {
+        --primary-teal: #0E7490;
+        --sky-blue: #0284C7;
+        --green: #22C55E;
+        --light-green: #10B981;
+        --red: #EF4444;
+        --orange: #F59E0B;
+        --purple: #A855F7;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+    }
+
+    /* ==================== GENERAL STYLES ==================== */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    body {
+        background: var(--gray-50);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    /* ==================== RECEIPT CONTAINER ==================== */
+    .receipt-wrapper {
+        max-width: 900px;
         margin: 2rem auto;
-        padding: 2.5rem;
-        background: #fff;
-        border: 1px solid #dee2e6;
-        box-shadow: 0 0.5rem 1rem rgba(0,0,0,.05);
+        padding: 0 1rem;
     }
+
+    .receipt-container {
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    /* ==================== HEADER SECTION ==================== */
     .receipt-header {
-        border-bottom: 2px solid var(--primary-dark-teal);
-        padding-bottom: 1rem;
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        color: white;
+        padding: 2.5rem 2.5rem 2rem 2.5rem;
+        position: relative;
+        overflow: hidden;
     }
-    .receipt-header img.logo {
-        max-height: 60px;
+
+    .receipt-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
     }
-    .receipt-title {
-        color: var(--primary-dark-teal);
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .logo-section img {
+        max-height: 70px;
+        filter: brightness(0) invert(1);
+    }
+
+    .company-info h1 {
+        font-size: 1.75rem;
         font-weight: 700;
+        margin: 0;
+        letter-spacing: 0.5px;
     }
+
+    .company-info p {
+        margin: 0.25rem 0 0 0;
+        opacity: 0.95;
+        font-size: 0.95rem;
+    }
+
+    .invoice-badge {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .invoice-badge .badge-label {
+        font-size: 0.875rem;
+        opacity: 0.9;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .invoice-badge .badge-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: block;
+    }
+
+    /* ==================== BILLING INFO SECTION ==================== */
+    .billing-info {
+        background: linear-gradient(to right, #F0F9FF, #E0F2FE);
+        padding: 2rem 2.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .info-section h3 {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--primary-teal);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 1rem;
+    }
+
+    .patient-details {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
     .patient-avatar {
-        width: 60px;
-        height: 60px;
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
         object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
-    .table-totals th, .table-totals td {
-        border: none !important;
+
+    .patient-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin: 0;
     }
-    .amount-due {
-        background-color: #fff3cd;
-        font-size: 1.2rem;
+
+    .patient-email {
+        font-size: 0.95rem;
+        color: var(--gray-600);
+        margin: 0.25rem 0 0 0;
+    }
+
+    .invoice-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: var(--gray-600);
+        font-size: 0.95rem;
+    }
+
+    .detail-value {
+        font-weight: 700;
+        color: var(--gray-800);
+        font-size: 0.95rem;
+    }
+
+    /* ==================== ITEMS TABLE ==================== */
+    .items-section {
+        padding: 2.5rem;
+    }
+
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .section-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .items-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 2rem;
+    }
+
+    .items-table thead {
+        background: linear-gradient(to right, var(--primary-teal), var(--sky-blue));
+        color: white;
+    }
+
+    .items-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 700;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .items-table th.text-center {
+        text-align: center;
+    }
+
+    .items-table th.text-end {
+        text-align: right;
+    }
+
+    .items-table tbody tr {
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .items-table tbody tr:nth-child(even) {
+        background: var(--gray-50);
+    }
+
+    .items-table td {
+        padding: 1rem;
+        font-size: 0.95rem;
+        color: var(--gray-700);
+    }
+
+    .items-table td.text-center {
+        text-align: center;
+    }
+
+    .items-table td.text-end {
+        text-align: right;
+        font-weight: 600;
+    }
+
+    .item-number {
+        font-weight: 700;
+        color: var(--primary-teal);
+    }
+
+    /* ==================== TOTALS SECTION ==================== */
+    .totals-section {
+        background: var(--gray-50);
+        padding: 1.5rem;
+        border-radius: 10px;
+        max-width: 400px;
+        margin-left: auto;
+    }
+
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        font-size: 1rem;
+    }
+
+    .total-row.subtotal {
+        border-bottom: 1px solid var(--gray-300);
+    }
+
+    .total-row.paid {
+        color: var(--light-green);
+        font-weight: 600;
+    }
+
+    .total-row.due {
+        color: var(--red);
+        font-weight: 700;
+        background: #FEE2E2;
+        padding: 0.75rem 1rem;
+        margin: 0.5rem -1rem;
+        border-radius: 8px;
+    }
+
+    .total-row.grand-total {
+        border-top: 3px solid var(--primary-teal);
+        padding-top: 1rem;
+        margin-top: 0.5rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+    }
+
+    /* ==================== STATUS SECTION ==================== */
+    .status-section {
+        background: linear-gradient(to right, #F0F9FF, #E0F2FE);
+        padding: 2rem 2.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 2px solid var(--gray-200);
+    }
+
+    .status-badge-large {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-badge-large.paid {
+        background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+        color: #065F46;
+        border: 3px solid var(--light-green);
+    }
+
+    .status-badge-large.unpaid {
+        background: linear-gradient(135deg, #FEE2E2, #FECACA);
+        color: #991B1B;
+        border: 3px solid var(--red);
+    }
+
+    .status-badge-large.partial {
+        background: linear-gradient(135deg, #FEF3C7, #FDE68A);
+        color: #92400E;
+        border: 3px solid var(--orange);
+    }
+
+    .status-icon {
+        font-size: 1.75rem;
+    }
+
+    .footer-text {
+        text-align: right;
+    }
+
+    .footer-text h4 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .footer-text p {
+        font-size: 0.95rem;
+        color: var(--gray-600);
+        margin: 0;
+    }
+
+    /* ==================== ACTION BUTTONS ==================== */
+    .action-buttons {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-print {
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+    }
+
+    .btn-print:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-back {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-back:hover {
+        background: var(--gray-300);
+        transform: translateY(-2px);
+    }
+
+    /* ==================== PRINT STYLES ==================== */
+    @media print {
+        body {
+            background: white;
+        }
+
+        .receipt-wrapper {
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+
+        .receipt-container {
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .action-buttons {
+            display: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+
+        /* Ensure colors print properly */
+        .receipt-header,
+        .items-table thead,
+        .status-badge-large,
+        .section-icon,
+        .billing-info,
+        .totals-section,
+        .status-section {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+        }
+    }
+
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @media (max-width: 768px) {
+        .receipt-header {
+            padding: 2rem 1.5rem;
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .billing-info {
+            grid-template-columns: 1fr;
+            padding: 1.5rem;
+        }
+
+        .items-section {
+            padding: 1.5rem;
+        }
+
+        .items-table {
+            font-size: 0.875rem;
+        }
+
+        .items-table th,
+        .items-table td {
+            padding: 0.75rem 0.5rem;
+        }
+
+        .status-section {
+            flex-direction: column;
+            gap: 1.5rem;
+            padding: 1.5rem;
+        }
+
+        .footer-text {
+            text-align: center;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 
-<div class="container my-4">
+<div class="receipt-wrapper">
     <div class="receipt-container">
-        <!-- Header: Logo and Title -->
-        <div class="receipt-header d-flex justify-content-between align-items-center mb-4">
-            <img src="{% static 'images/logo.png' %}" alt="MedCare HMS Logo" class="logo">
-            <h1 class="receipt-title h2 mb-0">INVOICE / RECEIPT</h1>
+        <!-- Header Section -->
+        <div class="receipt-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="{% static 'images/logo.png' %}" alt="MedCare HMS Logo">
+                    <div class="company-info">
+                        <h1>MedCare HMS</h1>
+                        <p>Hospital Management System</p>
+                    </div>
+                </div>
+                <div class="invoice-badge">
+                    <span class="badge-label">Invoice Number</span>
+                    <span class="badge-number">MED-{{ bill.pk|stringformat:"05d" }}</span>
+                </div>
+            </div>
         </div>
-        
-        <!-- Patient and Bill Info -->
-        <div class="row mb-4">
-            <div class="col-6">
-                <h5 class="text-primary">Billed To:</h5>
-                <div class="d-flex align-items-center">
-                    <img src="{{ bill.patient.profile_picture.url }}" alt="Patient" class="patient-avatar rounded-circle me-3">
+
+        <!-- Billing Information -->
+        <div class="billing-info">
+            <div class="info-section">
+                <h3>Billed To</h3>
+                <div class="patient-details">
+                    <img src="{% if bill.patient.profile_picture %}{{ bill.patient.profile_picture.url }}{% else %}{% static 'images/default.jpeg' %}{% endif %}" 
+                         alt="{{ bill.patient.user.get_full_name }}" 
+                         class="patient-avatar">
                     <div>
-                        <strong class="d-block">{{ bill.patient.user.get_full_name }}</strong>
-                        <span class="text-muted">{{ bill.patient.user.email }}</span>
+                        <p class="patient-name">{{ bill.patient.user.get_full_name }}</p>
+                        <p class="patient-email">{{ bill.patient.user.email }}</p>
                     </div>
                 </div>
             </div>
-            <div class="col-6 text-end">
-                <p class="mb-1"><strong>Invoice #:</strong> MED-{{ bill.pk|stringformat:"05d" }}</p>
-                <p class="mb-1"><strong>Date Issued:</strong> {{ bill.bill_date|date:"F d, Y" }}</p>
-                <p class="mb-1"><strong>Due Date:</strong> {{ bill.due_date|date:"F d, Y"|default:"N/A" }}</p>
+            <div class="info-section">
+                <h3>Invoice Details</h3>
+                <div class="invoice-details">
+                    <div class="detail-row">
+                        <span class="detail-label">Date Issued:</span>
+                        <span class="detail-value">{{ bill.bill_date|date:"F d, Y" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Due Date:</span>
+                        <span class="detail-value">{{ bill.due_date|date:"F d, Y"|default:"N/A" }}</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Payment Method:</span>
+                        <span class="detail-value">{{ bill.payment_method|default:"N/A" }}</span>
+                    </div>
+                </div>
             </div>
         </div>
-        
-        <!-- Bill Items Table -->
-        <div class="table-responsive mb-4">
-            <table class="table table-striped">
-                <thead style="background-color: var(--primary-teal); color: white;">
+
+        <!-- Items Section -->
+        <div class="items-section">
+            <div class="section-title">
+                <div class="section-icon">
+                    <i class="fas fa-list"></i>
+                </div>
+                Bill Items
+            </div>
+
+            <table class="items-table">
+                <thead>
                     <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Description</th>
-                        <th scope="col" class="text-center">Quantity</th>
-                        <th scope="col" class="text-end">Unit Price</th>
-                        <th scope="col" class="text-end">Amount</th>
+                        <th>#</th>
+                        <th>Description</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Amount</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in bill.items.all %}
                     <tr>
-                        <th scope="row">{{ forloop.counter }}</th>
+                        <td class="item-number">{{ forloop.counter }}</td>
                         <td>{{ item.description }}</td>
                         <td class="text-center">{{ item.quantity }}</td>
                         <td class="text-end">{{ item.unit_price|currency_ugx }}</td>
@@ -90,56 +606,70 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </div>
-        
-        <!-- Totals Section -->
-        <div class="row justify-content-end">
-            <div class="col-md-5">
-                <table class="table table-borderless table-totals">
-                    <tbody>
-                        <tr>
-                            <th class="text-end">Subtotal:</th>
-                            <td class="text-end">{{ bill.total_amount|currency_ugx }}</td>
-                        </tr>
-                        {% if bill.status == 'Partially Paid' %}
-                        <tr>
-                            <th class="text-end text-success">Amount Paid:</th>
-                            <td class="text-end text-success">{{ bill.amount_paid|currency_ugx }}</td>
-                        </tr>
-                        <tr class="fw-bold amount-due">
-                            <th class="text-end text-danger">Amount Due:</th>
-                            <td class="text-end text-danger">{{ bill.amount_due|currency_ugx }}</td>
-                        </tr>
-                        {% endif %}
-                        <tr class="fw-bold fs-5" style="border-top: 2px solid #333;">
-                            <th class="text-end">Total Amount:</th>
-                            <td class="text-end">{{ bill.total_amount|currency_ugx }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <!-- Totals -->
+            <div class="totals-section">
+                <div class="total-row subtotal">
+                    <span>Subtotal:</span>
+                    <span>{{ bill.total_amount|currency_ugx }}</span>
+                </div>
+                {% if bill.status == 'Partially Paid' %}
+                <div class="total-row paid">
+                    <span>Amount Paid:</span>
+                    <span>{{ bill.amount_paid|currency_ugx }}</span>
+                </div>
+                <div class="total-row due">
+                    <span>Amount Due:</span>
+                    <span>{{ bill.amount_due|currency_ugx }}</span>
+                </div>
+                {% endif %}
+                <div class="total-row grand-total">
+                    <span>Total Amount:</span>
+                    <span>{{ bill.total_amount|currency_ugx }}</span>
+                </div>
             </div>
         </div>
-        
+
         <!-- Status and Footer -->
-        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-            <h3 class="fw-bold">
-                Status:
-                {% if bill.status == 'Paid' %}<span class="text-success">PAID</span>
-                {% elif bill.status == 'Unpaid' %}<span class="text-danger">UNPAID</span>
-                {% else %}<span class="text-warning">PARTIALLY PAID</span>
+        <div class="status-section">
+            <div>
+                {% if bill.status == 'Paid' %}
+                <div class="status-badge-large paid">
+                    <i class="fas fa-check-circle status-icon"></i>
+                    <span>Paid</span>
+                </div>
+                {% elif bill.status == 'Unpaid' %}
+                <div class="status-badge-large unpaid">
+                    <i class="fas fa-times-circle status-icon"></i>
+                    <span>Unpaid</span>
+                </div>
+                {% else %}
+                <div class="status-badge-large partial">
+                    <i class="fas fa-exclamation-circle status-icon"></i>
+                    <span>Partially Paid</span>
+                </div>
                 {% endif %}
-            </h3>
-            <div class="text-end">
-                <p class="mb-0">Thank you for your business!</p>
-                <small class="text-muted">MedCare Hospital Management System</small>
+            </div>
+            <div class="footer-text">
+                <h4>Thank You!</h4>
+                <p>MedCare Hospital Management System</p>
+                <p style="font-size: 0.875rem; color: var(--gray-600); margin-top: 0.25rem;">
+                    Generated on {{ bill.bill_date|date:"F d, Y" }}
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- Print Button (Hidden on Print) -->
-    <div class="text-center my-4 no-print">
-        <button onclick="window.print()" class="btn btn-primary-custom"><i class="fas fa-print me-2"></i>Print Receipt</button>
+    <!-- Action Buttons (Hidden on Print) -->
+    <div class="action-buttons no-print">
+        <button onclick="window.print()" class="btn btn-print">
+            <i class="fas fa-print"></i>
+            Print Receipt
+        </button>
+        <a href="{% url 'billing:bill_detail' bill.pk %}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to Bill
+        </a>
     </div>
 </div>
-<script>window.print();</script>
 {% endblock %}
