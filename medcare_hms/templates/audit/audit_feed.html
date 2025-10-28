@@ -1,112 +1,751 @@
 {% extends 'base_admin.html' %}
+{% load static %}
 {% block title %}Audit Feed | MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* ==================== ROOT VARIABLES ==================== */
+    :root {
+        --primary-teal: #0E7490;
+        --sky-blue: #0284C7;
+        --green: #22C55E;
+        --light-green: #10B981;
+        --purple: #A855F7;
+        --orange: #F59E0B;
+        --red: #EF4444;
+        --gray-50: #F9FAFB;
+        --gray-100: #F3F4F6;
+        --gray-200: #E5E7EB;
+        --gray-300: #D1D5DB;
+        --gray-600: #4B5563;
+        --gray-700: #374151;
+        --gray-800: #1F2937;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* ==================== MAIN WRAPPER ==================== */
+    .audit-feed-wrapper {
+        min-height: 100vh;
+        background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+        padding: 2rem 3rem;
+    }
+
+    /* ==================== PAGE HEADER ==================== */
+    .page-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        padding: 3rem 2rem;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+        color: white;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    .page-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+
+    .header-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    .header-text h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-text p {
+        margin: 0.5rem 0 0 0;
+        font-size: 1rem;
+        opacity: 0.95;
+    }
+
+    .btn-export {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-export:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+        color: white;
+    }
+
+    /* ==================== FILTER SECTION ==================== */
+    .filter-container {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: var(--shadow-xl);
+        margin-bottom: 2rem;
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .filter-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--gray-800);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .filter-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .filter-group label {
+        display: block;
+        font-weight: 600;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-control,
+    .form-select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: var(--gray-50);
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--primary-teal);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(14, 116, 144, 0.1);
+    }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%234B5563' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 12px;
+        padding-right: 3rem;
+        appearance: none;
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .btn-filter {
+        padding: 0.875rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-filter.apply {
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+    }
+
+    .btn-filter.apply:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-filter.reset {
+        background: var(--gray-200);
+        color: var(--gray-700);
+    }
+
+    .btn-filter.reset:hover {
+        background: var(--gray-300);
+        transform: translateY(-2px);
+    }
+
+    /* ==================== TABLE CONTAINER ==================== */
+    .table-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--shadow-xl);
+        overflow: hidden;
+        animation: slideUp 0.7s ease-out;
+        margin-bottom: 2rem;
+    }
+
+    .table-header {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--sky-blue) 100%);
+        color: white;
+        padding: 1.5rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .table-header-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .table-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    /* ==================== AUDIT TABLE ==================== */
+    .audit-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .audit-table thead {
+        background: linear-gradient(to right, #F3F4F6, #E5E7EB);
+    }
+
+    .audit-table th {
+        padding: 1rem 1.5rem;
+        text-align: left;
+        font-weight: 700;
+        color: var(--gray-700);
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .audit-table td {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-700);
+        font-size: 0.95rem;
+    }
+
+    .audit-table tbody tr {
+        transition: all 0.3s ease;
+    }
+
+    .audit-table tbody tr:hover {
+        background: var(--gray-50);
+        transform: scale(1.005);
+    }
+
+    /* ==================== ACTION BADGES ==================== */
+    .action-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.875rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+    }
+
+    .action-badge.create {
+        background: linear-gradient(135deg, #D1FAE5, #A7F3D0);
+        color: #065F46;
+    }
+
+    .action-badge.update {
+        background: linear-gradient(135deg, #DBEAFE, #BFDBFE);
+        color: #1E40AF;
+    }
+
+    .action-badge.delete {
+        background: linear-gradient(135deg, #FEE2E2, #FECACA);
+        color: #991B1B;
+    }
+
+    .action-badge.view {
+        background: linear-gradient(135deg, #E0E7FF, #C7D2FE);
+        color: #3730A3;
+    }
+
+    .action-badge.default {
+        background: linear-gradient(135deg, var(--gray-200), var(--gray-300));
+        color: var(--gray-700);
+    }
+
+    /* ==================== CORRELATION LINK ==================== */
+    .correlation-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.375rem 0.75rem;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-300);
+        border-radius: 8px;
+        color: var(--primary-teal);
+        text-decoration: none;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+    }
+
+    .correlation-link:hover {
+        background: var(--gray-200);
+        transform: translateX(3px);
+        color: var(--sky-blue);
+    }
+
+    /* ==================== EMPTY STATE ==================== */
+    .empty-state {
+        padding: 4rem 2rem;
+        text-align: center;
+    }
+
+    .empty-icon {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto 1.5rem;
+        background: linear-gradient(135deg, var(--gray-100), var(--gray-200));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: var(--gray-400);
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--gray-700);
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-text {
+        font-size: 1rem;
+        color: var(--gray-600);
+    }
+
+    /* ==================== PAGINATION ==================== */
+    .pagination-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem 2rem;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        justify-content: center;
+        animation: slideUp 0.8s ease-out;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .page-item {
+        list-style: none;
+    }
+
+    .page-link {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .page-link:hover {
+        background: var(--primary-teal);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .page-item.disabled .page-link {
+        background: var(--gray-100);
+        color: var(--gray-400);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .page-item.active .page-link {
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+        color: white;
+        border-color: var(--primary-teal);
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes float {
+        0%, 100% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        33% {
+            transform: translate(30px, -30px) rotate(120deg);
+        }
+        66% {
+            transform: translate(-20px, 20px) rotate(240deg);
+        }
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    /* ==================== RESPONSIVE DESIGN ==================== */
+    @media (max-width: 768px) {
+        .audit-feed-wrapper {
+            padding: 1rem;
+        }
+
+        .page-header {
+            padding: 2rem 1.5rem;
+            border-radius: 15px;
+        }
+
+        .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-text h1 {
+            font-size: 1.5rem;
+        }
+
+        .filter-container {
+            padding: 1.5rem;
+        }
+
+        .filter-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .filter-actions {
+            flex-direction: column;
+        }
+
+        .btn-filter {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .audit-table {
+            font-size: 0.875rem;
+        }
+
+        .audit-table th,
+        .audit-table td {
+            padding: 0.875rem 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container-fluid fade-in-up">
-  <h2 class="mb-3 d-flex justify-content-between align-items-center">Audit Feed
-    <a class="btn btn-sm btn-outline-success" href="?action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}&export=csv">Export CSV</a>
-  </h2>
-  <form method="get" class="row g-2 align-items-end mb-3">
-    <div class="col-md-2">
-      <label class="form-label">Action</label>
-      <select name="action" class="form-select">
-        <option value="">All</option>
-        {% for a in actions %}
-          <option value="{{ a }}" {% if a == selected_action %}selected{% endif %}>{{ a }}</option>
-        {% endfor %}
-      </select>
+<div class="audit-feed-wrapper">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="header-text">
+                    <h1>Audit Feed</h1>
+                    <p>Track all system activities and user actions</p>
+                </div>
+            </div>
+            <a class="btn-export" href="?action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}&export=csv">
+                <i class="fas fa-download"></i>
+                Export CSV
+            </a>
+        </div>
     </div>
-    <div class="col-md-2">
-      <label class="form-label">Actor (partial)</label>
-      <input type="text" name="actor" value="{{ actor_search }}" class="form-control" placeholder="username or name" />
+
+    <!-- Filter Section -->
+    <div class="filter-container">
+        <div class="filter-title">
+            <div class="filter-icon">
+                <i class="fas fa-filter"></i>
+            </div>
+            Filter Audit Logs
+        </div>
+
+        <form method="get">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label for="action">Action</label>
+                    <select name="action" id="action" class="form-select">
+                        <option value="">All Actions</option>
+                        {% for a in actions %}
+                            <option value="{{ a }}" {% if a == selected_action %}selected{% endif %}>{{ a }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="actor">Actor (Username/Name)</label>
+                    <input type="text" name="actor" id="actor" value="{{ actor_search }}" class="form-control" placeholder="Search by username or name" />
+                </div>
+
+                <div class="filter-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="form-control" />
+                </div>
+
+                <div class="filter-group">
+                    <label for="end_date">End Date</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="form-control" />
+                </div>
+
+                <div class="filter-group">
+                    <label for="correlation">Correlation ID</label>
+                    <input type="text" name="correlation" id="correlation" value="{{ selected_correlation_id }}" class="form-control" placeholder="Enter correlation ID" />
+                </div>
+
+                <div class="filter-group">
+                    <label for="page_size">Results Per Page</label>
+                    <select name="page_size" id="page_size" class="form-select">
+                        {% if page_sizes %}
+                            {% for size in page_sizes %}
+                                <option value="{{ size }}" {% if page_size == size %}selected{% endif %}>{{ size }}</option>
+                            {% endfor %}
+                        {% else %}
+                            <option value="10" {% if page_size == 10 %}selected{% endif %}>10</option>
+                            <option value="25" {% if page_size == 25 %}selected{% endif %}>25</option>
+                            <option value="50" {% if page_size == 50 %}selected{% endif %}>50</option>
+                            <option value="100" {% if page_size == 100 %}selected{% endif %}>100</option>
+                            <option value="200" {% if page_size == 200 %}selected{% endif %}>200</option>
+                        {% endif %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <a href="{% url 'audit:audit_feed' %}" class="btn-filter reset">
+                    <i class="fas fa-redo"></i>
+                    Reset Filters
+                </a>
+                <button type="submit" class="btn-filter apply">
+                    <i class="fas fa-check"></i>
+                    Apply Filters
+                </button>
+            </div>
+        </form>
     </div>
-    <div class="col-md-2">
-      <label class="form-label">Start Date</label>
-      <input type="date" name="start_date" value="{{ start_date }}" class="form-control" />
-    </div>
-    <div class="col-md-2">
-      <label class="form-label">End Date</label>
-      <input type="date" name="end_date" value="{{ end_date }}" class="form-control" />
-    </div>
-    <div class="col-md-2">
-      <label class="form-label">Correlation ID</label>
-      <input type="text" name="correlation" value="{{ selected_correlation_id }}" class="form-control" placeholder="partial ok" />
-    </div>
-    <div class="col-md-1">
-      <label class="form-label">Page Size</label>
-      <select name="page_size" class="form-select">
-        {% if page_sizes %}
-          {% for size in page_sizes %}
-            <option value="{{ size }}" {% if page_size == size %}selected{% endif %}>{{ size }}</option>
-          {% endfor %}
+
+    <!-- Audit Table -->
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-header-icon">
+                <i class="fas fa-list"></i>
+            </div>
+            <h2>Audit Events</h2>
+        </div>
+
+        {% if page_obj.object_list %}
+            <table class="audit-table">
+                <thead>
+                    <tr>
+                        <th>Time</th>
+                        <th>Actor</th>
+                        <th>Action</th>
+                        <th>Target</th>
+                        <th>Summary</th>
+                        <th>Correlation</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in page_obj.object_list %}
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-clock" style="color: var(--orange);"></i>
+                                <span style="font-size: 0.9rem;">{{ log.created_at|date:'Y-m-d H:i:s' }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <i class="fas fa-user" style="color: var(--purple);"></i>
+                                <span style="font-weight: 600;">{% if log.actor %}{{ log.actor.username }}{% else %}<span style="color: var(--gray-400);">—</span>{% endif %}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="action-badge {% if log.action == 'CREATE' %}create{% elif log.action == 'UPDATE' %}update{% elif log.action == 'DELETE' %}delete{% elif log.action == 'VIEW' %}view{% else %}default{% endif %}">
+                                {% if log.action == 'CREATE' %}<i class="fas fa-plus"></i>
+                                {% elif log.action == 'UPDATE' %}<i class="fas fa-edit"></i>
+                                {% elif log.action == 'DELETE' %}<i class="fas fa-trash"></i>
+                                {% elif log.action == 'VIEW' %}<i class="fas fa-eye"></i>
+                                {% else %}<i class="fas fa-circle"></i>
+                                {% endif %}
+                                {{ log.action }}
+                            </span>
+                        </td>
+                        <td>
+                            <code style="font-size: 0.9rem; color: var(--primary-teal); background: var(--gray-100); padding: 0.25rem 0.5rem; border-radius: 5px;">{{ log.target_model }}#{{ log.target_id }}</code>
+                        </td>
+                        <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="{{ log.summary }}">
+                            {{ log.summary }}
+                        </td>
+                        <td>
+                            {% if log.correlation_id %}
+                                <a href="{% url 'audit:correlation_detail' log.correlation_id %}" class="correlation-link">
+                                    <i class="fas fa-link"></i>
+                                    {{ log.correlation_id|slice:':8' }}…
+                                </a>
+                            {% else %}
+                                <span style="color: var(--gray-400);">—</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         {% else %}
-          <option value="5" {% if page_size == 5 %}selected{% endif %}>5</option>
-          <option value="10" {% if page_size == 10 %}selected{% endif %}>10</option>
-          <option value="15" {% if page_size == 15 %}selected{% endif %}>15</option>
-          <option value="20" {% if page_size == 20 %}selected{% endif %}>20</option>
-          <option value="25" {% if page_size == 25 %}selected{% endif %}>25</option>
-          <option value="50" {% if page_size == 50 %}selected{% endif %}>50</option>
-          <option value="100" {% if page_size == 100 %}selected{% endif %}>100</option>
-          <option value="200" {% if page_size == 200 %}selected{% endif %}>200</option>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <div class="empty-title">No Audit Events Found</div>
+                <p class="empty-text">Try adjusting your filters to see more results.</p>
+            </div>
         {% endif %}
-      </select>
     </div>
-    <div class="col-md-1 d-grid">
-      <label class="form-label" style="visibility:hidden;">Apply</label>
-      <button class="btn btn-sky" type="submit">Apply</button>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <div class="pagination-container">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-left"></i></span>
+                </li>
+            {% endif %}
+
+            <li class="page-item active">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link"><i class="fas fa-chevron-right"></i></span>
+                </li>
+            {% endif %}
+        </ul>
     </div>
-    <div class="col-md-1 d-grid">
-      <label class="form-label" style="visibility:hidden;">Reset</label>
-      <a href="{% url 'audit:audit_feed' %}" class="btn btn-outline-secondary">Reset</a>
-    </div>
-  </form>
-  <div class="table-responsive">
-    <table class="table table-sm table-striped align-middle">
-      <thead class="table-light">
-        <tr>
-          <th>Time</th>
-          <th>Actor</th>
-          <th>Action</th>
-          <th>Target</th>
-          <th>Summary</th>
-          <th>Correlation</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for log in page_obj.object_list %}
-          <tr>
-            <td><small>{{ log.created_at|date:'Y-m-d H:i:s' }}</small></td>
-            <td>{% if log.actor %}{{ log.actor.username }}{% else %}<span class="text-muted">—</span>{% endif %}</td>
-            <td><span class="badge bg-primary">{{ log.action }}</span></td>
-            <td>{{ log.target_model }}#{{ log.target_id }}</td>
-            <td style="max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="{{ log.summary }}">{{ log.summary }}</td>
-            <td>
-              {% if log.correlation_id %}
-                <a href="{% url 'audit:correlation_detail' log.correlation_id %}"><code style="font-size:0.7rem;">{{ log.correlation_id|slice:':8' }}…</code></a>
-              {% endif %}
-            </td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="6" class="text-center text-muted py-4">No audit events found.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-  {% if page_obj.has_other_pages %}
-  <nav aria-label="Audit pagination">
-    <ul class="pagination pagination-sm">
-      {% if page_obj.has_previous %}
-        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">«</a></li>
-      {% else %}
-        <li class="page-item disabled"><span class="page-link">«</span></li>
-      {% endif %}
-      <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-      {% if page_obj.has_next %}
-        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}&action={{ selected_action }}&actor={{ actor_search }}&correlation={{ selected_correlation_id }}&start_date={{ start_date }}&end_date={{ end_date }}&page_size={{ page_size }}">»</a></li>
-      {% else %}
-        <li class="page-item disabled"><span class="page-link">»</span></li>
-      {% endif %}
-    </ul>
-  </nav>
-  {% endif %}
+    {% endif %}
 </div>
 {% endblock %}
