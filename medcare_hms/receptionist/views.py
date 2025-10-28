@@ -152,9 +152,13 @@ def book_appointment_view(request):
     # Get all active doctors to display as cards
     available_doctors = DoctorProfile.objects.filter(user__is_active=True).select_related('user')
     
+    # Get all patients to display as cards
+    all_patients = PatientProfile.objects.filter(user__is_active=True).select_related('user')
+    
     context = {
         'form': form,
-        'doctors': available_doctors
+        'doctors': available_doctors,
+        'patients': all_patients
     }
     return render(request, 'receptionist/book_appointment.html', context)
 

@@ -2,87 +2,596 @@
 
 {% block title %}Manage Appointments{% endblock %}
 
-{% block content %}
-
-<style>
-    .django-filters .form-select, .django-filters input {
-        font-size: 0.9rem;
+{% block extra_css %}
+    /* ==================== MODERN APPOINTMENTS LIST ==================== */
+    
+    .appointments-wrapper {
+        padding: 2rem 0;
+        animation: fadeIn 0.6s ease;
     }
-</style>
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    /* Header section */
+    .appointments-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        border-radius: 20px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(14, 116, 144, 0.3);
+        animation: slideDown 0.6s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .appointments-header::before {
+        content: '';
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        top: -80px;
+        right: -80px;
+        animation: float 15s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(-20px, 20px); }
+    }
+    
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    
+    .header-icon {
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.8rem;
+        animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
+    .header-title h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+    
+    .header-title p {
+        margin: 0.25rem 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+    
+    .btn-book-new {
+        background: white;
+        color: #0284C7;
+        border: none;
+        padding: 0.85rem 2rem;
+        border-radius: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-book-new:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        color: #0284C7;
+    }
+    
+    /* Filter pills */
+    .filter-pills {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        animation: fadeInUp 0.6s ease 0.1s backwards;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .filter-pills .btn {
+        border-radius: 10px;
+        padding: 0.6rem 1.2rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-pills .btn-primary-custom {
+        background: linear-gradient(135deg, #0284C7, #0EA5E9);
+        border: none;
+        color: white;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+    }
+    
+    .filter-pills .btn-outline-secondary {
+        border: 2px solid #e2e8f0;
+        color: #64748b;
+        background: white;
+    }
+    
+    .filter-pills .btn-outline-secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+        transform: translateY(-2px);
+    }
+    
+    /* Advanced filter form */
+    .filter-form {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        animation: fadeInUp 0.6s ease 0.2s backwards;
+    }
+    
+    .filter-form .form-select,
+    .filter-form input[type="date"] {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        transition: all 0.3s ease;
+        background: #f8fafc;
+        width: 100%;
+        font-size: 0.95rem;
+    }
+    
+    .filter-form .form-select:focus,
+    .filter-form input[type="date"]:focus {
+        background: white;
+        border-color: #0284C7;
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+        outline: none;
+    }
+    
+    .filter-form label {
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+        display: block;
+    }
+    
+    .filter-form .btn-primary-custom {
+        background: linear-gradient(135deg, #0284C7, #0EA5E9);
+        border: none;
+        border-radius: 10px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-form .btn-primary-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.3);
+    }
+    
+    /* Table container */
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        animation: fadeInUp 0.6s ease 0.3s backwards;
+    }
+    
+    /* Table styling */
+    .appointments-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .appointments-table thead {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-radius: 10px;
+    }
+    
+    .appointments-table th {
+        font-weight: 700;
+        color: #1e293b;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        padding: 1rem;
+        border: none;
+    }
+    
+    .appointments-table tbody tr {
+        border-bottom: 1px solid #f1f5f9;
+        transition: all 0.3s ease;
+        animation: fadeInRow 0.4s ease backwards;
+    }
+    
+    .appointments-table tbody tr:nth-child(1) { animation-delay: 0.1s; }
+    .appointments-table tbody tr:nth-child(2) { animation-delay: 0.15s; }
+    .appointments-table tbody tr:nth-child(3) { animation-delay: 0.2s; }
+    .appointments-table tbody tr:nth-child(4) { animation-delay: 0.25s; }
+    .appointments-table tbody tr:nth-child(5) { animation-delay: 0.3s; }
+    .appointments-table tbody tr:nth-child(6) { animation-delay: 0.35s; }
+    
+    @keyframes fadeInRow {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .appointments-table tbody tr:hover {
+        background: linear-gradient(90deg, #f0f9ff 0%, transparent 100%);
+        transform: translateX(5px);
+    }
+    
+    .appointments-table td {
+        padding: 1rem;
+        vertical-align: middle;
+        color: #475569;
+    }
+    
+    .patient-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    
+    .patient-avatar {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+    
+    .appointments-table tbody tr:hover .patient-avatar {
+        border-color: #0284C7;
+        transform: scale(1.1);
+    }
+    
+    .patient-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .patient-name,
+    .doctor-name {
+        font-weight: 600;
+        color: #1e293b;
+    }
+    
+    .patient-name {
+        color: #0284C7;
+    }
+    
+    /* Status badges */
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        letter-spacing: 0.3px;
+    }
+    
+    .badge.bg-success {
+        background: linear-gradient(135deg, #10B981, #14B8A6) !important;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+    
+    .badge.bg-warning {
+        background: linear-gradient(135deg, #F59E0B, #F97316) !important;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        color: white !important;
+    }
+    
+    .badge.bg-info {
+        background: linear-gradient(135deg, #0EA5E9, #06B6D4) !important;
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+    
+    .badge.bg-danger {
+        background: linear-gradient(135deg, #EF4444, #F43F5E) !important;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+    
+    /* Action buttons */
+    .action-btn {
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        border: none;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+        margin-right: 0.25rem;
+    }
+    
+    .action-btn.btn-approve {
+        background: linear-gradient(135deg, #10B981, #14B8A6);
+        color: white;
+    }
+    
+    .action-btn.btn-approve:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    }
+    
+    .action-btn.btn-reject {
+        background: linear-gradient(135deg, #EF4444, #F43F5E);
+        color: white;
+    }
+    
+    .action-btn.btn-reject:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+    
+    .action-btn.btn-cancel-appt {
+        background: linear-gradient(135deg, #64748b, #475569);
+        color: white;
+    }
+    
+    .action-btn.btn-cancel-appt:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(100, 116, 139, 0.4);
+    }
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94a3b8;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+        animation: bounce 2s ease-in-out infinite;
+    }
+    
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    .empty-state p {
+        font-size: 1.1rem;
+        margin: 0;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-content {
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+        }
+        
+        .header-title {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+        }
+        
+        .appointments-table {
+            min-width: 800px;
+        }
+    }
+{% endblock %}
 
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>All System Appointments</h4>
-        </div>
-        <div>
-            <a href="{% url 'receptionist:book_appointment' %}" class="btn btn-sky btn-sm"><i class="fas fa-calendar-plus me-2"></i>Book New Appointment</a>
-        </div>
-    </div>
-    <div class="card-body">
-        <!-- Filter Pills -->
-        <div class="mb-4">
-            <a href="?filter=all" class="btn btn-sm {% if filter_by == 'all' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">All</a>
-            <a href="?filter=pending" class="btn btn-sm {% if filter_by == 'pending' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">Pending Approval</a>
-            <a href="?filter=today" class="btn btn-sm {% if filter_by == 'today' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">Today's Schedule</a>
-        </div>
-
-        <form method="get" class="mb-4 p-3 border rounded bg-light">
-            <div class="row g-3 align-items-center">
-                <div class="col-md-3">{{ filter.form.doctor.label_tag }} {{ filter.form.doctor }}</div>
-                <div class="col-md-3">{{ filter.form.status.label_tag }} {{ filter.form.status }}</div>
-                <div class="col-md-2">{{ filter.form.start_date.label_tag }} {{ filter.form.start_date }}</div>
-                <div class="col-md-2">{{ filter.form.end_date.label_tag }} {{ filter.form.end_date }}</div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit" class="btn btn-primary-custom w-100">Filter</button>
+{% block content %}
+<div class="appointments-wrapper">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="appointments-header">
+            <div class="header-content">
+                <div class="header-title">
+                    <div class="header-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                        <h2>Manage Appointments</h2>
+                        <p>View, filter, and manage all system appointments</p>
+                    </div>
                 </div>
+                <a href="{% url 'receptionist:book_appointment' %}" class="btn-book-new">
+                    <i class="fas fa-calendar-plus"></i>
+                    Book New Appointment
+                </a>
             </div>
-        </form>
+        </div>
+
+        <!-- Filter Pills -->
+        <div class="filter-pills">
+            <a href="?filter=all" class="btn btn-sm {% if filter_by == 'all' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">
+                <i class="fas fa-list"></i> All Appointments
+            </a>
+            <a href="?filter=pending" class="btn btn-sm {% if filter_by == 'pending' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">
+                <i class="fas fa-clock"></i> Pending Approval
+            </a>
+            <a href="?filter=today" class="btn btn-sm {% if filter_by == 'today' %}btn-primary-custom{% else %}btn-outline-secondary{% endif %}">
+                <i class="fas fa-calendar-day"></i> Today's Schedule
+            </a>
+        </div>
+
+        <!-- Advanced Filter Form -->
+        <div class="filter-form">
+            <form method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.doctor.id_for_label }}">{{ filter.form.doctor.label }}</label>
+                        {{ filter.form.doctor }}
+                    </div>
+                    <div class="col-md-3">
+                        <label for="{{ filter.form.status.id_for_label }}">{{ filter.form.status.label }}</label>
+                        {{ filter.form.status }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ filter.form.start_date.id_for_label }}">{{ filter.form.start_date.label }}</label>
+                        {{ filter.form.start_date }}
+                    </div>
+                    <div class="col-md-2">
+                        <label for="{{ filter.form.end_date.id_for_label }}">{{ filter.form.end_date.label }}</label>
+                        {{ filter.form.end_date }}
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary-custom w-100">
+                            <i class="fas fa-filter"></i> Apply Filter
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
         <!-- Appointments Table -->
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Patient</th>
-                        <th>Doctor</th>
-                        <th>Date & Time</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for appt in appointments %}
-                    <tr>
-                        <td>{{ appt.patient.user.get_full_name }}</td>
-                        <td>{{ appt.doctor }}</td>
-                        <td>{{ appt.appointment_date|date:"F d, Y" }} at {{ appt.appointment_time|time:"g:i A" }}</td>
-                        <td>
-                            {% if appt.status == 'Approved' %}<span class="badge bg-success">{{ appt.status }}</span>
-                            {% elif appt.status == 'Pending' %}<span class="badge bg-warning">{{ appt.status }}</span>
-                            {% elif appt.status == 'Completed' %}<span class="badge bg-info">{{ appt.status }}</span>
-                            {% else %}<span class="badge bg-danger">{{ appt.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group">
-                                {% if appt.status == 'Pending' %}
-                                    <a href="{% url 'receptionist:update_appointment_status' appt.pk 'Approved' %}" class="btn btn-sm btn-success" title="Approve">Approve</a>
-                                    <a href="{% url 'receptionist:update_appointment_status' appt.pk 'Rejected' %}" class="btn btn-sm btn-danger" title="Reject">Reject</a>
-                                {% elif appt.status == 'Approved' %}
-                                    <a href="{% url 'receptionist:cancel_appointment' appt.pk %}" class="btn btn-sm btn-secondary" title="Cancel Appointment">Cancel</a>
+        <div class="table-container">
+            <div class="table-responsive">
+                <table class="appointments-table table table-hover">
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-user-injured me-2"></i>Patient</th>
+                            <th><i class="fas fa-user-md me-2"></i>Doctor</th>
+                            <th><i class="fas fa-calendar me-2"></i>Date & Time</th>
+                            <th><i class="fas fa-info-circle me-2"></i>Status</th>
+                            <th><i class="fas fa-cogs me-2"></i>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for appt in appointments %}
+                        <tr>
+                            <td>
+                                <div class="patient-cell">
+                                    {% if appt.patient.profile_picture %}
+                                        <img src="{{ appt.patient.profile_picture.url }}" alt="{{ appt.patient.user.get_full_name }}" class="patient-avatar">
+                                    {% else %}
+                                        <div class="patient-avatar" style="background: linear-gradient(135deg, #0284C7, #0EA5E9); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem;">
+                                            {{ appt.patient.user.first_name|first }}{{ appt.patient.user.last_name|first }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="patient-info">
+                                        <span class="patient-name">{{ appt.patient.user.get_full_name }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="doctor-name">{{ appt.doctor }}</td>
+                            <td>
+                                <strong>{{ appt.appointment_date|date:"M d, Y" }}</strong>
+                                <span class="text-muted">at {{ appt.appointment_time|time:"g:i A" }}</span>
+                            </td>
+                            <td>
+                                {% if appt.status == 'Approved' %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>{{ appt.status }}
+                                    </span>
+                                {% elif appt.status == 'Pending' %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-clock me-1"></i>{{ appt.status }}
+                                    </span>
+                                {% elif appt.status == 'Completed' %}
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-check-double me-1"></i>{{ appt.status }}
+                                    </span>
                                 {% else %}
-                                    <span class="text-muted small">--</span>
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-times-circle me-1"></i>{{ appt.status }}
+                                    </span>
                                 {% endif %}
-                            </div>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">No appointments found for this filter.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                            <td>
+                                {% if appt.status == 'Pending' %}
+                                    <a href="{% url 'receptionist:update_appointment_status' appt.pk 'Approved' %}" 
+                                       class="action-btn btn-approve" title="Approve">
+                                        <i class="fas fa-check"></i> Approve
+                                    </a>
+                                    <a href="{% url 'receptionist:update_appointment_status' appt.pk 'Rejected' %}" 
+                                       class="action-btn btn-reject" title="Reject">
+                                        <i class="fas fa-times"></i> Reject
+                                    </a>
+                                {% elif appt.status == 'Approved' %}
+                                    <a href="{% url 'receptionist:cancel_appointment' appt.pk %}" 
+                                       class="action-btn btn-cancel-appt" title="Cancel Appointment">
+                                        <i class="fas fa-ban"></i> Cancel
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">No actions available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5">
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <p>No appointments found for this filter</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
