@@ -1,42 +1,587 @@
 {% extends 'base_doctor.html' %}
+{% load static %}
+{% load availability_tags %}
 
-{% block title %}Manage My Availability{% endblock %}
+{% block title %}Manage My Availability - MedCare HMS{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="fas fa-user-clock me-2"></i>My Weekly Schedule</h4>
-        <button type="button" class="btn btn-sky btn-sm" data-bs-toggle="modal" data-bs-target="#addSlotModal">
-            <i class="fas fa-plus me-2"></i>Add New Time Slot
-        </button>
+<style>
+    /* ==================== AVAILABILITY MANAGEMENT STYLES ==================== */
+
+    /* Full-width layout matching dashboard */
+    .availability-wrapper {
+        width: 100vw;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    .availability-header {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background: linear-gradient(135deg,
+            #0E7490 0%,
+            #0284C7 35%,
+            #14B8A6 70%,
+            #0C4A6E 100%
+        );
+        background-size: 300% 300%;
+        animation: headerGradient 15s ease infinite;
+        border-radius: 0 !important;
+        padding: 3rem 5vw;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 20px 60px rgba(14, 116, 144, 0.3),
+            0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .content-section {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0 5vw;
+    }
+
+    /* Weekly Calendar Grid */
+    .weekly-calendar {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .calendar-header {
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        color: white;
+        padding: 1.5rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .calendar-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .week-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+        background: #f8fafc;
+    }
+
+    .day-column {
+        background: white;
+        min-height: 400px;
+    }
+
+    .day-header {
+        background: #f1f5f9;
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 2px solid #e2e8f0;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .day-slots {
+        padding: 0.5rem;
+        min-height: 350px;
+    }
+
+    /* Time Slot Styling */
+    .time-slot {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 0.75rem 0.5rem;
+        margin-bottom: 0.5rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        border: 2px solid transparent;
+    }
+
+    .time-slot:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .time-slot .slot-time {
+        font-weight: 600;
+        margin-bottom: 0.25rem;
+    }
+
+    .time-slot .slot-actions {
+        position: absolute;
+        top: 0.25rem;
+        right: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .time-slot:hover .slot-actions {
+        opacity: 1;
+    }
+
+    /* Make slot action buttons visible on small screens (no hover) */
+    @media (max-width: 768px) {
+        .time-slot .slot-actions {
+            opacity: 1;
+            position: relative;
+            top: auto;
+            right: auto;
+            margin-top: 0.5rem;
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.25rem;
+        }
+        .time-slot { padding-bottom: 0.75rem; }
+    }
+
+    .slot-actions .btn {
+        padding: 0.125rem 0.25rem;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        margin-left: 0.125rem;
+    }
+
+    /* Empty Day Styling */
+    .empty-day {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 200px;
+        color: #9ca3af;
+        text-align: center;
+    }
+
+    .empty-day i {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        opacity: 0.5;
+    }
+
+    .empty-day .add-slot-btn {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 0.5rem;
+    }
+
+    .empty-day .add-slot-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Quick Actions Panel */
+    .quick-actions {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .action-card {
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .action-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        border-color: #0E7490;
+    }
+
+    .action-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        color: white;
+    }
+
+    .action-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .action-description {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    /* Statistics Cards */
+    .stats-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        font-size: 1.25rem;
+    }
+
+    .stat-icon.calendar {
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+    }
+
+    .stat-icon.clock {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+    }
+
+    .stat-icon.availability {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    /* Modal Enhancements */
+    .modal-content {
+        border-radius: 16px;
+        border: none;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        color: white;
+        border-radius: 16px 16px 0 0;
+        border-bottom: none;
+        padding: 1.5rem 2rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0E7490;
+        box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.1);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .week-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .day-header {
+            padding: 0.75rem;
+            font-size: 0.875rem;
+        }
+
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stats-overview {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 576px) {
+        .stats-overview {
+            grid-template-columns: 1fr;
+        }
+
+        .calendar-title {
+            font-size: 1.25rem;
+        }
+    }
+
+    /* Animation keyframes */
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    /* Button Styles */
+    .btn-sky {
+        background: linear-gradient(135deg, #0284C7 0%, #0E7490 100%);
+        border: none;
+        color: white;
+        padding: 0.6rem 1.2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-sky::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+    }
+
+    .btn-sky:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .btn-sky:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+        color: white;
+    }
+</style>
+
+<div class="availability-wrapper">
+    <!-- Header Section -->
+    <div class="availability-header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold text-white mb-2">
+                        <i class="fas fa-user-clock me-3"></i>Manage Availability
+                    </h1>
+                    <p class="lead text-white-50 mb-0">
+                        Set your weekly schedule and manage time slots for patient appointments
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
+                    <div class="d-flex flex-column flex-lg-row gap-3 justify-content-lg-end">
+                        <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#bulkScheduleModal">
+                            <i class="fas fa-calendar-plus me-2"></i>Bulk Schedule
+                        </button>
+                        <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#addSlotModal">
+                            <i class="fas fa-plus me-2"></i>Add Time Slot
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <ul class="list-group list-group-flush">
-            {% for slot in slots %}
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-                <div>
-                    <strong class="d-block">{{ slot.get_day_of_week_display }}</strong>
-                    <span class="text-muted">{{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}</span>
+
+    <div class="content-section">
+        <div class="container-fluid">
+            <!-- Statistics Overview -->
+            <div class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon calendar">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="stat-value">{{ slots|length }}</div>
+                    <div class="stat-label">Active Time Slots</div>
                 </div>
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-info edit-slot-btn"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editSlotModal"
-                            data-slot-id="{{ slot.id }}"
-                            data-day="{{ slot.day_of_week }}"
-                            data-start="{{ slot.start_time|time:'H:i' }}"
-                            data-end="{{ slot.end_time|time:'H:i' }}">
-                        <i class="fas fa-pen"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteSlotModal-{{ slot.id }}">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                <div class="stat-card">
+                    <div class="stat-icon clock">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-value">{{ total_hours|default:"0" }}</div>
+                    <div class="stat-label">Weekly Hours</div>
                 </div>
-            </li>
-            {% empty %}
-            <li class="list-group-item text-center text-muted py-4">You have not set any available time slots.</li>
-            {% endfor %}
-        </ul>
+                <div class="stat-card">
+                    <div class="stat-icon availability">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-value">{{ available_days|default:"0" }}</div>
+                    <div class="stat-label">Available Days</div>
+                </div>
+            </div>
+
+            <!-- Weekly Calendar View -->
+            <div class="weekly-calendar">
+                <div class="calendar-header">
+                    <h2 class="calendar-title mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>My Weekly Schedule
+                    </h2>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-light btn-sm" onclick="refreshCalendar()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="week-grid">
+                    {% for day_num, day_name in days_of_week.items %}
+                    <div class="day-column">
+                        <div class="day-header">{{ day_name }}</div>
+                        <div class="day-slots">
+                            {% with day_slots=slots|filter_by_day:day_num %}
+                            {% if day_slots %}
+                                {% for slot in day_slots %}
+                                <div class="time-slot" data-slot-id="{{ slot.id }}">
+                                    <div class="slot-time">
+                                        {{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}
+                                    </div>
+                                    <div class="slot-actions">
+                                        <button class="btn btn-light btn-sm edit-slot-btn"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editSlotModal"
+                                                data-slot-id="{{ slot.id }}"
+                                                data-day="{{ slot.day_of_week }}"
+                                                data-start="{{ slot.start_time|time:'H:i' }}"
+                                                data-end="{{ slot.end_time|time:'H:i' }}"
+                                                title="Edit Slot">
+                                            <i class="fas fa-pen"></i>
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                                data-bs-target="#deleteSlotModal-{{ slot.id }}" title="Delete Slot">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty-day">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <div>No slots scheduled</div>
+                                    <button type="button" class="btn btn-sky btn-sm add-slot-btn" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#addSlotModal"
+                                            data-day="{{ day_num }}" 
+                                            onclick="setDayForNewSlot('{{ day_num }}')">
+                                        <i class="fas fa-plus me-1"></i>Add Slot
+                                    </button>
+                                </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <h3 class="text-center mb-4">
+                    <i class="fas fa-bolt text-warning me-2"></i>Quick Actions
+                </h3>
+                <div class="actions-grid">
+                    <div class="action-card" data-bs-toggle="modal" data-bs-target="#bulkScheduleModal">
+                        <div class="action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <div class="action-title">Bulk Schedule</div>
+                        <div class="action-description">Set recurring time slots for multiple days at once</div>
+                    </div>
+                    <div class="action-card" data-bs-toggle="modal" data-bs-target="#timeOffModal">
+                        <div class="action-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="action-title">Time Off</div>
+                        <div class="action-description">Mark specific dates or periods as unavailable</div>
+                    </div>
+                    <div id="copyScheduleCard" class="action-card">
+                        <div class="action-icon">
+                            <i class="fas fa-copy"></i>
+                        </div>
+                        <div class="action-title">Copy Schedule</div>
+                        <div class="action-description">Duplicate your schedule to another week or day</div>
+                    </div>
+                    <div id="clearAllCard" class="action-card" data-bs-toggle="modal" data-bs-target="#clearAllModal">
+                        <div class="action-icon">
+                            <i class="fas fa-trash-alt"></i>
+                        </div>
+                        <div class="action-title">Clear All</div>
+                        <div class="action-description">Remove all time slots (irreversible action)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -44,105 +589,471 @@
 
 <!-- Add New Slot Modal -->
 <div class="modal fade" id="addSlotModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add Time Slot</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form action="{% url 'doctors:manage_availability' %}" method="post">
-          {% csrf_token %}
-          <div class="modal-body">
-              <div class="mb-3"><label for="id_day_of_week_add" class="form-label">Day of week:</label>{{ form.day_of_week }}</div>
-              <div class="mb-3"><label for="id_start_time_add" class="form-label">Start time:</label>{{ form.start_time }}</div>
-              <div class="mb-3"><label for="id_end_time_add" class="form-label">End time:</label>{{ form.end_time }}</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary-custom">Add Slot</button>
-          </div>
-      </form>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-plus-circle me-2"></i>Add New Time Slot
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="{% url 'doctors:manage_availability' %}" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_day_of_week_add" class="form-label">
+                                    <i class="fas fa-calendar-day me-1"></i>Day of Week
+                                </label>
+                                {{ form.day_of_week }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_start_time_add" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Start Time
+                                </label>
+                                {{ form.start_time }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_end_time_add" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>End Time
+                                </label>
+                                {{ form.end_time }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Tip:</strong> Time slots should be at least 30 minutes long and cannot overlap with existing slots.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-sky">
+                        <i class="fas fa-plus me-1"></i>Add Time Slot
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
 </div>
 
 <!-- Edit Slot Modal -->
 <div class="modal fade" id="editSlotModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Edit Time Slot</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-      </div>
-      <form id="editSlotForm" method="post"> {# Action will be set by JS #}
-          {% csrf_token %}
-          <div class="modal-body">
-              <div class="mb-3"><label for="id_day_of_week_edit" class="form-label">Day of week:</label>{{ form.day_of_week }}</div>
-              <div class="mb-3"><label for="id_start_time_edit" class="form-label">Start time:</label>{{ form.start_time }}</div>
-              <div class="mb-3"><label for="id_end_time_edit" class="form-label">End time:</label>{{ form.end_time }}</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary-custom">Save Changes</button>
-          </div>
-      </form>
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>Edit Time Slot
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editSlotForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_day_of_week_edit" class="form-label">
+                                    <i class="fas fa-calendar-day me-1"></i>Day of Week
+                                </label>
+                                {{ form.day_of_week }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_start_time_edit" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>Start Time
+                                </label>
+                                {{ form.start_time }}
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="id_end_time_edit" class="form-label">
+                                    <i class="fas fa-clock me-1"></i>End Time
+                                </label>
+                                {{ form.end_time }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancel
+                    </button>
+                    <button type="submit" class="btn btn-sky">
+                        <i class="fas fa-save me-1"></i>Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- Bulk Schedule Modal -->
+<div class="modal fade" id="bulkScheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-plus me-2"></i>Bulk Schedule Creation
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Select multiple days and set recurring time slots for efficient scheduling.</p>
+
+                <form id="bulkScheduleForm" action="{% url 'doctors:bulk_create_availability' %}" method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">
+                                    <i class="fas fa-calendar-week me-1"></i>Select Days
+                                </label>
+                                <div class="day-selector">
+                                    {% for day_num, day_name in days_of_week.items %}
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="day{{ day_num }}" name="days" value="{{ day_num }}">
+                                        <label class="form-check-label" for="day{{ day_num }}">{{ day_name|slice:":3" }}</label>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="bulkStartTime" class="form-label">
+                                            <i class="fas fa-clock me-1"></i>Start Time
+                                        </label>
+                                        <input type="time" class="form-control" id="bulkStartTime" name="start_time" required>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mb-3">
+                                        <label for="bulkEndTime" class="form-label">
+                                            <i class="fas fa-clock me-1"></i>End Time
+                                        </label>
+                                        <input type="time" class="form-control" id="bulkEndTime" name="end_time" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" id="bulkCreateBtn" class="btn btn-sky">
+                    <i class="fas fa-plus me-1"></i>Create Schedule
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Time Off Modal -->
+<div class="modal fade" id="timeOffModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-times me-2"></i>Mark Time Off
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">Mark specific dates or date ranges as unavailable for appointments.</p>
+
+                <form id="timeOffForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="timeOffStart" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>Start Date
+                                </label>
+                                <input type="date" class="form-control" id="timeOffStart" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="timeOffEnd" class="form-label">
+                                    <i class="fas fa-calendar me-1"></i>End Date
+                                </label>
+                                <input type="date" class="form-control" id="timeOffEnd">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="timeOffReason" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Reason (Optional)
+                        </label>
+                        <textarea class="form-control" id="timeOffReason" rows="3" placeholder="e.g., Vacation, Conference, Sick Leave"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <button type="button" class="btn btn-warning" onclick="markTimeOff()">
+                    <i class="fas fa-calendar-times me-1"></i>Mark as Unavailable
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Delete Confirmation Modals -->
 {% for slot in slots %}
 <div class="modal fade" id="deleteSlotModal-{{ slot.id }}" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header"><h5 class="modal-title">Confirm Deletion</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
-      <div class="modal-body">Are you sure you want to delete this time slot?</div>
-      <div class="modal-footer">
-        <form action="{% url 'doctors:delete_availability' slot.pk %}" method="post">
-            {% csrf_token %}
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-danger">Yes, Delete</button>
-        </form>
-      </div>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-calendar-times text-warning" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-center mb-3">Delete Time Slot</h5>
+                <p class="text-muted mb-3">Are you sure you want to delete this time slot?</p>
+                <div class="card border-warning mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Day:</strong><br>
+                                {{ slot.get_day_of_week_display }}
+                            </div>
+                            <div class="col-6">
+                                <strong>Time:</strong><br>
+                                {{ slot.start_time|time:"g:i A" }} - {{ slot.end_time|time:"g:i A" }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Note:</strong> Patients will no longer be able to book appointments during this time slot.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <form action="{% url 'doctors:delete_availability' slot.pk %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Yes, Delete Slot
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 {% endfor %}
+
+<!-- Clear All Slots Confirmation Modal -->
+<div class="modal fade" id="clearAllModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Clear All Time Slots
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="text-center mb-3">Are you absolutely sure?</h5>
+                <p class="text-muted mb-3">This action will permanently delete <strong>ALL</strong> of your time slots. This includes:</p>
+                <ul class="text-muted mb-3">
+                    <li>All scheduled availability across all days</li>
+                    <li>All time slots that patients can book appointments for</li>
+                    <li>This action cannot be undone</li>
+                </ul>
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> Patients will no longer be able to book appointments during your previously available times.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+                <form action="{% url 'doctors:clear_all_availability' %}" method="post" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-1"></i>Yes, Clear All Slots
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script>
+// Fallback global handlers in case DOMContentLoaded handlers fail or execute later.
+window.applyBulkSchedule = window.applyBulkSchedule || function() {
+    const form = document.getElementById('bulkScheduleForm');
+    if (!form) { alert('Bulk form not found.'); return; }
+    // Basic validation: at least one day checkbox and times
+    const selected = Array.from(form.querySelectorAll('input[name="days"]:checked'));
+    const start = form.querySelector('input[name="start_time"]')?.value;
+    const end = form.querySelector('input[name="end_time"]')?.value;
+    if (selected.length === 0) { alert('Please select at least one day.'); return; }
+    if (!start || !end) { alert('Please set both start and end times.'); return; }
+    form.submit();
+};
+
+window.clearAllSlots = window.clearAllSlots || function() {
+    const modal = document.getElementById('clearAllModal');
+    if (modal) { const bsModal = new bootstrap.Modal(modal); bsModal.show(); }
+    else { alert('Clear all modal not found.'); }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
+    try {
+    // Edit slot modal functionality
     const editSlotModal = document.getElementById('editSlotModal');
-    
-    editSlotModal.addEventListener('show.bs.modal', function (event) {
-        const button = event.relatedTarget; 
-        
+
+    if (editSlotModal) {
+        editSlotModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
         const slotId = button.dataset.slotId;
         const day = button.dataset.day;
         const startTime = button.dataset.start;
         const endTime = button.dataset.end;
 
         const form = editSlotModal.querySelector('#editSlotForm');
-        
-        // --- THIS IS THE ROBUST FIX ---
-        // We select the inputs within the specific edit form by their 'name' attribute,
-        // which is guaranteed to be unique within that form.
         const daySelect = form.querySelector('select[name="day_of_week"]');
         const startInput = form.querySelector('input[name="start_time"]');
         const endInput = form.querySelector('input[name="end_time"]');
-        // --- END OF FIX ---
 
-        // Construct the URL for the form's action attribute
-        const url = `/doctor/availability/${slotId}/edit/`;
-        form.action = url;
-        
-        // Update the modal's form fields with the data from the clicked button
-        if(daySelect) daySelect.value = day;
-        if(startInput) startInput.value = startTime;
-        if(endInput) endInput.value = endTime;
+    // Build the edit URL from Django's URL resolver (use placeholder 0 and replace it)
+    const urlTemplate = "{% url 'doctors:edit_availability' 0 %}";
+    const url = urlTemplate.replace('/0/', `/${slotId}/`);
+    form.action = url;
+
+            if(daySelect) daySelect.value = day;
+            if(startInput) startInput.value = startTime;
+            if(endInput) endInput.value = endTime;
+        });
+    }
+
+    // Set day for new slot when clicking from empty day (and attach handlers to add-slot buttons)
+    function setDayForNewSlot(dayNum) {
+        const modal = document.getElementById('addSlotModal');
+        if (!modal) return;
+        const daySelect = modal.querySelector('select[name="day_of_week"]');
+        if(daySelect) {
+            daySelect.value = parseInt(dayNum);
+        }
+    }
+
+    // Attach handlers for per-day add-slot buttons
+    const addSlotBtns = Array.from(document.querySelectorAll('.add-slot-btn'));
+    addSlotBtns.forEach(btn => {
+        btn.addEventListener('click', function(e){
+            const day = this.dataset.day;
+            setDayForNewSlot(day);
+            // modal will be opened by data-bs-toggle/data-bs-target
+        });
     });
+
+    // Bulk schedule: attach to bulkCreateBtn and submit the bulkScheduleForm
+    const bulkScheduleForm = document.getElementById('bulkScheduleForm');
+    const bulkCreateBtn = document.getElementById('bulkCreateBtn');
+    if (bulkCreateBtn && bulkScheduleForm) {
+        bulkCreateBtn.addEventListener('click', function(e){
+            e.preventDefault();
+            const selectedDays = Array.from(bulkScheduleForm.querySelectorAll('input[name="days"]:checked'));
+            const start = bulkScheduleForm.querySelector('input[name="start_time"]')?.value;
+            const end = bulkScheduleForm.querySelector('input[name="end_time"]')?.value;
+            if (selectedDays.length === 0) { alert('Please select at least one day.'); return; }
+            if (!start || !end) { alert('Please set both start and end times.'); return; }
+            bulkScheduleForm.submit();
+        });
+    }
+
+    // Copy schedule card handler
+    const copyScheduleCard = document.getElementById('copyScheduleCard');
+    if (copyScheduleCard) {
+        copyScheduleCard.addEventListener('click', function(){
+            alert('Copy schedule functionality - Coming soon!');
+        });
+    }
+
+    // Clear all: attach handler to clearAllCard to show modal (data-bs attributes still present as a fallback)
+    const clearAllCard = document.getElementById('clearAllCard');
+    if (clearAllCard) {
+        clearAllCard.addEventListener('click', function(e){
+            // Allow data-bs-toggle to handle modal opening; if not, open programmatically
+            const modal = document.getElementById('clearAllModal');
+            if (modal && !modal.classList.contains('show')) {
+                const bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            }
+        });
+    }
+
+    // Time off functionality
+    window.markTimeOff = function() {
+        const startDate = document.getElementById('timeOffStart').value;
+        const endDate = document.getElementById('timeOffEnd').value;
+        const reason = document.getElementById('timeOffReason').value;
+
+        if (!startDate) {
+            alert('Please select a start date.');
+            return;
+        }
+
+        // Here you would send an AJAX request to mark time off
+        alert('Time off marked successfully!');
+        bootstrap.Modal.getInstance(document.getElementById('timeOffModal')).hide();
+    };
+
+    // Copy schedule functionality
+    window.copySchedule = function() {
+        alert('Copy schedule functionality - Coming soon!');
+    };
+
+    // Clear all slots functionality
+    window.clearAllSlots = function() {
+        // Show custom confirmation modal
+        const modal = document.getElementById('clearAllModal');
+        if (modal) {
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        }
+    };
+
+    // Refresh calendar
+    window.refreshCalendar = function() {
+        location.reload();
+    };
+    } catch (e) {
+        console.error('manage_availability inline script error:', e);
+    }
 });
 </script>
 {% endblock %}
