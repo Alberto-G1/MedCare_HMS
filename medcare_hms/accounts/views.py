@@ -325,7 +325,6 @@ def doctor_dashboard(request):
         'waiting_patients_count': waiting_patients_count,
         'upcoming_appointments_today': upcoming_appointments_today,
         # Dummy data for features not yet implemented
-        'unread_messages_count': 7, 
         'pending_lab_results_count': 4,
         'current_time': timezone.now(),
     }

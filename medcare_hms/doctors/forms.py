@@ -8,13 +8,14 @@ from django.core.exceptions import ValidationError
 
 class DoctorProfileForm(forms.ModelForm):
     # --- Fields from the User model ---
-    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
-    last_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control'}))
+    first_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control-custom'}))
+    last_name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs={'class': 'form-control-custom'}))
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class': 'form-control-custom'}))
     
     department = forms.ModelChoiceField(
         queryset=Department.objects.filter(is_active=True),
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        widget=forms.Select(attrs={'class': 'form-control-custom form-select-custom'})
     )
 
     class Meta:
@@ -24,11 +25,11 @@ class DoctorProfileForm(forms.ModelForm):
             'license_number', 'years_of_experience', 'availability'
         ]
         widgets = {
-            'specialization': forms.TextInput(attrs={'class': 'form-control'}),
-            'license_number': forms.TextInput(attrs={'class': 'form-control'}),
-            'years_of_experience': forms.NumberInput(attrs={'class': 'form-control'}),
-            'availability': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+            'specialization': forms.TextInput(attrs={'class': 'form-control-custom', 'placeholder': 'e.g., Cardiology, Neurology'}),
+            'license_number': forms.TextInput(attrs={'class': 'form-control-custom', 'placeholder': 'Medical license number'}),
+            'years_of_experience': forms.NumberInput(attrs={'class': 'form-control-custom', 'min': '0', 'max': '50'}),
+            'availability': forms.Textarea(attrs={'class': 'form-control-custom form-textarea-custom', 'placeholder': 'Describe your availability schedule (e.g., Mon-Fri, 9am-5pm)'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control-custom'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -36,6 +37,7 @@ class DoctorProfileForm(forms.ModelForm):
         if self.instance and self.instance.user:
             self.fields['first_name'].initial = self.instance.user.first_name
             self.fields['last_name'].initial = self.instance.user.last_name
+            self.fields['email'].initial = self.instance.user.email
     
     def save(self, commit=True):
         profile = super().save(commit=False)

@@ -1,18 +1,1055 @@
 {% extends 'base_doctor.html' %}
+{% load static %}
+{% load profile_tags %}
 
 {% block title %}Edit Doctor Profile{% endblock %}
+
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom"><h4 class="mb-0">Edit Profile Information</h4></div>
-    <div class="card-body">
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <div class="d-flex justify-content-end mt-4">
-                <a href="{% url 'doctors:doctor_profile' %}" class="btn btn-secondary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary-custom"><i class="fas fa-save me-2"></i>Save Changes</button>
+<style>
+    /* Scoped styles to prevent affecting base file */
+    .edit-doctor-profile-page {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Profile Container Animations */
+    @keyframes profileFadeInCustom {
+        from {
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes cardSlideInCustom {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes detailsSlideInCustom {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes profileImageZoomCustom {
+        from {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes gradientShiftCustom {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes iconFloatCustom {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    @keyframes badgePulseCustom {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 0.6; }
+    }
+
+    /* Profile Container - Full Width Background */
+    .edit-doctor-profile-page .profile-container-custom {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 2rem 1rem;
+        animation: profileFadeInCustom 0.8s ease-out;
+        background: var(--background-light);
+        min-height: calc(100vh - 100px);
+    }
+
+    .edit-doctor-profile-page .profile-card-custom {
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        overflow: visible;
+        position: static;
+        animation: none;
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .edit-doctor-profile-page .profile-card-custom::before,
+    .edit-doctor-profile-page .profile-card-custom::after {
+        display: none;
+    }
+
+    /* Form Layout - Full Width Grid */
+    .edit-doctor-profile-page .profile-main-grid-custom {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        width: 100%;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Form Sections - Full Width */
+    .edit-doctor-profile-page .form-section-custom {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        width: 100%;
+    }
+
+    .edit-doctor-profile-page .form-grid-custom {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    /* Profile Header */
+    .edit-doctor-profile-page .profile-header-custom {
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+        color: white;
+        padding: 2rem 3rem;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .edit-doctor-profile-page .profile-header-custom::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+        animation: shimmer 4s ease-in-out infinite;
+    }
+
+    .edit-doctor-profile-page .profile-title-custom {
+        font-size: 1.8rem;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 0;
+    }
+
+    .edit-doctor-profile-page .profile-title-custom i {
+        animation: iconFloatCustom 3s ease-in-out infinite;
+    }
+
+    /* Cancel Button */
+    .edit-doctor-profile-page .cancel-btn-custom {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .edit-doctor-profile-page .cancel-btn-custom:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .edit-doctor-profile-page .cancel-btn-custom:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .edit-doctor-profile-page .cancel-btn-custom:hover {
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+    }
+
+    .edit-doctor-profile-page .save-btn-custom {
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .edit-doctor-profile-page .save-btn-custom::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transform: translate(-50%, -50%);
+        transition: width 0.5s, height 0.5s;
+    }
+
+    .edit-doctor-profile-page .save-btn-custom:hover::before {
+        width: 300px;
+        height: 300px;
+    }
+
+    .edit-doctor-profile-page .save-btn-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.6);
+    }
+
+    .edit-doctor-profile-page .cancel-btn-custom i,
+    .edit-doctor-profile-page .cancel-btn-custom span,
+    .edit-doctor-profile-page .save-btn-custom i,
+    .edit-doctor-profile-page .save-btn-custom span {
+        position: relative;
+        z-index: 1;
+    }
+
+    /* Profile Content Section */
+    .edit-doctor-profile-page .profile-content-custom {
+        position: relative;
+        z-index: 2;
+        padding: 2rem 3rem 3rem;
+    }
+
+    .edit-doctor-profile-page .profile-main-grid-custom {
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 3rem;
+        align-items: start;
+    }
+
+    /* Profile Sidebar */
+    .edit-doctor-profile-page .profile-sidebar-custom {
+        background: linear-gradient(145deg, #f8fafc 0%, #f1f5f9 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        text-align: center;
+        box-shadow: 0 8px 32px rgba(14, 116, 144, 0.08);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        position: relative;
+        animation: cardSlideInCustom 1s ease-out 0.2s both;
+    }
+
+    .edit-doctor-profile-page .profile-sidebar-custom::before {
+        content: '';
+        position: absolute;
+        top: -2px;
+        left: -2px;
+        right: -2px;
+        bottom: -2px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue), var(--accent-blue));
+        border-radius: 20px;
+        z-index: -1;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .edit-doctor-profile-page .profile-sidebar-custom:hover::before {
+        opacity: 0.2;
+    }
+
+    /* Profile Image Container */
+    .edit-doctor-profile-page .profile-image-container-custom {
+        position: relative;
+        width: 180px;
+        height: 180px;
+        margin: 0 auto 1.5rem;
+        animation: profileImageZoomCustom 0.8s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+    }
+
+    .edit-doctor-profile-page .profile-image-wrapper-custom {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        padding: 6px;
+        background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue), var(--accent-blue));
+        background-size: 200% 200%;
+        animation: gradientShiftCustom 6s ease infinite;
+        box-shadow: 0 12px 40px rgba(14, 116, 144, 0.3);
+        position: relative;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .edit-doctor-profile-page .profile-image-wrapper-custom:hover {
+        transform: scale(1.08) rotate(5deg);
+        box-shadow: 0 16px 50px rgba(14, 116, 144, 0.4);
+    }
+
+    .edit-doctor-profile-page .profile-image-wrapper-custom::after {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+        opacity: 0;
+        z-index: -1;
+        transition: opacity 0.4s ease;
+        animation: badgePulseCustom 3s ease-in-out infinite;
+    }
+
+    .edit-doctor-profile-page .profile-image-wrapper-custom:hover::after {
+        opacity: 0.3;
+    }
+
+    .edit-doctor-profile-page .profile-page-image-custom {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .edit-doctor-profile-page .doctor-name-custom {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .edit-doctor-profile-page .doctor-email-custom {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .edit-doctor-profile-page .doctor-email-custom i {
+        color: var(--primary-teal);
+    }
+
+    /* Status Badge */
+    .edit-doctor-profile-page .status-badge-profile-custom {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 2rem;
+    }
+
+    .edit-doctor-profile-page .status-badge-profile-custom.active {
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+    }
+
+    .edit-doctor-profile-page .status-badge-profile-custom.pending {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+    }
+
+    /* Quick Stats */
+    .edit-doctor-profile-page .quick-stats-custom {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .edit-doctor-profile-page .stat-item-custom {
+        background: white;
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(14, 116, 144, 0.08);
+        border: 1px solid rgba(14, 116, 144, 0.05);
+        transition: all 0.3s ease;
+    }
+
+    .edit-doctor-profile-page .stat-item-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(14, 116, 144, 0.15);
+    }
+
+    .edit-doctor-profile-page .stat-label-custom {
+        font-size: 0.8rem;
+        color: #64748b;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .edit-doctor-profile-page .stat-value-custom {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--primary-teal);
+    }
+
+    /* Profile Details - Form Section */
+    .edit-doctor-profile-page .profile-details-custom {
+        animation: detailsSlideInCustom 1s ease-out 0.4s both;
+    }
+
+    .edit-doctor-profile-page .form-section-custom {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 4px 20px rgba(14, 116, 144, 0.08);
+        border: 1px solid rgba(14, 116, 144, 0.08);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 2rem;
+    }
+
+    .edit-doctor-profile-page .form-section-custom:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(14, 116, 144, 0.15);
+    }
+
+    .edit-doctor-profile-page .section-title-custom {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        position: relative;
+        padding-bottom: 1rem;
+    }
+
+    .edit-doctor-profile-page .section-title-custom::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary-teal), var(--accent-blue));
+        border-radius: 2px;
+    }
+
+    .edit-doctor-profile-page .section-title-custom i {
+        color: var(--primary-teal);
+        animation: iconFloatCustom 3s ease-in-out infinite;
+    }
+
+    /* Form Styling */
+    .edit-doctor-profile-page .form-group-custom {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .edit-doctor-profile-page .form-label-custom {
+        font-weight: 600;
+        color: var(--primary-dark-teal);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .edit-doctor-profile-page .form-label-custom i {
+        width: 20px;
+        text-align: center;
+        color: var(--primary-teal);
+        font-size: 1rem;
+    }
+
+    .edit-doctor-profile-page .form-control-custom {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid rgba(14, 116, 144, 0.1);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #f8fafc;
+    }
+
+    .edit-doctor-profile-page .form-control-custom:focus {
+        border-color: var(--primary-teal);
+        box-shadow: 0 0 0 3px rgba(14, 116, 144, 0.1);
+        background: white;
+        outline: none;
+    }
+
+    .edit-doctor-profile-page .form-control-custom:hover {
+        border-color: var(--sky-blue);
+    }
+
+    .edit-doctor-profile-page .form-textarea-custom {
+        min-height: 120px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .edit-doctor-profile-page .form-select-custom {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 0.75rem center;
+        background-repeat: no-repeat;
+        background-size: 1rem;
+        padding-right: 2.5rem;
+    }
+
+    /* File Upload Styling */
+    .edit-doctor-profile-page .file-upload-custom {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .edit-doctor-profile-page .file-upload-custom input[type="file"] {
+        position: absolute;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .edit-doctor-profile-page .file-upload-custom .upload-area-custom {
+        border: 2px dashed rgba(14, 116, 144, 0.3);
+        border-radius: 12px;
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.02) 0%, rgba(56, 189, 248, 0.02) 100%);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .edit-doctor-profile-page .file-upload-custom:hover .upload-area-custom {
+        border-color: var(--primary-teal);
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.05) 0%, rgba(56, 189, 248, 0.05) 100%);
+    }
+
+    .edit-doctor-profile-page .upload-area-custom i {
+        font-size: 2rem;
+        color: var(--primary-teal);
+        margin-bottom: 0.5rem;
+    }
+
+    .edit-doctor-profile-page .upload-area-custom .upload-text-custom {
+        color: var(--primary-dark-teal);
+        font-weight: 600;
+    }
+
+    .edit-doctor-profile-page .upload-area-custom .upload-subtext-custom {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    /* Error Messages */
+    .edit-doctor-profile-page .error-message-custom {
+        color: #dc2626;
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .edit-doctor-profile-page .error-message-custom i {
+        font-size: 0.8rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .edit-doctor-profile-page .profile-main-grid-custom {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        .edit-doctor-profile-page .profile-sidebar-custom {
+            order: -1;
+        }
+
+        .edit-doctor-profile-page .profile-header-custom,
+        .edit-doctor-profile-page .profile-content-custom {
+            padding: 1.5rem;
+        }
+
+        .edit-doctor-profile-page .profile-sidebar-custom {
+            padding: 1.5rem;
+        }
+
+        .edit-doctor-profile-page .profile-image-container-custom {
+            width: 150px;
+            height: 150px;
+        }
+
+        .edit-doctor-profile-page .form-section-custom {
+            padding: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .edit-doctor-profile-page .profile-container-custom {
+            padding: 0 1rem;
+        }
+
+        .edit-doctor-profile-page .profile-title-custom {
+            font-size: 1.5rem;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .edit-doctor-profile-page .action-buttons-custom {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .edit-doctor-profile-page .cancel-btn-custom,
+        .edit-doctor-profile-page .save-btn-custom {
+            width: 100%;
+            max-width: 250px;
+            justify-content: center;
+        }
+    }
+
+    /* Loading Animation */
+    .edit-doctor-profile-page .loading-overlay-custom {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .edit-doctor-profile-page .loading-spinner-custom {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(14, 116, 144, 0.1);
+        border-left: 4px solid var(--primary-teal);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Save Button Section Styles */
+    .save-section-custom {
+        text-align: center;
+        padding: 2rem 0;
+        border-top: 1px solid rgba(14, 116, 144, 0.1);
+        margin-top: 2rem;
+    }
+
+    .save-btn-bottom-custom {
+        background: linear-gradient(135deg, var(--accent-green) 0%, var(--primary-teal) 100%);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 25px rgba(34, 197, 94, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        min-width: 200px;
+        justify-content: center;
+    }
+
+    .save-btn-bottom-custom:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(34, 197, 94, 0.4);
+        background: linear-gradient(135deg, var(--primary-teal) 0%, var(--accent-green) 100%);
+    }
+
+    .save-btn-bottom-custom:active {
+        transform: translateY(-1px);
+    }
+
+    .save-btn-bottom-custom i {
+        font-size: 1.2rem;
+    }
+
+    .save-note-custom {
+        margin-top: 1rem;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .save-note-custom i {
+        color: var(--primary-teal);
+    }
+
+    /* Responsive Save Button */
+    @media (max-width: 768px) {
+        .save-btn-bottom-custom {
+            padding: 0.9rem 2rem;
+            font-size: 1rem;
+            min-width: 180px;
+        }
+
+        .save-section-custom {
+            padding: 1.5rem 0;
+        }
+    }
+</style>
+
+<div class="edit-doctor-profile-page">
+    <div class="profile-container-custom">
+        <div class="profile-card-custom">
+            <!-- Profile Header -->
+            <div class="profile-header-custom">
+                <h1 class="profile-title-custom">
+                    <i class="fas fa-edit"></i>
+                    Edit My Profile
+                </h1>
+                <a href="{% url 'doctors:doctor_profile' %}" class="cancel-btn-custom">
+                    <i class="fas fa-times"></i>
+                    <span>Cancel</span>
+                </a>
             </div>
-        </form>
+
+            <!-- Profile Content -->
+            <div class="profile-content-custom">
+                <div class="profile-main-grid-custom">
+                    <!-- Profile Sidebar -->
+                    <div class="profile-sidebar-custom">
+                        <div class="profile-image-container-custom">
+                            <div class="profile-image-wrapper-custom">
+                                {% profile_image user size="168" css_class="profile-page-image-custom" %}
+                            </div>
+                        </div>
+
+                        <h2 class="doctor-name-custom">Dr. {{ user.get_full_name }}</h2>
+
+                        <div class="doctor-email-custom">
+                            <i class="fas fa-envelope"></i>
+                            <span>{{ user.email }}</span>
+                        </div>
+
+                        {% if user.is_active %}
+                            <span class="status-badge-profile-custom active">
+                                <i class="fas fa-circle"></i>
+                                Active Doctor
+                            </span>
+                        {% else %}
+                            <span class="status-badge-profile-custom pending">
+                                <i class="fas fa-clock"></i>
+                                Pending Approval
+                            </span>
+                        {% endif %}
+
+                        <!-- Quick Stats -->
+                        <div class="quick-stats-custom">
+                            <div class="stat-item-custom">
+                                <div class="stat-label-custom">Experience</div>
+                                <div class="stat-value-custom">{{ profile.years_of_experience|default:"0" }} Years</div>
+                            </div>
+                            <div class="stat-item-custom">
+                                <div class="stat-label-custom">Specialization</div>
+                                <div class="stat-value-custom" style="font-size: 1rem;">{{ profile.specialization|default:"Not set" }}</div>
+                            </div>
+                            <div class="stat-item-custom">
+                                <div class="stat-label-custom">Department</div>
+                                <div class="stat-value-custom" style="font-size: 0.9rem;">{{ profile.department.name|default:"Not assigned" }}</div>
+                            </div>
+                            <div class="stat-item-custom">
+                                <div class="stat-label-custom">License</div>
+                                <div class="stat-value-custom" style="font-size: 0.9rem;">{{ profile.license_number|default:"Not set" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Edit Form -->
+                    <div class="profile-details-custom">
+                        <form id="edit-profile-form" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <!-- Personal Information Section -->
+                            <div class="form-section-custom">
+                                <h3 class="section-title-custom">
+                                    <i class="fas fa-user"></i>
+                                    Personal Information
+                                </h3>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                <i class="fas fa-user"></i>
+                                                First Name
+                                            </label>
+                                            <input type="text" class="form-control-custom" name="first_name" value="{{ user.first_name }}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-custom">
+                                            <label class="form-label-custom">
+                                                <i class="fas fa-user"></i>
+                                                Last Name
+                                            </label>
+                                            <input type="text" class="form-control-custom" name="last_name" value="{{ user.last_name }}" required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-envelope"></i>
+                                        Email Address
+                                    </label>
+                                    <input type="email" class="form-control-custom" name="email" value="{{ user.email }}" required>
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-phone"></i>
+                                        Contact Number
+                                    </label>
+                                    <input type="tel" class="form-control-custom" name="contact" value="{{ user.userprofile.contact }}">
+                                </div>
+                            </div>
+
+                            <!-- Professional Information Section -->
+                            <div class="form-section-custom">
+                                <h3 class="section-title-custom">
+                                    <i class="fas fa-stethoscope"></i>
+                                    Professional Information
+                                </h3>
+
+                                <div class="form-group-custom">
+                                    <label for="{{ form.specialization.id_for_label }}" class="form-label-custom">
+                                        <i class="fas fa-stethoscope"></i>
+                                        {{ form.specialization.label }}
+                                    </label>
+                                    {{ form.specialization }}
+                                    {% if form.specialization.errors %}
+                                        <div class="text-danger mt-1">{{ form.specialization.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="{{ form.department.id_for_label }}" class="form-label-custom">
+                                        <i class="fas fa-building"></i>
+                                        {{ form.department.label }}
+                                    </label>
+                                    {{ form.department }}
+                                    {% if form.department.errors %}
+                                        <div class="text-danger mt-1">{{ form.department.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="{{ form.license_number.id_for_label }}" class="form-label-custom">
+                                        <i class="fas fa-id-card"></i>
+                                        {{ form.license_number.label }}
+                                    </label>
+                                    {{ form.license_number }}
+                                    {% if form.license_number.errors %}
+                                        <div class="text-danger mt-1">{{ form.license_number.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="{{ form.years_of_experience.id_for_label }}" class="form-label-custom">
+                                        <i class="fas fa-award"></i>
+                                        {{ form.years_of_experience.label }}
+                                    </label>
+                                    {{ form.years_of_experience }}
+                                    {% if form.years_of_experience.errors %}
+                                        <div class="text-danger mt-1">{{ form.years_of_experience.errors }}</div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="form-group-custom">
+                                    <label for="{{ form.availability.id_for_label }}" class="form-label-custom">
+                                        <i class="fas fa-calendar-check"></i>
+                                        {{ form.availability.label }}
+                                    </label>
+                                    {{ form.availability }}
+                                    {% if form.availability.errors %}
+                                        <div class="text-danger mt-1">{{ form.availability.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Profile Picture Section -->
+                            <div class="form-section-custom">
+                                <h3 class="section-title-custom">
+                                    <i class="fas fa-camera"></i>
+                                    Profile Picture
+                                </h3>
+
+                                <div class="form-group-custom">
+                                    <label class="form-label-custom">
+                                        <i class="fas fa-upload"></i>
+                                        Upload New Picture
+                                    </label>
+                                    <div class="file-upload-custom">
+                                        <input type="file" name="profile_picture" accept="image/*" id="profile-picture-input">
+                                        <div class="upload-area-custom">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            <div class="upload-text-custom">Click to upload or drag and drop</div>
+                                            <div class="upload-subtext-custom">PNG, JPG, GIF up to 5MB</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save Button Section -->
+                            <div class="form-section-custom">
+                                <div class="save-section-custom">
+                                    <button type="submit" class="save-btn-bottom-custom">
+                                        <i class="fas fa-save"></i>
+                                        <span>Save Changes</span>
+                                    </button>
+                                    <div class="save-note-custom">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>Click save to update your profile information</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden submit button for form submission -->
+                            <button type="submit" style="display: none;" id="hidden-submit"></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+// File upload preview
+document.getElementById('profile-picture-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        // You can add file validation here
+        console.log('File selected:', file.name);
+    }
+});
+
+// Form submission with loading state
+document.getElementById('edit-profile-form').addEventListener('submit', function(e) {
+    const submitBtn = document.querySelector('.save-btn-custom');
+    const originalText = submitBtn.innerHTML;
+
+    // Show loading state
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>Saving...</span>';
+    submitBtn.disabled = true;
+
+    // Re-enable after 3 seconds (in case of slow response)
+    setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }, 3000);
+});
+
+// Drag and drop functionality for file upload
+const uploadArea = document.querySelector('.upload-area-custom');
+const fileInput = document.getElementById('profile-picture-input');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+    uploadArea.classList.add('dragover');
+}
+
+function unhighlight(e) {
+    uploadArea.classList.remove('dragover');
+}
+
+uploadArea.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+
+    if (files.length > 0) {
+        fileInput.files = files;
+        // Trigger change event
+        const event = new Event('change');
+        fileInput.dispatchEvent(event);
+    }
+}
+
+// Add dragover styling
+const style = document.createElement('style');
+style.textContent = `
+    .upload-area-custom.dragover {
+        border-color: var(--primary-teal) !important;
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.1) 0%, rgba(56, 189, 248, 0.1) 100%) !important;
+        transform: scale(1.02);
+    }
+`;
+document.head.appendChild(style);
+</script>
+
 {% endblock %}

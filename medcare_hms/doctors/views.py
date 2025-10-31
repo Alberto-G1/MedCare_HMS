@@ -27,17 +27,32 @@ def doctor_profile_view(request):
 @login_required
 @doctor_required
 def edit_doctor_profile_view(request):
+    from management.models import Department
     profile, created = DoctorProfile.objects.get_or_create(user=request.user)
+    departments = Department.objects.all()
     if request.method == 'POST':
-        # Don't forget request.FILES for the profile picture
+        # Handle DoctorProfile form
         form = DoctorProfileForm(request.POST, request.FILES, instance=profile)
         if form.is_valid():
+            # Update User model fields
+            user = request.user
+            user.first_name = request.POST.get('first_name', user.first_name)
+            user.last_name = request.POST.get('last_name', user.last_name)
+            user.email = request.POST.get('email', user.email)
+            user.save()
+
+            # Update UserProfile contact if it exists
+            if hasattr(user, 'userprofile'):
+                user.userprofile.contact = request.POST.get('contact', user.userprofile.contact)
+                user.userprofile.save()
+
+            # Save the DoctorProfile form
             form.save()
             messages.success(request, 'Your profile has been updated successfully!')
             return redirect('doctors:doctor_profile')
     else:
         form = DoctorProfileForm(instance=profile)
-    return render(request, 'doctors/edit_doctor_profile.html', {'form': form})
+    return render(request, 'doctors/edit_doctor_profile.html', {'form': form, 'profile': profile, 'departments': departments})
 
 # --- Appointment Views ---
 @login_required
