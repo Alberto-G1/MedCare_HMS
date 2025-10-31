@@ -23,4 +23,6 @@ urlpatterns = [
     path('api/get-availability/', views.get_doctor_availability_api, name='api_get_doctor_availability'),
     path('availability/<int:pk>/edit/', views.edit_availability_view, name='edit_availability'),
     path('availability/<int:pk>/delete/', views.delete_availability_view, name='delete_availability'),
+    path('availability/clear-all/', views.clear_all_availability_view, name='clear_all_availability'),
+    path('availability/bulk-create/', views.bulk_create_availability_view, name='bulk_create_availability'),
 ]

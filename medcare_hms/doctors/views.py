@@ -243,7 +243,33 @@ def manage_availability_view(request):
         
     slots = DoctorAvailability.objects.filter(doctor=doctor_profile).order_by('day_of_week', 'start_time')
     
-    context = {'form': form, 'slots': slots}
+    # Calculate statistics for the new template
+    total_hours = 0
+    available_days = set()
+    days_of_week = {}
+    
+    for slot in slots:
+        # Calculate duration in hours using datetime.combine to handle time objects
+        from datetime import date
+        start_datetime = datetime.combine(date.today(), slot.start_time)
+        end_datetime = datetime.combine(date.today(), slot.end_time)
+        duration = (end_datetime - start_datetime).total_seconds() / 3600
+        total_hours += duration
+        available_days.add(slot.day_of_week)
+    
+    # Include all days of the week, even if no slots
+    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+    for i, day_name in enumerate(day_names):
+        days_of_week[i] = day_name
+    
+    context = {
+        'form': form, 
+        'slots': slots,
+        'total_hours': round(total_hours, 1),
+        'available_days': len(available_days),
+        'days_of_week': days_of_week,
+        'total_slots': len(slots)
+    }
     return render(request, 'doctors/manage_availability.html', context)
 
 
@@ -334,5 +360,60 @@ def delete_availability_view(request, pk):
     if request.method == 'POST':
         slot.delete()
         messages.success(request, "Time slot deleted successfully.")
+    
+    return redirect('doctors:manage_availability')
+
+@login_required
+@doctor_required
+def clear_all_availability_view(request):
+    doctor_profile = get_object_or_404(DoctorProfile, user=request.user)
+    
+    if request.method == 'POST':
+        deleted_count = DoctorAvailability.objects.filter(doctor=doctor_profile).count()
+        DoctorAvailability.objects.filter(doctor=doctor_profile).delete()
+        messages.success(request, f"All {deleted_count} time slots have been deleted successfully.")
+    
+    return redirect('doctors:manage_availability')
+
+@login_required
+@doctor_required
+def bulk_create_availability_view(request):
+    doctor_profile = get_object_or_404(DoctorProfile, user=request.user)
+    
+    if request.method == 'POST':
+        selected_days = request.POST.getlist('days')
+        start_time = request.POST.get('start_time')
+        end_time = request.POST.get('end_time')
+        
+        if not selected_days or not start_time or not end_time:
+            messages.error(request, "Please select days and set both start and end times.")
+            return redirect('doctors:manage_availability')
+        
+        created_count = 0
+        for day in selected_days:
+            try:
+                day_int = int(day)
+                # Check for overlapping slots
+                overlapping = DoctorAvailability.objects.filter(
+                    doctor=doctor_profile, 
+                    day_of_week=day_int,
+                    start_time__lt=end_time, 
+                    end_time__gt=start_time
+                )
+                if not overlapping.exists():
+                    DoctorAvailability.objects.create(
+                        doctor=doctor_profile,
+                        day_of_week=day_int,
+                        start_time=start_time,
+                        end_time=end_time
+                    )
+                    created_count += 1
+            except (ValueError, IntegrityError):
+                continue
+        
+        if created_count > 0:
+            messages.success(request, f"Successfully created {created_count} time slots.")
+        else:
+            messages.warning(request, "No new time slots were created. They may conflict with existing slots.")
     
     return redirect('doctors:manage_availability')
