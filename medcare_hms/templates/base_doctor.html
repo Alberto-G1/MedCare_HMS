@@ -44,59 +44,249 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
+        /* Smooth Page Transition Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        /* Page Content Animations */
         .content-wrapper {
             flex: 1;
+            animation: fadeInUp 0.6s ease-out;
+            padding-top: 100px; /* Space for fixed navbar */
         }
 
-        /* Doctor-specific Navbar with teal theme */
+        main.container-fluid {
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        /* Enhanced Navbar with Animations */
         .navbar-custom {
             background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
-            box-shadow: 0 4px 12px rgba(14, 116, 144, 0.15);
+            box-shadow: 0 8px 32px rgba(14, 116, 144, 0.2);
             padding: 0.8rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+            animation: fadeInDown 0.5s ease-out;
+            backdrop-filter: blur(10px);
+        }
+
+
+        .navbar-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, 
+                var(--accent-green) 0%, 
+                var(--accent-blue) 50%, 
+                var(--light-sky-blue) 100%);
+            animation: shimmer 3s infinite linear;
+            background-size: 200% 100%;
         }
 
         .logo-container {
             display: flex;
             align-items: center;
             gap: 12px;
+            animation: slideInLeft 0.6s ease-out;
         }
 
         .navbar-logo {
             height: 50px;
             width: 50px;
-            border-radius: 8px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-logo:hover {
+            transform: rotate(360deg) scale(1.1);
+            box-shadow: 0 8px 24px rgba(14, 116, 144, 0.4);
         }
 
         .logo-text {
             font-size: 1.5rem;
             font-weight: 700;
             color: white;
+            position: relative;
+            overflow: hidden;
         }
 
+        .logo-text::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-green);
+            transition: width 0.4s ease;
+        }
+
+        .logo-container:hover .logo-text::after {
+            width: 100%;
+        }
+
+        /* Enhanced Navigation Links */
         .nav-link {
             color: rgba(255, 255, 255, 0.9) !important;
             font-weight: 500;
             padding: 0.75rem 1rem !important;
-            border-radius: 8px;
+            border-radius: 12px;
             margin: 0 4px;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+            pointer-events: none;
+        }
+
+        .nav-link:hover::before {
+            left: 100%;
         }
 
         .nav-link:hover {
-            background-color: rgba(56, 189, 248, 0.2);
+            background-color: rgba(56, 189, 248, 0.25);
             color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
         }
 
         .nav-link.active {
             background: linear-gradient(135deg, var(--accent-green) 0%, var(--accent-blue) 100%);
             color: white !important;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, 0.4);
         }
 
-        /* Doctor Profile Dropdown */
+        .nav-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover i {
+            transform: scale(1.2);
+        }
+
+        /* Animated Status Badge */
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-badge::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .status-badge:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Enhanced User Profile Dropdown */
         .user-profile-nav {
             position: relative;
+            animation: slideInRight 0.6s ease-out;
         }
 
         .user-profile-toggle {
@@ -104,16 +294,20 @@
             align-items: center;
             gap: 10px;
             color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
-            background: transparent;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .user-profile-toggle:hover {
-            background-color: rgba(59, 130, 246, 0.2);
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
         }
 
         .user-avatar {
@@ -121,242 +315,566 @@
             height: 42px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.4);
             background: var(--accent-blue);
-            /* Fallback background color if image fails to load */
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .user-avatar:hover {
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: scale(1.05);
-        }
-
-        /* Error handling for broken images */
-        .user-avatar:error {
-            background: var(--accent-blue);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        /* Profile page images */
-        .profile-page-image {
-            border: 4px solid var(--background-white);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-        }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .user-role {
-            font-size: 0.8rem;
-            opacity: 0.8;
-            color: var(--light-blue);
+            border-color: white;
+            transform: scale(1.15) rotate(5deg);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
         .user-dropdown {
             position: absolute;
-            top: 100%;
+            top: calc(100% + 15px);
             right: 0;
-            width: 260px;
+            width: 280px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
-            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+            padding: 0;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transform: translateY(10px);
-            transition: all 0.3s ease;
+            transform: translateY(-20px) scale(0.95);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(14, 116, 144, 0.1);
+            overflow: hidden;
+        }
+
+        .user-dropdown::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 30px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            border-left: 1px solid rgba(14, 116, 144, 0.1);
+            border-top: 1px solid rgba(14, 116, 144, 0.1);
         }
 
         .user-dropdown.show {
             opacity: 1;
             visibility: visible;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
         }
 
         .dropdown-header {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border-light);
-            margin-bottom: 0.75rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            color: white;
+            border-radius: 16px 16px 0 0;
+        }
+
+        .dropdown-header .user-avatar {
+            border-color: white;
         }
 
         .dropdown-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 0.75rem;
-            border-radius: 6px;
+            padding: 1rem 1.5rem;
             color: var(--text-dark);
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-teal);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .dropdown-item:hover::before {
+            transform: scaleY(1);
         }
 
         .dropdown-item:hover {
-            background-color: #f3f4f6;
-            color: var(--primary-blue);
+            background: linear-gradient(90deg, rgba(14, 116, 144, 0.05) 0%, transparent 100%);
+            padding-left: 2rem;
+            color: var(--primary-teal);
         }
 
         .dropdown-item i {
-            width: 18px;
+            width: 20px;
             text-align: center;
-            color: var(--text-light);
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
         }
 
         .dropdown-item:hover i {
-            color: var(--primary-blue);
+            transform: scale(1.2) rotate(10deg);
         }
 
-        /* Mobile Sidebar */
-        @media (max-width: 768px) {
-            .mobile-sidebar {
-                position: fixed;
-                top: 0;
-                left: -100%;
-                width: 280px;
-                height: 100vh;
-                background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-dark-blue) 100%);
-                z-index: 1040;
-                transition: left 0.3s ease;
-                padding-top: 2rem;
-            }
-            
-            .mobile-sidebar.show {
-                left: 0;
-            }
-            
-            .sidebar-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.5);
-                z-index: 1039;
-            }
-            
-            .sidebar-overlay.show {
-                display: block;
-            }
-
-            .user-info {
-                display: none;
-            }
+        .dropdown-divider {
+            margin: 0.5rem 1rem;
+            border-color: rgba(14, 116, 144, 0.1);
         }
 
-        /* Cards */
+        /* Enhanced Cards */
         .card-custom {
             background: white;
-            border-radius: 12px;
+            border-radius: 16px;
             border: none;
-            box-shadow: 0 4px 12px rgba(31, 41, 55, 0.05);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(31, 41, 55, 0.08);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        .card-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14, 116, 144, 0.05), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .card-custom:hover::before {
+            left: 100%;
         }
 
         .card-custom:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(31, 41, 55, 0.15);
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 16px 48px rgba(14, 116, 144, 0.2);
         }
 
-        /* Doctor-specific status badges */
-        .status-badge {
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .status-online {
-            background-color: #dcfce7;
-            color: #166534;
-        }
-
-        .status-busy {
-            background-color: #fed7d7;
-            color: #c53030;
-        }
-
-        .status-away {
-            background-color: #fef3c7;
-            color: #92400e;
-        }
-
-        /* Footer */
-        .footer {
-            background: linear-gradient(135deg, var(--primary-dark-teal) 0%, #1e293b 100%);
-            color: white;
-            margin-top: auto;
-        }
-
-        .footer a {
-            color: var(--light-blue);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer a:hover {
-            color: var(--accent-orange);
-        }
-
-        .footer h5 {
-            color: white;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        .footer ul li {
-            margin-bottom: 0.75rem;
-        }
-
-        .social-links a {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            margin-right: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .social-links a:hover {
-            background: var(--secondary-blue);
-            transform: translateY(-3px);
-        }
-
-        /* Doctor-specific notification indicator */
+        /* Animated Notification Badge */
         .notification-badge {
             position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--accent-red);
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             font-size: 0.7rem;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+            border: 2px solid white;
+            z-index: 10;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            position: relative;
+        }
+
+        .notification-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: #fff;
+            padding: 0.6rem;
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .notification-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: #fff;
+        }
+
+        .notification-btn:hover i {
+            animation: pulse 0.6s ease-in-out;
+        }
+
+        .notification-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            width: 380px;
+            max-height: 500px;
+            overflow: hidden;
+            display: none;
+            z-index: 1000;
+            animation: slideInFromRight 0.3s ease-out;
+        }
+
+        .notification-dropdown-menu.show {
+            display: block;
+        }
+
+        .notification-dropdown-header {
+            background: linear-gradient(135deg, var(--primary-teal), var(--sky-blue));
+            color: white;
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .notification-dropdown-header h3 {
+            font-size: 1rem;
             font-weight: 600;
+            margin: 0;
+        }
+
+        .notification-dropdown-header .mark-all-read {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .notification-dropdown-header .mark-all-read:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .notification-dropdown-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-dropdown-footer {
+            padding: 0.75rem 1.25rem;
+            text-align: center;
+            border-top: 1px solid var(--background-light);
+        }
+
+        .notification-dropdown-footer a {
+            color: var(--primary-teal);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .notification-dropdown-footer a:hover {
+            color: var(--sky-blue);
+        }
+
+        .notification-empty {
+            padding: 3rem 1.25rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        .notification-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .notification-empty p {
+            margin: 0;
+            font-size: 0.875rem;
+        }
+
+        /* Mobile Sidebar Enhancements */
+        .mobile-sidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 320px;
+            height: 100vh;
+            background: linear-gradient(180deg, var(--primary-teal) 0%, var(--primary-dark-teal) 100%);
+            z-index: 1040;
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            padding-top: 2rem;
+            box-shadow: 20px 0 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-sidebar.show {
+            left: 0;
+        }
+
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1039;
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Enhanced Footer */
+.footer {
+    background: linear-gradient(135deg, var(--primary-dark-teal) 0%, #1e293b 100%);
+    color: #e2e8f0;
+    padding-top: 130px;
+    padding-bottom: 30px;
+    position: relative;
+}
+
+.footer h5 {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--accent-blue);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.footer p, .footer li {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.footer ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.footer ul li {
+    margin-bottom: 8px;
+}
+
+.footer ul li a {
+    color: #cbd5e1;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer ul li a:hover {
+    color: var(--accent-orange);
+}
+
+.footer .social-links a {
+    width: 38px;
+    height: 38px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.footer .social-links a:hover {
+    background: var(--accent-blue);
+    transform: translateY(-4px);
+}
+
+.footer hr {
+    border-color: rgba(255, 255, 255, 0.1);
+    margin: 40px 0 20px;
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, 
+                var(--accent-green) 0%, 
+                var(--accent-blue) 50%, 
+                var(--light-sky-blue) 100%);
+        }
+
+        .footer a {
+            color: var(--light-sky-blue);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .footer a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-orange);
+            transition: width 0.3s ease;
+        }
+
+        .footer a:hover::after {
+            width: 100%;
+        }
+
+        .footer a:hover {
+            color: var(--accent-orange);
+            transform: translateX(5px);
+        }
+
+        .social-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .social-link:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) rotate(5deg);
+            background: linear-gradient(135deg, var(--accent-blue) 0%, var(--sky-blue) 100%);
+            box-shadow: 0 8px 24px rgba(20, 184, 166, 0.4);
+        }
+
+        /* Dropdown Menu Animations */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            animation: slideInDown 0.3s ease-out;
+            z-index: 1050;
+            position: absolute;
+        }
+
+        .dropdown-menu .dropdown-item {
+            transition: all 0.3s ease;
+            padding: 0.75rem 1.5rem;
+        }
+
+        .dropdown-menu .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(14, 116, 144, 0.1) 0%, transparent 100%);
+            transform: translateX(5px);
+        }
+
+        /* Responsive Animations */
+        @media (max-width: 768px) {
+            .user-info {
+                display: none;
+            }
+            
+            .navbar-logo {
+                height: 40px;
+                width: 40px;
+            }
+            
+            .logo-text {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Loading Animation for Content */
+        @keyframes contentLoad {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-animated {
+            animation: contentLoad 0.6s ease-out forwards;
+        }
+
+        /* Stagger animation for multiple elements */
+        .stagger-animation > * {
+            animation: fadeInUp 0.6s ease-out backwards;
+        }
+
+        .stagger-animation > *:nth-child(1) { animation-delay: 0.1s; }
+        .stagger-animation > *:nth-child(2) { animation-delay: 0.2s; }
+        .stagger-animation > *:nth-child(3) { animation-delay: 0.3s; }
+        .stagger-animation > *:nth-child(4) { animation-delay: 0.4s; }
+        .stagger-animation > *:nth-child(5) { animation-delay: 0.5s; }
+        .stagger-animation > *:nth-child(6) { animation-delay: 0.6s; }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Enhanced hover effects for interactive elements */
+        button, .btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button:hover, .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        button:active, .btn:active {
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -364,110 +882,142 @@
     <div class="content-wrapper">
         <!-- Top Navigation -->
         <nav class="navbar navbar-expand-lg navbar-custom">
-            <div class="container">
-                <div class="logo-container">
+            <div class="d-flex w-100 px-4">
+                <div class="logo-container me-4">
                     <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo">
                     <span class="logo-text">MedCare HMS</span>
                 </div>
 
-                <button class="navbar-toggler border-0 d-lg-none" type="button" id="mobileMenuToggle">
+                <button class="navbar-toggler border-0 d-lg-none ms-auto me-3" type="button" id="mobileMenuToggle">
                     <i class="fas fa-bars text-white"></i>
                 </button>
 
-                <div class="collapse navbar-collapse d-none d-lg-block" id="navbarContent">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <div class="collapse navbar-collapse d-none d-lg-block flex-grow-1" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 stagger-animation">
                         <li class="nav-item">
-                            <a class="nav-link active" href="{% url 'accounts:doctor_dashboard' %}">
+                            <a class="nav-link active fw-semibold px-3 py-2 mx-1" href="{% url 'accounts:doctor_dashboard' %}">
                                 <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'doctors:manage_availability' %}">
+                            <a class="nav-link fw-semibold px-3 py-2 mx-1" href="{% url 'doctors:manage_availability' %}">
                                 <i class="fas fa-calendar-alt me-2"></i>My Schedule
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'doctors:doctor_appointments' %}">
+                            <a class="nav-link fw-semibold px-3 py-2 mx-1" href="{% url 'doctors:doctor_appointments' %}">
                                 <i class="fas fa-calendar-check me-2"></i>Appointments
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'doctors:medical_record_list' %}">
+                            <a class="nav-link fw-semibold px-3 py-2 mx-1" href="{% url 'doctors:medical_record_list' %}">
                                 <i class="fas fa-file-medical me-2"></i>Medical Records
                             </a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle fw-semibold px-3 py-2 mx-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="fas fa-users me-2"></i>Patients
-                                <i class="fas fa-chevron-down ms-1"></i>
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-list me-2"></i>Patient List</a></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Add Patient</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0">
+                                <li><a class="dropdown-item py-2" href="#"><i class="fas fa-list me-2 text-primary"></i>Patient List</a></li>
+                                <li><a class="dropdown-item py-2" href="#"><i class="fas fa-plus me-2 text-success"></i>Add Patient</a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-search me-2"></i>Search Patients</a></li>
+                                <li><a class="dropdown-item py-2" href="#"><i class="fas fa-search me-2 text-info"></i>Search Patients</a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'chat:thread_list' %}">
+                            <a class="nav-link fw-semibold px-3 py-2 mx-1 position-relative" href="{% url 'chat:thread_list' %}">
                                 <i class="fas fa-comments me-2"></i>Messages
-                                <span class="notification-badge">3</span>
+                                {% if unread_chat_messages_count %}
+                                <span class="notification-badge">{{ unread_chat_messages_count }}</span>
+                                {% endif %}
                             </a>
                         </li>
                     </ul>
 
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center ms-auto">
                         <!-- Doctor Status -->
-                        <div class="me-3">
-                            <span class="status-badge status-online">
-                                <i class="fas fa-circle me-1"></i>Available
+                        <div class="me-4">
+                            <span class="status-badge px-3 py-1" style="background: rgba(25,135,84,0.9); color: white;">
+                                <i class="fas fa-circle me-1" style="font-size: 0.6rem;"></i>Available
                             </span>
                         </div>
 
+                        <!-- Notifications -->
+                        <div class="notification-dropdown me-3">
+                            <button class="notification-btn" id="notificationToggle">
+                                <i class="fas fa-bell"></i>
+                                {% if unread_notifications_count %}
+                                <span class="notification-badge" id="notificationBadge">{{ unread_notifications_count }}</span>
+                                {% endif %}
+                            </button>
+
+                            <div class="notification-dropdown-menu" id="notificationDropdown">
+                                <div class="notification-dropdown-header">
+                                    <h3>Notifications</h3>
+                                    <button class="mark-all-read" id="markAllReadBtn">
+                                        <i class="fas fa-check-double"></i> Mark all read
+                                    </button>
+                                </div>
+                                <div class="notification-dropdown-body" id="notificationList">
+                                    <!-- Notifications will be loaded here via JavaScript -->
+                                    <div class="notification-empty">
+                                        <i class="fas fa-bell"></i>
+                                        <p>Loading notifications...</p>
+                                    </div>
+                                </div>
+                                <div class="notification-dropdown-footer">
+                                    <a href="{% url 'notifications:notification_list' %}">View All Notifications</a>
+                                </div>
+                            </div>
+                        </div>
+
                         {% if user.is_authenticated %}
-                        <div class="user-profile-nav">
+                        <div class="user-profile-nav position-relative">
                             <button class="user-profile-toggle" id="userProfileToggle">
-                                {% profile_image user size="42" css_class="user-avatar rounded" %}
-                                <div class="user-info">
-                                    <span class="user-name">Dr. {{ user.first_name }} {{ user.last_name }}</span>
-                                    <span class="user-role">Physician</span>
+                                {% profile_image user size="38" css_class="user-avatar" %}
+                                <div class="user-info text-start">
+                                    <div class="user-name">Dr. {{ user.first_name }} {{ user.last_name }}</div>
+                                    <div class="user-role small opacity-75">Doctor</div>
                                 </div>
                                 <i class="fas fa-chevron-down ms-2"></i>
                             </button>
                             <div class="user-dropdown" id="userDropdown">
                                 <div class="dropdown-header">
-                                    {% profile_image user size="42" css_class="user-avatar rounded" %}
+                                    {% profile_image user size="50" css_class="user-avatar" %}
                                     <div>
-                                        <div class="user-name">Dr. {{ user.first_name }} {{ user.last_name }}</div>
-                                        <div class="user-role">Physician</div>
+                                        <div class="user-name fw-bold">Dr. {{ user.first_name }} {{ user.last_name }}</div>
+                                        <div class="user-role small opacity-90">Doctor</div>
                                     </div>
                                 </div>
                                 <a href="{% url 'doctors:doctor_profile' %}" class="dropdown-item">
-                                    <i class="fas fa-user-md"></i>
+                                    <i class="fas fa-user-md text-primary"></i>
                                     <span>My Profile</span>
                                 </a>
                                 <a href="{% url 'doctors:edit_doctor_profile' %}" class="dropdown-item">
-                                    <i class="fas fa-cog"></i>
+                                    <i class="fas fa-cog text-secondary"></i>
                                     <span>Settings</span>
                                 </a>
                                 <a href="{% url 'doctors:manage_availability' %}" class="dropdown-item">
-                                    <i class="fas fa-calendar"></i>
+                                    <i class="fas fa-calendar text-info"></i>
                                     <span>Availability</span>
                                 </a>
                                 <a href="#" class="dropdown-item">
-                                    <i class="fas fa-chart-line"></i>
+                                    <i class="fas fa-chart-line text-success"></i>
                                     <span>Statistics</span>
                                 </a>
                                 <div class="dropdown-divider"></div>
-                                <a href="{% url 'accounts:logout' %}" class="dropdown-item">
+                                <a href="{% url 'accounts:logout' %}" class="dropdown-item text-danger">
                                     <i class="fas fa-sign-out-alt"></i>
                                     <span>Logout</span>
                                 </a>
                             </div>
                         </div>
                         {% else %}
-                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm me-2">Login</a>
-                        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-sm">Register</a>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm px-3 py-2 rounded-pill fw-semibold">Login</a>
+                            <a href="{% url 'accounts:register' %}" class="btn btn-light btn-sm px-3 py-2 rounded-pill fw-semibold">Register</a>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -479,71 +1029,73 @@
             <div class="sidebar-content p-3">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <div class="logo-container">
-                        <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" class="navbar-logo" style="width: 40px; height: 40px;">
-                        <span class="logo-text" style="font-size: 1.2rem;">MedCare HMS</span>
+                        <img src="{% static 'images/logo.png' %}" alt="MedCare Logo" style="width: 40px; height: 40px; border-radius: 8px;">
+                        <span class="logo-text text-white" style="font-size: 1.2rem;">MedCare HMS</span>
                     </div>
                     <button class="btn-close btn-close-white" id="closeMobileSidebar"></button>
                 </div>
                 
                 {% if user.is_authenticated %}
-                <div class="d-flex align-items-center gap-3 mb-4 p-2 rounded" style="background: rgba(255,255,255,0.1);">
-                    {% profile_image user size="50" css_class="user-avatar rounded" %}
+                <div class="d-flex align-items-center gap-3 mb-4 p-3 rounded" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
+                    {% profile_image user size="50" css_class="user-avatar rounded-circle" %}
                     <div>
-                        <div class="user-name">Dr. {{ user.first_name }} {{ user.last_name }}</div>
-                        <div class="user-role">Physician</div>
+                        <div class="user-name text-white fw-semibold">Dr. {{ user.first_name }} {{ user.last_name }}</div>
+                        <div class="user-role text-light opacity-75 small">Doctor</div>
                     </div>
                 </div>
                 {% endif %}
-                
+
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active text-white" href="{% url 'accounts:doctor_dashboard' %}">
-                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'accounts:doctor_dashboard' %}">
+                            <i class="fas fa-tachometer-alt me-3"></i>Dashboard
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'doctors:manage_availability' %}">
-                            <i class="fas fa-calendar-alt me-2"></i>My Schedule
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'doctors:manage_availability' %}">
+                            <i class="fas fa-calendar-alt me-3"></i>My Schedule
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'doctors:doctor_appointments' %}">
-                            <i class="fas fa-calendar-check me-2"></i>Appointments
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'doctors:doctor_appointments' %}">
+                            <i class="fas fa-calendar-check me-3"></i>Appointments
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'doctors:medical_record_list' %}">
-                            <i class="fas fa-file-medical me-2"></i>Medical Records
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'doctors:medical_record_list' %}">
+                            <i class="fas fa-file-medical me-3"></i>Medical Records
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'chat:thread_list' %}">
-                            <i class="fas fa-comments me-2"></i>Messages
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'chat:thread_list' %}">
+                            <i class="fas fa-comments me-3"></i>Messages
                         </a>
                     </li>
                     {% if user.is_authenticated %}
-                    <li class="nav-item mt-3">
-                        <a class="nav-link text-white" href="{% url 'doctors:doctor_profile' %}">
-                            <i class="fas fa-user-md me-2"></i>My Profile
+                    <li class="nav-item mt-4 pt-3 border-top border-light border-opacity-25">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'doctors:doctor_profile' %}">
+                            <i class="fas fa-user-md me-3"></i>My Profile
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'accounts:logout' %}">
-                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                    <li class="nav-item mb-2">
+                        <a class="nav-link text-white py-3 px-3 rounded-pill fw-semibold" href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt me-3"></i>Logout
                         </a>
                     </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
+
+        <!-- Sidebar Overlay -->
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
         <!-- Include Messages Component -->
         {% include 'components/messages.html' %}
 
-        <!-- Main Content -->
-        <main class="container-fluid py-4">
-            <div class="container">
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <div class="content-container">
                 {% block content %}
                 <!-- Doctor specific content goes here -->
                 {% endblock %}
@@ -562,10 +1114,10 @@
                     </div>
                     <p class="mb-3">Advanced healthcare management platform for medical professionals. Streamline your practice with comprehensive patient care tools.</p>
                     <div class="social-links">
-                        <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" title="Facebook" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" title="Twitter" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="LinkedIn" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" title="Instagram" class="social-link"><i class="fab fa-instagram"></i></a>
                     </div>
                 </div>
                 <div class="col-lg-2 col-md-4 mb-4">
@@ -605,11 +1157,9 @@
             </div>
             <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
             <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS. All rights reserved.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0">Professional Healthcare Solutions by THE WONAs</p>
+                <div class="footer-bottom">
+                <p class="mb-0">&copy; {% now 'Y' %} MedCare HMS. All rights reserved.</p>
+                <p class="mb-0">Professional Healthcare Solutions by THE WONAs</p>
                 </div>
             </div>
         </div>
@@ -617,17 +1167,14 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
+    <!-- Custom JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // User profile dropdown toggle
             const userProfileToggle = document.getElementById('userProfileToggle');
             const userDropdown = document.getElementById('userDropdown');
-            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-            const mobileSidebar = document.getElementById('mobileSidebar');
-            const closeMobileSidebar = document.getElementById('closeMobileSidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-            // User profile dropdown toggle
             if (userProfileToggle && userDropdown) {
                 userProfileToggle.addEventListener('click', function (e) {
                     e.stopPropagation();
@@ -636,19 +1183,50 @@
 
                 // Close dropdown when clicking outside
                 document.addEventListener('click', function (e) {
-                    if (userDropdown.classList.contains('show') && 
-                        !userProfileToggle.contains(e.target) && 
+                    if (userDropdown.classList.contains('show') &&
+                        !userProfileToggle.contains(e.target) &&
                         !userDropdown.contains(e.target)) {
                         userDropdown.classList.remove('show');
                     }
                 });
             }
 
+            // Notification Dropdown Functionality
+            const notificationToggle = document.getElementById('notificationToggle');
+            const notificationDropdown = document.getElementById('notificationDropdown');
+
+            if (notificationToggle && notificationDropdown) {
+                notificationToggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.classList.toggle('show');
+
+                    // Close user dropdown if open
+                    if (userDropdown && userDropdown.classList.contains('show')) {
+                        userDropdown.classList.remove('show');
+                    }
+                });
+
+                // Close notification dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (notificationDropdown.classList.contains('show') &&
+                        !notificationDropdown.contains(e.target) &&
+                        !notificationToggle.contains(e.target)) {
+                        notificationDropdown.classList.remove('show');
+                    }
+                });
+            }
+
             // Mobile sidebar toggle
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const mobileSidebar = document.getElementById('mobileSidebar');
+            const closeMobileSidebar = document.getElementById('closeMobileSidebar');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
             if (mobileMenuToggle) {
                 mobileMenuToggle.addEventListener('click', function() {
-                    mobileSidebar.classList.toggle('show');
-                    sidebarOverlay.classList.toggle('show');
+                    mobileSidebar.classList.add('show');
+                    sidebarOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
                 });
             }
 
@@ -657,6 +1235,7 @@
                 closeMobileSidebar.addEventListener('click', function() {
                     mobileSidebar.classList.remove('show');
                     sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
                 });
             }
 
@@ -664,6 +1243,7 @@
                 sidebarOverlay.addEventListener('click', function() {
                     mobileSidebar.classList.remove('show');
                     this.classList.remove('show');
+                    document.body.style.overflow = '';
                 });
             }
 
@@ -675,33 +1255,33 @@
                         // Create fallback with user initials if image fails to load
                         const userName = '{{ user.first_name }} {{ user.last_name }}';
                         const initials = userName.split(' ').map(name => name.charAt(0)).join('').toUpperCase();
-                        
+
                         // Create a canvas to generate initial-based avatar
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         const size = 100; // Higher resolution for better quality
-                        
+
                         canvas.width = size;
                         canvas.height = size;
-                        
+
                         // Set background color (doctor theme)
                         ctx.fillStyle = '#14B8A6';
                         ctx.fillRect(0, 0, size, size);
-                        
+
                         // Set text properties
                         ctx.fillStyle = '#FFFFFF';
                         ctx.font = 'bold ' + (size / 2.5) + 'px Poppins, sans-serif';
                         ctx.textAlign = 'center';
                         ctx.textBaseline = 'middle';
-                        
+
                         // Draw initials
                         ctx.fillText(initials, size / 2, size / 2);
-                        
+
                         // Replace the broken image with the generated avatar
                         this.src = canvas.toDataURL();
                         this.style.border = '2px solid rgba(255, 255, 255, 0.3)';
                     });
-                    
+
                     // Also set up a loading placeholder
                     img.addEventListener('loadstart', function() {
                         this.style.background = 'var(--accent-blue)';
@@ -711,7 +1291,130 @@
 
             // Initialize profile image fallbacks
             setupProfileImageFallback();
+
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add loading animation for navigation links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    if (this.href && !this.href.includes('#')) {
+                        this.style.opacity = '0.7';
+                        this.innerHTML += ' <i class="fas fa-spinner fa-spin ms-2"></i>';
+                    }
+                });
+            });
+
+            // Enhanced status badge animation
+            const statusBadge = document.querySelector('.status-badge');
+            if (statusBadge) {
+                setInterval(() => {
+                    statusBadge.style.transform = 'scale(1.05)';
+                    setTimeout(() => {
+                        statusBadge.style.transform = 'scale(1)';
+                    }, 1000);
+                }, 3000);
+            }
+
+            // Add keyboard navigation support
+            document.addEventListener('keydown', function(e) {
+                // Close dropdowns with Escape key
+                if (e.key === 'Escape') {
+                    const openDropdowns = document.querySelectorAll('.user-dropdown.show');
+                    openDropdowns.forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+
+                    // Close mobile sidebar
+                    if (mobileSidebar && mobileSidebar.classList.contains('show')) {
+                        mobileSidebar.classList.remove('show');
+                        sidebarOverlay.classList.remove('show');
+                        document.body.style.overflow = '';
+                    }
+                }
+            });
+
+            // Add touch gesture support for mobile
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            document.addEventListener('touchstart', function(e) {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+
+            document.addEventListener('touchend', function(e) {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const swipeDistance = touchEndX - touchStartX;
+
+                // Swipe right to open sidebar (from left edge)
+                if (touchStartX < 50 && swipeDistance > swipeThreshold && mobileSidebar && !mobileSidebar.classList.contains('show')) {
+                    mobileSidebar.classList.add('show');
+                    sidebarOverlay.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                // Swipe left to close sidebar
+                if (swipeDistance < -swipeThreshold && mobileSidebar && mobileSidebar.classList.contains('show')) {
+                    mobileSidebar.classList.remove('show');
+                    sidebarOverlay.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Add intersection observer for scroll animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('content-animated');
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements that should animate on scroll
+            document.querySelectorAll('.card-custom, .content-section').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Add performance monitoring
+            if ('performance' in window && 'getEntriesByType' in performance) {
+                window.addEventListener('load', function() {
+                    const navigationTiming = performance.getEntriesByType('navigation')[0];
+                    if (navigationTiming) {
+                        const loadTime = navigationTiming.loadEventEnd - navigationTiming.fetchStart;
+                        console.log(`Page load time: ${loadTime}ms`);
+                    }
+                });
+            }
         });
+
+        // Add service worker registration for PWA capabilities (optional)
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Service worker registration can be added here if needed
+                // navigator.serviceWorker.register('/sw.js');
+            });
+        }
     </script>
 </body>
 </html>
