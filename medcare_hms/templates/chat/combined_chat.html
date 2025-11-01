@@ -1116,6 +1116,10 @@
     <!-- MAIN CHAT AREA -->
     <div class="chat-main">
         {% if active_thread %}
+            <!-- Hidden current-user avatar probe to safely capture avatar URL in JS without injecting HTML into strings -->
+            <div id="current-user-avatar-probe" style="display:none;">
+                {% profile_image request.user size="36" css_class="current-user-avatar-probe" %}
+            </div>
             <!-- Chat Header -->
             <div class="chat-main-header">
                 <div class="chat-header-top">
@@ -1365,6 +1369,9 @@
     const statusText = document.getElementById('status-text');
     const typingIndicator = document.querySelector('.typing-indicator');
     const cannedResponsesSelect = document.getElementById('canned-responses');
+    // Safely read current user's avatar URL from hidden probe element
+    const currentUserAvatarEl = document.querySelector('#current-user-avatar-probe img');
+    const currentUserAvatarUrl = currentUserAvatarEl ? currentUserAvatarEl.src : '/media/profile_pictures/default.jpeg';
     
     // File attachment elements
     const attachmentBtn = document.getElementById('attachment-btn');
@@ -1388,6 +1395,14 @@
     messageInput.addEventListener('input', function() {
         this.style.height = 'auto';
         this.style.height = (this.scrollHeight) + 'px';
+    });
+
+    // Handle Enter key to send message (Shift+Enter for new line)
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault(); // Prevent new line
+            messageForm.dispatchEvent(new Event('submit'));
+        }
     });
 
     // Typing indicator
@@ -1473,11 +1488,14 @@
     chatSocket.onmessage = function(e) {
         const data = JSON.parse(e.data);
         
-        if (data.type === 'chat_message') {
-            appendMessage(data);
-            scrollToBottom();
+        if (data.type === 'message') {
+            // Don't append message if it's from current user (already appended on send)
+            if (data.sender !== '{{ request.user.username }}') {
+                appendMessage(data);
+                scrollToBottom();
+            }
         } else if (data.type === 'typing') {
-            if (data.user_id !== currentUserId) {
+            if (data.user !== '{{ request.user.username }}') {
                 if (data.is_typing) {
                     if (statusText) statusText.textContent = 'typing';
                     if (typingIndicator) typingIndicator.style.display = 'inline';
@@ -1489,7 +1507,9 @@
         } else if (data.type === 'read_receipt') {
             updateReadReceipts(data.message_id);
         } else if (data.type === 'status') {
-            updateUserStatus(data.is_online);
+            if (data.user !== '{{ request.user.username }}') {
+                updateUserStatus(data.status === 'online');
+            }
         }
     };
 
@@ -1510,10 +1530,32 @@
         if (selectedFile) {
             await uploadFileWithMessage(message);
         } else {
+            // Immediately append the message to UI for current user
+            const currentTime = new Date().toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+            
+            const tempMessageData = {
+                message_id: 'temp-' + Date.now(),
+                message: message,
+                sender: '{{ request.user.username }}',
+                sender_name: '{{ request.user.get_full_name }}',
+                sender_avatar: currentUserAvatarUrl,
+                timestamp: currentTime,
+                is_read: false
+            };
+            
+            appendMessage(tempMessageData);
+            scrollToBottom();
+            
+            // Send via WebSocket
             chatSocket.send(JSON.stringify({
                 'type': 'message',
                 'message': message
             }));
+            
             messageInput.value = '';
             messageInput.style.height = 'auto';
         }
@@ -1564,12 +1606,31 @@
     }
 
     function appendMessage(data) {
-        const isSent = data.sender === currentUserId;
+        // Check if message already exists (prevent duplicates)
+        if (document.querySelector(`[data-message-id="${data.message_id}"]`)) {
+            return;
+        }
+        
+        const isSent = data.sender === '{{ request.user.username }}';
+        
+        // Parse timestamp if it's ISO format
+        let displayTime = data.timestamp;
+        if (data.timestamp && data.timestamp.includes('T')) {
+            const date = new Date(data.timestamp);
+            displayTime = date.toLocaleTimeString('en-US', { 
+                hour: 'numeric', 
+                minute: '2-digit',
+                hour12: true 
+            });
+        }
+        // Determine avatar URL, prefer URL string; fallback to current user's avatar for own messages
+        let avatarUrl = data.sender_avatar || (isSent ? currentUserAvatarUrl : '/media/profile_pictures/default.jpeg');
+        
         const messageHtml = `
             <div class="message-wrapper ${isSent ? 'sent' : 'received'}" data-message-id="${data.message_id}">
-                ${!isSent ? `<img src="${data.sender_avatar}" class="message-avatar">` : ''}
+                ${!isSent ? `<img src="${avatarUrl}" class="message-avatar" alt="Avatar">` : ''}
                 <div class="message-bubble">
-                    <div class="message-content">${data.message}</div>
+                    <div class="message-content">${escapeHtml(data.message)}</div>
                     ${data.attachment_url ? `
                         <div class="message-attachment">
                             ${data.attachment_type === 'image' ? `
@@ -1594,14 +1655,21 @@
                         </div>
                     ` : ''}
                     <div class="message-footer">
-                        <span class="message-time">${data.timestamp}</span>
+                        <span class="message-time">${displayTime}</span>
                         ${isSent ? '<span class="read-receipt"><i class="fas fa-check"></i></span>' : ''}
                     </div>
                 </div>
-                ${isSent ? `<img src="${data.sender_avatar}" class="message-avatar">` : ''}
+                ${isSent ? `<img src="${avatarUrl}" class="message-avatar" alt="Avatar">` : ''}
             </div>
         `;
         messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
+    }
+    
+    // Helper function to escape HTML
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     }
 
     function updateReadReceipts(messageId) {
