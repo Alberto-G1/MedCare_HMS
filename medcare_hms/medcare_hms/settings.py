@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -55,15 +56,27 @@ INSTALLED_APPS = [
 # Set the ASGI application entry point
 ASGI_APPLICATION = 'medcare_hms.asgi.application'
 
-# Configure the channel layer to use Redis
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+# Channels / WebSocket configuration
+# In development, default to the in-memory channel layer so you don't need Redis running.
+# To force Redis (recommended for staging/production), set environment variable USE_REDIS_CHANNEL_LAYER=true
+USE_REDIS_CHANNEL_LAYER = os.getenv("USE_REDIS_CHANNEL_LAYER", "").lower() == "true"
+
+if DEBUG and not USE_REDIS_CHANNEL_LAYER:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        }
+    }
+else:
+    # Configure the channel layer to use Redis
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("127.0.0.1", 6379)],
+            },
         },
-    },
-}
+    }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
