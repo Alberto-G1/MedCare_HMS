@@ -20,6 +20,9 @@
     <!-- Doctor Theme CSS -->
     <link rel="stylesheet" href="{% static 'css/themes/doctor-theme.css' %}">
 
+    {# Allow pages to inject page-specific head content (inline CSS, fonts, meta) #}
+    {% block extra_head %}{% endblock %}
+
     <style>
         :root {
             --primary-teal: #0E7490;
@@ -28,9 +31,11 @@
             --light-sky-blue: #38BDF8;
             --background-light: #F1F5F9;
             --background-white: #FFFFFF;
-            --accent-blue: #14B8A6;
+            /* Map legacy accent-blue to the canonical sky-blue used across the doctor theme */
+            --accent-blue: var(--sky-blue);
             --text-dark: #1E293B;
-            --accent-green: #22C55E;
+            /* legacy accent-green preserved but pointed to blue palette to remove green tints */
+            --accent-green: var(--accent-blue);
             --accent-orange: #F97316;
         }
 

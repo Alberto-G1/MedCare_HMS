@@ -70,9 +70,21 @@ def doctor_appointments_view(request):
         
     appointments = appointment_list.order_by('appointment_date', 'appointment_time')
     
+    # Get appointment counts for statistics
+    all_appointments = Appointment.objects.filter(doctor=doctor_profile)
+    appointment_counts = {
+        'total': all_appointments.count(),
+        'pending': all_appointments.filter(status='Pending').count(),
+        'approved': all_appointments.filter(status='Approved').count(),
+        'completed': all_appointments.filter(status='Completed').count(),
+        'cancelled': all_appointments.filter(status='Cancelled').count(),
+        'rejected': all_appointments.filter(status='Rejected').count(),
+    }
+    
     return render(request, 'doctors/doctor_appointments.html', {
         'appointments': appointments,
-        'status_filter': status_filter
+        'status_filter': status_filter,
+        'appointment_counts': appointment_counts
     })
 
 @login_required
