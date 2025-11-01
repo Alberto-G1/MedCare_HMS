@@ -18,26 +18,41 @@
         overflow-x: hidden;
     }
 
+    /* Full-Width Dashboard Header */
     .availability-header {
         width: 100vw;
         margin-left: calc(-50vw + 50%);
         margin-right: calc(-50vw + 50%);
-        background: linear-gradient(135deg,
-            #0E7490 0%,
-            #0284C7 35%,
-            #14B8A6 70%,
-            #0C4A6E 100%
-        );
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 35%, #14B8A6 70%, #0C4A6E 100%);
         background-size: 300% 300%;
         animation: headerGradient 15s ease infinite;
         border-radius: 0 !important;
-        padding: 3rem 5vw;
+        padding: 4rem 5vw;
         margin-bottom: 2.5rem;
         position: relative;
         overflow: hidden;
         box-shadow:
             0 20px 60px rgba(14, 116, 144, 0.3),
             0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* SVG Diamond Pattern Overlay */
+    .availability-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.08;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: patternSlide 20s linear infinite;
+        pointer-events: none;
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(60px, 60px); }
     }
 
     .content-section {
@@ -355,7 +370,34 @@
     }
 
     /* Responsive Design */
-    @media (max-width: 768px) {
+    @media (min-width: 1400px) {
+        .availability-header,
+        .content-section {
+            padding-left: 8vw;
+            padding-right: 8vw;
+        }
+    }
+
+    @media (max-width: 1199px) {
+        .availability-header,
+        .content-section {
+            padding-left: 4vw;
+            padding-right: 4vw;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .availability-header,
+        .content-section {
+            padding-left: 3vw;
+            padding-right: 3vw;
+        }
+        
+        .availability-header {
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+        
         .week-grid {
             grid-template-columns: 1fr;
         }
@@ -429,28 +471,28 @@
 </style>
 
 <div class="availability-wrapper">
-    <!-- Header Section -->
+    <!-- Full-Width Dashboard Header -->
     <div class="availability-header">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-lg-8">
-                    <h1 class="display-4 fw-bold text-white mb-2">
-                        <i class="fas fa-user-clock me-3"></i>Manage Availability
-                    </h1>
-                    <p class="lead text-white-50 mb-0">
-                        Set your weekly schedule and manage time slots for patient appointments
-                    </p>
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-4">
+            <div>
+                <div style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.75rem 1.5rem; border-radius: 50px; display: inline-flex; align-items: center; gap: 0.75rem; color: white; font-weight: 600; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <i class="fas fa-user-md"></i>
+                    <span>Welcome, Dr. {{ request.user.get_full_name }}</span>
                 </div>
-                <div class="col-lg-4 text-lg-end mt-4 mt-lg-0">
-                    <div class="d-flex flex-column flex-lg-row gap-3 justify-content-lg-end">
-                        <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#bulkScheduleModal">
-                            <i class="fas fa-calendar-plus me-2"></i>Bulk Schedule
-                        </button>
-                        <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#addSlotModal">
-                            <i class="fas fa-plus me-2"></i>Add Time Slot
-                        </button>
-                    </div>
-                </div>
+                <h1 class="display-4 fw-bold text-white mb-2" style="text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);">
+                    <i class="fas fa-user-clock me-3"></i>Manage Availability
+                </h1>
+                <p class="lead mb-0" style="color: rgba(255, 255, 255, 0.9); font-size: 1.1rem; font-weight: 500;">
+                    Set your weekly schedule and manage time slots for patient appointments
+                </p>
+            </div>
+            <div class="d-flex gap-3 flex-wrap" style="align-items: flex-start;">
+                <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#bulkScheduleModal" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <i class="fas fa-calendar-plus me-2"></i>Bulk Schedule
+                </button>
+                <button type="button" class="btn btn-sky btn-lg px-4" data-bs-toggle="modal" data-bs-target="#addSlotModal" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); color: white; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                    <i class="fas fa-plus me-2"></i>Add Time Slot
+                </button>
             </div>
         </div>
     </div>

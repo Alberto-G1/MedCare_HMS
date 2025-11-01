@@ -1,52 +1,441 @@
 {% extends 'base_doctor.html' %}
-
+{% load static %}
 {% block title %}My Medical Records{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h4 class="mb-0"><i class="fas fa-notes-medical me-2"></i>My Authored Medical Records</h4>
+<style>
+    /* ==================== FULL-WIDTH LAYOUT ==================== */
+    .dashboard-wrapper {
+        width: 100vw;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* Full-width header matching doctor dashboard */
+    .records-header {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background: linear-gradient(135deg,
+            #0E7490 0%,
+            #0284C7 35%,
+            #14B8A6 70%,
+            #0C4A6E 100%
+        );
+        background-size: 300% 300%;
+        animation: headerGradient 15s ease infinite;
+        border-radius: 0 !important;
+        padding: 3rem 5vw;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 20px 60px rgba(14, 116, 144, 0.3),
+            0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .records-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='rgba(255,255,255,0.08)'/%3E%3C/svg%3E");
+        opacity: 0.4;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .header-content {
+        position: relative;
+        z-index: 2;
+    }
+
+    .records-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: white;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+    }
+
+    .records-subtitle {
+        font-size: 1.125rem;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+
+    .records-stats {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-badge {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stat-badge:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Content section */
+    .content-section {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0 5vw;
+    }
+
+    /* Enhanced table card */
+    .records-table-card {
+        background: white;
+        border-radius: 28px;
+        padding: 2.5rem;
+        box-shadow: 
+            0 15px 40px rgba(0, 0, 0, 0.12),
+            0 5px 12px rgba(0, 0, 0, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.8);
+        margin-bottom: 2rem;
+    }
+
+    /* Enhanced table */
+    .records-table {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .records-table thead th {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 1.25rem 1rem;
+        border: none;
+        font-size: 0.875rem;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .records-table thead th:first-child {
+        border-radius: 12px 0 0 12px;
+    }
+
+    .records-table thead th:last-child {
+        border-radius: 0 12px 12px 0;
+    }
+
+    .records-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid rgba(2, 132, 199, 0.08);
+    }
+
+    .records-table tbody tr:hover {
+        background: rgba(2, 132, 199, 0.05);
+        transform: translateX(5px);
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.1);
+    }
+
+    .records-table tbody td {
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        color: #374151;
+        font-size: 0.95rem;
+    }
+
+    /* Patient avatar with profile picture */
+    .patient-cell {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .patient-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 50%, #38BDF8 100%);
+        color: #fff;
+        font-weight: 800;
+        font-size: 1.05rem;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        border: 3px solid white;
+        flex-shrink: 0;
+    }
+
+    .patient-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .patient-name {
+        font-weight: 700;
+        color: #0C4A6E;
+        font-size: 0.95rem;
+    }
+
+    .patient-id {
+        font-size: 0.8rem;
+        color: #64748B;
+    }
+
+    /* Badge styles */
+    .prescription-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .prescription-badge.has-prescription {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+    }
+
+    .prescription-badge.no-prescription {
+        background: #E5E7EB;
+        color: #6B7280;
+    }
+
+    .prescription-badge:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Action button */
+    .btn-view {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        border: none;
+        padding: 0.625rem 1.25rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+        background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+    }
+
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #CBD5E1;
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .empty-state h5 {
+        color: #64748B;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #94A3B8;
+    }
+
+    /* Animations */
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(60px, 60px); }
+    }
+
+    /* Responsive Design */
+    @media (min-width: 1400px) {
+        .content-section {
+            padding: 0 8vw;
+        }
+        .records-header {
+            padding: 3rem 8vw;
+        }
+    }
+
+    @media (max-width: 1199px) {
+        .content-section {
+            padding: 0 4vw;
+        }
+        .records-header {
+            padding: 2.5rem 4vw;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .content-section {
+            padding: 0 3vw;
+        }
+        .records-header {
+            padding: 2rem 3vw;
+        }
+        .records-title {
+            font-size: 1.8rem;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .records-subtitle {
+            font-size: 1rem;
+        }
+        .records-table-card {
+            padding: 1.5rem;
+        }
+        /* Make table scrollable on mobile */
+        .table-responsive-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .patient-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 0.9rem;
+        }
+    }
+
+    body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+    <!-- Full-width header matching doctor dashboard -->
+    <div class="records-header">
+        <div class="header-content">
+            <h1 class="records-title">
+                <i class="fas fa-notes-medical"></i>
+                My Medical Records
+            </h1>
+            <p class="records-subtitle">View and manage all medical records you've created for your patients</p>
+            <div class="records-stats">
+                <div class="stat-badge">
+                    <i class="fas fa-file-medical"></i>
+                    <span>{{ records|length }} Total Records</span>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>Record Date</th>
-                        <th>Patient</th>
-                        <th>Diagnosis</th>
-                        <th>Linked Appointment Date</th>
-                        <th>Prescription</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in records %}
-                                        <tr>
-                                                <td>{{ record.record_date|date:"F d, Y" }}</td>
-                                                <td>{{ record.patient.user.get_full_name }}</td>
-                                                <td>{{ record.diagnosis }}</td>
-                                                <td>{{ record.appointment.appointment_date|date:"F d, Y"|default:"N/A" }}</td>
-                                                <td>
-                                                    {% with prescription=record.linked_prescriptions.first %}
-                                                        {% if prescription %}
-                                                            <a class="badge bg-success text-decoration-none" href="{% url 'prescriptions:doctor_prescription_detail' prescription.id %}">#{{ prescription.id }} {{ prescription.status|title }}</a>
-                                                        {% else %}
-                                                            <span class="badge bg-secondary">None</span>
-                                                        {% endif %}
-                                                    {% endwith %}
-                                                </td>
-                                                <td>
-                                                        <a href="{% url 'doctors:medical_record_detail' record.id %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
-                                                </td>
-                                        </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="5" class="text-center text-muted py-4">You have not created any medical records yet.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Content section -->
+    <div class="content-section">
+        <div class="records-table-card">
+            <div class="table-responsive-wrapper">
+                <table class="records-table table">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Diagnosis</th>
+                            <th>Record Date</th>
+                            <th>Appointment Date</th>
+                            <th>Prescription</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>
+                                <div class="patient-cell">
+                                    {% if record.patient.profile_picture %}
+                                        <img src="{{ record.patient.profile_picture.url }}" alt="Patient" class="patient-avatar">
+                                    {% else %}
+                                        <div class="patient-avatar">
+                                            {{ record.patient.user.first_name.0|upper }}{{ record.patient.user.last_name.0|upper }}
+                                        </div>
+                                    {% endif %}
+                                    <div class="patient-info">
+                                        <span class="patient-name">{{ record.patient.user.get_full_name }}</span>
+                                        <span class="patient-id">ID: #{{ record.patient.id }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <strong style="color: #0C4A6E;">{{ record.diagnosis }}</strong>
+                            </td>
+                            <td>{{ record.record_date|date:"F d, Y" }}</td>
+                            <td>{{ record.appointment.appointment_date|date:"F d, Y"|default:"N/A" }}</td>
+                            <td>
+                                {% with prescription=record.linked_prescriptions.first %}
+                                    {% if prescription %}
+                                        <a class="prescription-badge has-prescription" href="{% url 'prescriptions:doctor_prescription_detail' prescription.id %}">
+                                            #{{ prescription.id }} {{ prescription.status|title }}
+                                        </a>
+                                    {% else %}
+                                        <span class="prescription-badge no-prescription">None</span>
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td>
+                                <a href="{% url 'doctors:medical_record_detail' record.id %}" class="btn-view">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">
+                                <div class="empty-state">
+                                    <i class="fas fa-notes-medical"></i>
+                                    <h5>No Medical Records Yet</h5>
+                                    <p>You haven't created any medical records yet. Start by completing an appointment consultation.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
