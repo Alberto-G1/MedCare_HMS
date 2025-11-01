@@ -1,104 +1,473 @@
 {% extends 'base_patient.html' %}
 
-{% block title %}Edit Patient Profile{% endblock %}
+{% block title %}Edit Profile - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding/margin from main content area */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .edit-profile-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #DBEAFE 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes headerGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Page Header */
+    .edit-profile-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .edit-profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .edit-profile-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .edit-profile-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+    }
+
+    .edit-profile-header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Form Container */
+    .edit-profile-content {
+        width: 100%;
+        margin: 0;
+        padding: 3rem 2rem;
+    }
+
+    .form-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 3px solid transparent;
+        background-image: linear-gradient(white, white), 
+                          linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .form-section::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 24px;
+        padding: 3px;
+        background: linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        opacity: 0.3;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .form-section:hover {
+        box-shadow: 0 15px 50px rgba(14, 116, 144, 0.25);
+        transform: translateY(-5px);
+    }
+
+    .form-section:hover::before {
+        opacity: 0.8;
+    }
+
+    .form-section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(90deg, #0E7490, #0284C7, #14B8A6) 1;
+    }
+
+    .form-section-header i {
+        font-size: 1.8rem;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 50%, #14B8A6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-section-header h5 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0C4A6E;
+        margin: 0;
+    }
+
+    /* Form Fields */
+    .form-label {
+        font-weight: 600;
+        color: #0C4A6E;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        background: linear-gradient(135deg, #0E7490, #0284C7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #E0F2FE;
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #F0F9FF;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0E7490;
+        box-shadow: 0 0 0 0.25rem rgba(14, 116, 144, 0.15);
+        background: white;
+        outline: none;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: #0284C7;
+        background: white;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Buttons */
+    .btn-save-profile {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 50%, #14B8A6 100%);
+        border: none;
+        color: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(14, 116, 144, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-save-profile::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-save-profile:hover::before {
+        left: 100%;
+    }
+
+    .btn-save-profile:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(14, 116, 144, 0.4);
+        background: linear-gradient(135deg, #0C4A6E 0%, #0E7490 50%, #0284C7 100%);
+    }
+
+    .btn-cancel {
+        background: rgba(14, 116, 144, 0.1);
+        border: 2px solid rgba(14, 116, 144, 0.3);
+        color: #0E7490;
+        padding: 0.875rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-cancel:hover {
+        background: white;
+        border-color: #0E7490;
+        color: #0E7490;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(14, 116, 144, 0.2);
+    }
+
+    /* Alert */
+    .alert-danger {
+        background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+        border: 2px solid #DC2626;
+        border-radius: 16px;
+        padding: 1rem 1.5rem;
+        color: #991B1B;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+    }
+
+    .text-danger {
+        color: #DC2626 !important;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .text-danger::before {
+        content: '⚠';
+    }
+
+    @media (max-width: 768px) {
+        .edit-profile-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .edit-profile-header h1 {
+            font-size: 2rem;
+        }
+
+        .edit-profile-content {
+            padding: 2rem 1rem;
+        }
+
+        .form-section {
+            padding: 1.5rem;
+        }
+
+        .btn-save-profile, .btn-cancel {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Patient Profile Information</h4>
+<div class="edit-profile-wrapper">
+    <!-- Full-Width Page Header -->
+    <div class="edit-profile-header">
+        <div class="edit-profile-header-content">
+            <h1><i class="fas fa-user-edit me-3"></i>Edit Profile</h1>
+            <p>Update your personal information and preferences</p>
+        </div>
     </div>
-    <div class="card-body">
+
+    <!-- Form Content -->
+    <div class="edit-profile-content">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
 
             <!-- Non-field errors -->
             {% if form.non_field_errors %}
                 <div class="alert alert-danger">
+                    <strong><i class="fas fa-exclamation-circle me-2"></i>Error:</strong>
                     {% for error in form.non_field_errors %}{{ error }}{% endfor %}
                 </div>
             {% endif %}
 
             <!-- Personal Information Section -->
-            <h5 class="mb-3 text-primary">Personal Information</h5>
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
-                    {{ form.first_name }}
-                    {% if form.first_name.errors %}<div class="text-danger small mt-1">{{ form.first_name.errors.as_text }}</div>{% endif %}
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-user"></i>
+                    <h5>Personal Information</h5>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
-                    {{ form.last_name }}
-                    {% if form.last_name.errors %}<div class="text-danger small mt-1">{{ form.last_name.errors.as_text }}</div>{% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">{{ form.date_of_birth.label }}</label>
-                    {{ form.date_of_birth }}
-                    {% if form.date_of_birth.errors %}<div class="text-danger small mt-1">{{ form.date_of_birth.errors.as_text }}</div>{% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.gender.id_for_label }}" class="form-label">{{ form.gender.label }}</label>
-                    {{ form.gender }}
-                    {% if form.gender.errors %}<div class="text-danger small mt-1">{{ form.gender.errors.as_text }}</div>{% endif %}
-                </div>
-                 <div class="col-md-12 mb-3">
-                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">{{ form.profile_picture.label }}</label>
-                    {{ form.profile_picture }}
-                    {% if form.profile_picture.errors %}<div class="text-danger small mt-1">{{ form.profile_picture.errors.as_text }}</div>{% endif %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-signature"></i>{{ form.first_name.label }}
+                        </label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}<div class="text-danger mt-1">{{ form.first_name.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-signature"></i>{{ form.last_name.label }}
+                        </label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}<div class="text-danger mt-1">{{ form.last_name.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
+                            <i class="far fa-calendar"></i>{{ form.date_of_birth.label }}
+                        </label>
+                        {{ form.date_of_birth }}
+                        {% if form.date_of_birth.errors %}<div class="text-danger mt-1">{{ form.date_of_birth.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.gender.id_for_label }}" class="form-label">
+                            <i class="fas fa-venus-mars"></i>{{ form.gender.label }}
+                        </label>
+                        {{ form.gender }}
+                        {% if form.gender.errors %}<div class="text-danger mt-1">{{ form.gender.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                            <i class="fas fa-camera"></i>{{ form.profile_picture.label }}
+                        </label>
+                        {{ form.profile_picture }}
+                        {% if form.profile_picture.errors %}<div class="text-danger mt-1">{{ form.profile_picture.errors.as_text }}</div>{% endif %}
+                    </div>
                 </div>
             </div>
-            <hr class="my-4">
 
             <!-- Address & Medical Information Section -->
-            <h5 class="mb-3 text-primary">Address & Medical Information</h5>
-            <div class="row">
-                <div class="col-md-12 mb-3">
-                    <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}</label>
-                    {{ form.address }}
-                    {% if form.address.errors %}<div class="text-danger small mt-1">{{ form.address.errors.as_text }}</div>{% endif %}
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-heartbeat"></i>
+                    <h5>Address & Medical Information</h5>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.blood_group.id_for_label }}" class="form-label">{{ form.blood_group.label }}</label>
-                    {{ form.blood_group }}
-                    {% if form.blood_group.errors %}<div class="text-danger small mt-1">{{ form.blood_group.errors.as_text }}</div>{% endif %}
-                </div>
-                <div class="col-md-12 mb-3">
-                    <label for="{{ form.medical_history.id_for_label }}" class="form-label">{{ form.medical_history.label }}</label>
-                    {{ form.medical_history }}
-                    {% if form.medical_history.errors %}<div class="text-danger small mt-1">{{ form.medical_history.errors.as_text }}</div>{% endif %}
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">
+                            <i class="fas fa-home"></i>{{ form.address.label }}
+                        </label>
+                        {{ form.address }}
+                        {% if form.address.errors %}<div class="text-danger mt-1">{{ form.address.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.blood_group.id_for_label }}" class="form-label">
+                            <i class="fas fa-tint"></i>{{ form.blood_group.label }}
+                        </label>
+                        {{ form.blood_group }}
+                        {% if form.blood_group.errors %}<div class="text-danger mt-1">{{ form.blood_group.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-12 mb-3">
+                        <label for="{{ form.medical_history.id_for_label }}" class="form-label">
+                            <i class="fas fa-file-medical"></i>{{ form.medical_history.label }}
+                        </label>
+                        {{ form.medical_history }}
+                        {% if form.medical_history.errors %}<div class="text-danger mt-1">{{ form.medical_history.errors.as_text }}</div>{% endif %}
+                    </div>
                 </div>
             </div>
-            <hr class="my-4">
             
-             <!-- Emergency & Insurance Information Section -->
-            <h5 class="mb-3 text-primary">Emergency & Insurance</h5>
-             <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">{{ form.emergency_contact_name.label }}</gabel>
-                    {{ form.emergency_contact_name }}
-                    {% if form.emergency_contact_name.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_name.errors.as_text }}</div>{% endif %}
+            <!-- Emergency & Insurance Information Section -->
+            <div class="form-section">
+                <div class="form-section-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h5>Emergency & Insurance</h5>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.emergency_contact_number.id_for_label }}" class="form-label">{{ form.emergency_contact_number.label }}</gabel>
-                    {{ form.emergency_contact_number }}
-                    {% if form.emergency_contact_number.errors %}<div class="text-danger small mt-1">{{ form.emergency_contact_number.errors.as_text }}</div>{% endif %}
-                </div>
-                 <div class="col-md-6 mb-3">
-                    <label for="{{ form.insurance_provider.id_for_label }}" class="form-label">{{ form.insurance_provider.label }}</gabel>
-                    {{ form.insurance_provider }}
-                    {% if form.insurance_provider.errors %}<div class="text-danger small mt-1">{{ form.insurance_provider.errors.as_text }}</div>{% endif %}
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="{{ form.insurance_policy_number.id_for_label }}" class="form-label">{{ form.insurance_policy_number.label }}</gabel>
-                    {{ form.insurance_policy_number }}
-                    {% if form.insurance_policy_number.errors %}<div class="text-danger small mt-1">{{ form.insurance_policy_number.errors.as_text }}</div>{% endif %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.emergency_contact_name.id_for_label }}" class="form-label">
+                            <i class="fas fa-user-shield"></i>{{ form.emergency_contact_name.label }}
+                        </label>
+                        {{ form.emergency_contact_name }}
+                        {% if form.emergency_contact_name.errors %}<div class="text-danger mt-1">{{ form.emergency_contact_name.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.emergency_contact_number.id_for_label }}" class="form-label">
+                            <i class="fas fa-phone-volume"></i>{{ form.emergency_contact_number.label }}
+                        </label>
+                        {{ form.emergency_contact_number }}
+                        {% if form.emergency_contact_number.errors %}<div class="text-danger mt-1">{{ form.emergency_contact_number.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.insurance_provider.id_for_label }}" class="form-label">
+                            <i class="fas fa-building"></i>{{ form.insurance_provider.label }}
+                        </label>
+                        {{ form.insurance_provider }}
+                        {% if form.insurance_provider.errors %}<div class="text-danger mt-1">{{ form.insurance_provider.errors.as_text }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.insurance_policy_number.id_for_label }}" class="form-label">
+                            <i class="fas fa-id-card"></i>{{ form.insurance_policy_number.label }}
+                        </label>
+                        {{ form.insurance_policy_number }}
+                        {% if form.insurance_policy_number.errors %}<div class="text-danger mt-1">{{ form.insurance_policy_number.errors.as_text }}</div>{% endif %}
+                    </div>
                 </div>
             </div>
 
             <!-- Form Actions -->
-            <div class="d-flex justify-content-end mt-4">
-                <a href="{% url 'patients:patient_profile' %}" class="btn btn-secondary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary-custom"><i class="fas fa-save me-2"></i>Save Profile</button>
+            <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
+                <a href="{% url 'patients:patient_profile' %}" class="btn-cancel">
+                    <i class="fas fa-times"></i>Cancel
+                </a>
+                <button type="submit" class="btn-save-profile">
+                    <i class="fas fa-save"></i>Save Changes
+                </button>
             </div>
         </form>
     </div>

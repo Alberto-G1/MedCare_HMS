@@ -1,172 +1,941 @@
 {% extends 'base_patient.html' %}
 {% load static %}
-{% block title %}My Health Dashboard{% endblock %}
+{% block title %}My Health Dashboard - MedCare HMS{% endblock %}
 
-{% block content %}
-<!-- Welcome Header -->
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h1 class="h2 fw-bold text-custom-dark">Welcome, {{ user.first_name|default:user.username }}!</h1>
-        <p class="text-muted">Here's a summary of your health portal.</p>
-    </div>
-    <a href="{% url 'patients:book_appointment' %}" class="btn btn-primary-custom d-none d-md-flex">
-        <i class="fas fa-plus me-2"></i>Book New Appointment
-    </a>
-</div>
-
-<!-- Profile Incomplete Warning -->
-{% if not profile_is_complete %}
-<div class="alert alert-warning d-flex justify-content-between align-items-center">
-    <span><i class="fas fa-exclamation-triangle me-2"></i>Your profile is incomplete. Please update it for a better experience.</span>
-    <a href="{% url 'patients:patient_profile' %}" class="btn btn-sm btn-warning">Complete Profile</a>
-</div>
-{% endif %}
-
-<!-- Quick Stats Cards -->
-<div class="row">
-    <div class="col-lg-3 col-md-6 mb-4">
-        <a href="{% url 'patients:my_appointments' %}" class="card-link">
-            <div class="card card-custom h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted">Upcoming Appointments</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ upcoming_appointments|length }}</h2>
-                        </div>
-                        <div class="bg-info text-white p-3 rounded-circle"><i class="fas fa-calendar-check fa-2x"></i></div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-4">
-        <a href="#" class="card-link">
-            <div class="card card-custom h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted">Active Prescriptions</h6>
-                            <h2 class="fw-bold text-custom-dark">{{ recent_prescriptions|length }}</h2>
-                        </div>
-                        <div class="bg-primary text-white p-3 rounded-circle"><i class="fas fa-prescription-bottle-alt fa-2x"></i></div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-4">
-        <a href="{% url 'patients:my_bills_list' %}" class="card-link">
-            <div class="card card-custom h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted">Unpaid Bills</h6>
-                            <h2 class="fw-bold text-danger">{{ unpaid_bills_count }}</h2>
-                        </div>
-                        <div class="bg-success text-white p-3 rounded-circle"><i class="fas fa-file-invoice-dollar fa-2x"></i></div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-    <div class="col-lg-3 col-md-6 mb-4">
-        <a href="{% url 'chat:thread_list' %}" class="card-link">
-            <div class="card card-custom h-100">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="text-muted">Messages</h6>
-                            <h2 class="fw-bold text-custom-dark">View</h2>
-                        </div>
-                        <div class="bg-accent-orange text-white p-3 rounded-circle"><i class="fas fa-comments fa-2x"></i></div>
-                    </div>
-                </div>
-            </div>
-        </a>
-    </div>
-</div>
-
-<!-- Main Content Area -->
-<div class="row">
-    <!-- Upcoming Appointments -->
-    <div class="col-lg-7 mb-4">
-        <div class="card card-custom h-100">
-            <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Upcoming Appointments</h5>
-                <a href="{% url 'patients:my_appointments' %}" class="btn btn-sm btn-outline-primary-custom">View All</a>
-            </div>
-            <div class="card-body">
-                {% if upcoming_appointments %}
-                    <div class="list-group list-group-flush">
-                    {% for appointment in upcoming_appointments|slice:":4" %} {# Show up to 4 appointments #}
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-0">Appointment with {{ appointment.doctor }}</h6>
-                                <small class="text-muted">{{ appointment.appointment_date|date:"l, F d" }} at {{ appointment.appointment_time|time:"g:i A" }}</small>
-                            </div>
-                            {% if appointment.status == 'Approved' %}<span class="badge bg-success">{{ appointment.status }}</span>
-                            {% elif appointment.status == 'Pending' %}<span class="badge bg-warning">{{ appointment.status }}</span>
-                            {% else %}<span class="badge bg-secondary">{{ appointment.status }}</span>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                        <p class="text-muted mb-0">You have no upcoming appointments.</p>
-                        <a href="{% url 'patients:book_appointment' %}" class="btn btn-sky mt-3">Book One Now</a>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Prescriptions & Last Record -->
-    <div class="col-lg-5 mb-4">
-        <div class="card card-custom h-100">
-            <div class="card-header-custom d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Health Activity</h5>
-                <a href="{% url 'patients:my_medical_records_list' %}" class="btn btn-sm btn-outline-primary-custom">View All</a>
-            </div>
-            <div class="card-body">
-                {% if last_medical_record %}
-                    <h6 class="text-primary">Last Consultation Summary</h6>
-                    <div class="p-3 rounded mb-3" style="background-color: var(--background-light);">
-                        <div class="d-flex justify-content-between">
-                            <strong>{{ last_medical_record.diagnosis }}</strong>
-                            <small class="text-muted">{{ last_medical_record.record_date|date:"F d, Y" }}</small>
-                        </div>
-                        <p class="small text-muted mb-0">with {{ last_medical_record.doctor }}</p>
-                    </div>
-                {% endif %}
-
-                <h6 class="text-primary mt-4">Recent Prescriptions</h6>
-                {% if recent_prescriptions %}
-                    <ul class="list-unstyled">
-                    {% for prescription in recent_prescriptions %}
-                        <li class="mb-2">
-                            <i class="fas fa-pills text-success me-2"></i>
-                            <strong>{{ prescription.medication_name }}</strong> - <span class="text-muted">{{ prescription.dosage }}</span>
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% else %}
-                     <div class="text-center text-muted pt-3">
-                        <p>No recent prescriptions found.</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_head %}
 <style>
-    .card-link {
-        text-decoration: none;
+    /* ==================== ULTRA-MODERN PATIENT DASHBOARD ==================== */
+
+    /* Full-Width Dashboard Layout */
+    .dashboard-wrapper {
+        width: 100vw;
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        overflow-x: hidden;
     }
-    .card-link .card-custom:hover {
-        border-color: var(--primary-dark-teal);
+
+    /* Full-Width Animated Header */
+    .dashboard-header {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        background: linear-gradient(135deg,
+            #0E7490 0%,
+            #0284C7 35%,
+            #14B8A6 70%,
+            #0C4A6E 100%
+        );
+        background-size: 300% 300%;
+        animation: headerGradient 15s ease infinite;
+        border-radius: 0 !important;
+        padding: 4rem 5vw;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow:
+            0 20px 60px rgba(14, 116, 144, 0.3),
+            0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    /* SVG Pattern Overlay */
+    .dashboard-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.08;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: patternSlide 20s linear infinite;
+        pointer-events: none;
+    }
+
+    /* Content Section Wrapper */
+    .content-section {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0 5vw 3rem;
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translate(0, 0); }
+        100% { transform: translate(60px, 60px); }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% {
+            box-shadow: 0 0 20px rgba(14, 116, 144, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 40px rgba(20, 184, 166, 0.6);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes iconSpin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* ==================== HEADER CONTENT ==================== */
+    .dashboard-title {
+        color: white;
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        animation: slideInUp 0.8s ease-out;
+    }
+
+    .dashboard-subtitle {
+        color: rgba(255, 255, 255, 0.95);
+        font-size: 1.2rem;
+        margin: 0.5rem 0 0;
+        font-weight: 500;
+        animation: slideInUp 0.9s ease-out;
+    }
+
+    .greeting-badge {
+        display: inline-block;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        animation: slideInUp 0.7s ease-out;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-actions {
+        animation: slideInUp 1s ease-out;
+    }
+
+    .btn-book-appointment {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-book-appointment:hover {
+        background: white;
+        color: #0E7490;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.3);
+    }
+
+    /* ==================== STAT CARDS WITH 3D EFFECTS ==================== */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 28px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: visible;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 
+            0 15px 40px rgba(0, 0, 0, 0.08),
+            0 5px 12px rgba(0, 0, 0, 0.04);
+        transform-style: preserve-3d;
+        perspective: 1000px;
+        border: 1px solid rgba(14, 116, 144, 0.08);
+        animation: slideInUp 0.6s ease-out backwards;
+    }
+
+    .stats-card:nth-child(1) { animation-delay: 0.1s; }
+    .stats-card:nth-child(2) { animation-delay: 0.2s; }
+    .stats-card:nth-child(3) { animation-delay: 0.3s; }
+    .stats-card:nth-child(4) { animation-delay: 0.4s; }
+
+    /* Rainbow Gradient Border Animation */
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        background: linear-gradient(
+            45deg,
+            #0E7490, #14B8A6, #22C55E, #0284C7,
+            #38BDF8, #8B5CF6, #EC4899, #F59E0B
+        );
+        border-radius: 30px;
+        z-index: -1;
+        opacity: 0;
+        filter: blur(12px);
+        transition: opacity 0.6s ease;
+        background-size: 400% 400%;
+        animation: gradientShift 8s ease infinite;
+    }
+
+    .stats-card:hover::before {
+        opacity: 0.8;
+    }
+
+    .stats-card:hover {
+        transform: translateY(-18px) rotateX(8deg) scale(1.04);
+        box-shadow: 
+            0 30px 80px rgba(0, 0, 0, 0.15),
+            0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: white;
+        position: relative;
+        z-index: 1;
+        transition: all 0.4s ease;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    }
+
+    .stats-card:hover .stat-icon {
+        transform: scale(1.1) rotate(10deg);
+        animation: pulseGlow 2s infinite;
+    }
+
+    .stat-icon-appointments {
+        background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+    }
+
+    .stat-icon-prescriptions {
+        background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+    }
+
+    .stat-icon-billing {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    }
+
+    .stat-icon-messages {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    }
+
+    .stat-value {
+        font-size: 3rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin: 1rem 0 0.5rem;
+    }
+
+    .stat-label {
+        font-size: 1.1rem;
+        color: #64748B;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        height: 100%;
+    }
+
+    /* ==================== ALERT BOX ==================== */
+    .alert-profile-incomplete {
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+        border: 2px solid #F59E0B;
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 24px rgba(245, 158, 11, 0.2);
+        animation: slideInUp 0.5s ease-out 0.5s backwards;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .alert-profile-incomplete::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(180deg, #F59E0B, #D97706);
+    }
+
+    .alert-profile-incomplete .btn-complete {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .alert-profile-incomplete .btn-complete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    }
+
+    /* ==================== CONTENT CARDS ==================== */
+    .content-card {
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.08);
+        border: 1px solid rgba(2, 132, 199, 0.1);
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        animation: fadeInScale 0.6s ease-out backwards;
+        height: 100%;
+    }
+
+    .content-card:nth-child(1) { animation-delay: 0.6s; }
+    .content-card:nth-child(2) { animation-delay: 0.7s; }
+
+    .content-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #0E7490 0%, #0284C7 50%, #38BDF8 100%);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .content-card:hover {
+        box-shadow: 0 15px 50px rgba(2, 132, 199, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .content-card:hover::before {
+        opacity: 1;
+    }
+
+    .card-header-custom {
+        background: linear-gradient(145deg, #F0F9FF 0%, #E0F2FE 100%);
+        border-bottom: 2px solid rgba(2, 132, 199, 0.12);
+        padding: 1.75rem 2rem;
+        position: relative;
+    }
+
+    .card-header-custom h5 {
+        display: flex;
+        align-items: center;
+        gap: 0.875rem;
+        color: #0C4A6E;
+        font-weight: 700;
+        font-size: 1.35rem;
+        margin: 0;
+    }
+
+    .card-header-custom i {
+        font-size: 1.4rem;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .btn-view-all {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        border: none;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+
+    .btn-view-all:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        color: white;
+    }
+
+    /* ==================== APPOINTMENT LIST ==================== */
+    .appointment-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(2, 132, 199, 0.1);
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .appointment-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .appointment-item:hover {
+        background: linear-gradient(90deg, rgba(14, 116, 144, 0.04) 0%, transparent 100%);
+        transform: translateX(5px);
+    }
+
+    .appointment-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .appointment-item:last-child {
+        border-bottom: none;
+    }
+
+    .appointment-doctor {
+        font-weight: 700;
+        color: #0C4A6E;
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .appointment-datetime {
+        color: #64748B;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-approved {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .badge-pending {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-cancelled {
+        background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(100, 116, 139, 0.3);
+    }
+
+    /* ==================== EMPTY STATES ==================== */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, #CBD5E1 0%, #94A3B8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-state h6 {
+        color: #64748B;
+        font-weight: 700;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #94A3B8;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-empty-action {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        border: none;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn-empty-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(2, 132, 199, 0.4);
+        color: white;
+    }
+
+    /* ==================== HEALTH ACTIVITY ==================== */
+    .health-activity-section {
+        padding: 2rem;
+    }
+
+    .activity-header {
+        color: #0E7490;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .activity-card {
+        background: linear-gradient(145deg, #F8FAFC 0%, #F1F5F9 100%);
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
+        border: 2px solid rgba(14, 116, 144, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .activity-card:hover {
+        border-color: #0E7490;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(14, 116, 144, 0.1);
+    }
+
+    .activity-card strong {
+        color: #0C4A6E;
+        font-size: 1.1rem;
+    }
+
+    .activity-card small {
+        color: #64748B;
+    }
+
+    .prescription-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .prescription-item {
+        padding: 1rem;
+        margin-bottom: 0.75rem;
+        background: white;
+        border-radius: 12px;
+        border: 2px solid rgba(139, 92, 246, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .prescription-item:hover {
+        border-color: #8B5CF6;
+        transform: translateX(5px);
+        box-shadow: 0 4px 16px rgba(139, 92, 246, 0.15);
+    }
+
+    .prescription-item i {
+        color: #8B5CF6;
+        font-size: 1.5rem;
+    }
+
+    .prescription-item strong {
+        color: #0C4A6E;
+        font-weight: 700;
+    }
+
+    .prescription-item .dosage {
+        color: #64748B;
+        font-size: 0.95rem;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (min-width: 1400px) {
+        .dashboard-header,
+        .content-section {
+            padding-left: 8vw;
+            padding-right: 8vw;
+        }
+    }
+
+    @media (max-width: 1199px) {
+        .dashboard-header,
+        .content-section {
+            padding-left: 4vw;
+            padding-right: 4vw;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 767px) {
+        .dashboard-header,
+        .content-section {
+            padding-left: 3vw;
+            padding-right: 3vw;
+        }
+
+        .dashboard-header {
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+
+        .dashboard-title {
+            font-size: 1.8rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+        }
+
+        .btn-book-appointment {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-wrapper">
+    <!-- Full-Width Animated Header -->
+    <div class="dashboard-header">
+        <div class="d-flex justify-content-between align-items-end flex-wrap gap-4">
+            <div>
+                <div class="greeting-badge">
+                    <i class="fas fa-heart-pulse me-2"></i>
+                    Patient Portal
+                </div>
+                <h1 class="dashboard-title">Welcome Back, {{ user.first_name|default:user.username }}!</h1>
+                <p class="dashboard-subtitle">
+                    <i class="far fa-calendar-check me-2"></i>
+                    {{ current_time|date:"l, F j, Y" }}
+                </p>
+            </div>
+            <div class="header-actions">
+                <a href="{% url 'patients:book_appointment' %}" class="btn-book-appointment">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span>Book Appointment</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="content-section">
+        <!-- Profile Incomplete Warning -->
+        {% if not profile_is_complete %}
+        <div class="alert-profile-incomplete d-flex justify-content-between align-items-center">
+            <div>
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Complete Your Profile:</strong> Update your information for a personalized healthcare experience.
+            </div>
+            <a href="{% url 'patients:edit_patient_profile' %}" class="btn btn-complete">
+                <i class="fas fa-user-edit me-2"></i>Complete Now
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Statistics Cards with 3D Effects and Rainbow Borders -->
+        <div class="stats-grid">
+            <a href="{% url 'patients:my_appointments' %}" class="stat-link">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="stat-label">Upcoming</div>
+                            <div class="stat-value">{{ upcoming_appointments|length }}</div>
+                            <div class="stat-label" style="text-transform: none; font-size: 0.95rem;">Appointments</div>
+                        </div>
+                        <div class="stat-icon stat-icon-appointments">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="#" class="stat-link">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="stat-label">Active</div>
+                            <div class="stat-value">{{ recent_prescriptions|length|default:"0" }}</div>
+                            <div class="stat-label" style="text-transform: none; font-size: 0.95rem;">Prescriptions</div>
+                        </div>
+                        <div class="stat-icon stat-icon-prescriptions">
+                            <i class="fas fa-prescription-bottle-medical"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'patients:my_bills_list' %}" class="stat-link">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="stat-label">Unpaid</div>
+                            <div class="stat-value" style="{% if unpaid_bills_count > 0 %}background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);{% endif %}">{{ unpaid_bills_count }}</div>
+                            <div class="stat-label" style="text-transform: none; font-size: 0.95rem;">Bills</div>
+                        </div>
+                        <div class="stat-icon stat-icon-billing">
+                            <i class="fas fa-file-invoice-dollar"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{% url 'chat:thread_list' %}" class="stat-link">
+                <div class="stats-card">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <div class="stat-label">Chat</div>
+                            <div class="stat-value" style="font-size: 2rem;">View</div>
+                            <div class="stat-label" style="text-transform: none; font-size: 0.95rem;">Messages</div>
+                        </div>
+                        <div class="stat-icon stat-icon-messages">
+                            <i class="fas fa-comments"></i>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="row g-4">
+            <!-- Upcoming Appointments -->
+            <div class="col-lg-7">
+                <div class="content-card">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-calendar-alt"></i>Upcoming Appointments</h5>
+                        <a href="{% url 'patients:my_appointments' %}" class="btn-view-all">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if upcoming_appointments %}
+                            {% for appointment in upcoming_appointments|slice:":5" %}
+                            <div class="appointment-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="appointment-doctor">
+                                            <i class="fas fa-user-doctor me-2"></i>
+                                            Dr. {{ appointment.doctor.user.get_full_name }}
+                                        </div>
+                                        <div class="appointment-datetime">
+                                            <i class="far fa-calendar"></i>
+                                            {{ appointment.appointment_date|date:"l, F d, Y" }}
+                                            <span class="mx-2">•</span>
+                                            <i class="far fa-clock"></i>
+                                            {{ appointment.appointment_time|time:"g:i A" }}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% if appointment.status == 'Approved' %}
+                                            <span class="status-badge badge-approved">
+                                                <i class="fas fa-check-circle me-1"></i>Approved
+                                            </span>
+                                        {% elif appointment.status == 'Pending' %}
+                                            <span class="status-badge badge-pending">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                        {% else %}
+                                            <span class="status-badge badge-cancelled">
+                                                <i class="fas fa-times-circle me-1"></i>{{ appointment.status }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <h6>No Upcoming Appointments</h6>
+                                <p>You don't have any scheduled appointments at the moment.</p>
+                                <a href="{% url 'patients:book_appointment' %}" class="btn-empty-action">
+                                    <i class="fas fa-calendar-plus me-2"></i>Book Your First Appointment
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Health Activity -->
+            <div class="col-lg-5">
+                <div class="content-card">
+                    <div class="card-header-custom d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-activity"></i>Recent Health Activity</h5>
+                        <a href="{% url 'patients:my_medical_records_list' %}" class="btn-view-all">
+                            View All <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                    </div>
+                    <div class="health-activity-section">
+                        {% if last_medical_record %}
+                            <div class="activity-header">
+                                <i class="fas fa-file-medical-alt"></i>
+                                Last Consultation
+                            </div>
+                            <div class="activity-card">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <strong>{{ last_medical_record.diagnosis }}</strong>
+                                    <small class="text-muted">{{ last_medical_record.record_date|date:"M d, Y" }}</small>
+                                </div>
+                                <p class="mb-0 text-muted small">
+                                    <i class="fas fa-user-doctor me-2"></i>
+                                    Dr. {{ last_medical_record.doctor.user.get_full_name }}
+                                </p>
+                            </div>
+                        {% else %}
+                            <div class="empty-state py-3">
+                                <i class="fas fa-file-medical" style="font-size: 3rem;"></i>
+                                <p class="mb-0">No medical records yet.</p>
+                            </div>
+                        {% endif %}
+
+                        <div class="activity-header mt-4">
+                            <i class="fas fa-pills"></i>
+                            Active Prescriptions
+                        </div>
+                        {% if recent_prescriptions %}
+                            <ul class="prescription-list">
+                                {% for prescription in recent_prescriptions|slice:":4" %}
+                                <li class="prescription-item">
+                                    <i class="fas fa-prescription-bottle"></i>
+                                    <div class="flex-grow-1">
+                                        <strong>{{ prescription.medication_name }}</strong>
+                                        <div class="dosage">{{ prescription.dosage }}</div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="empty-state py-3">
+                                <i class="fas fa-prescription" style="font-size: 3rem;"></i>
+                                <p class="mb-0">No active prescriptions.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="row g-4 mt-3">
+            <div class="col-md-4">
+                <a href="{% url 'patients:doctor_list' %}" class="stat-link">
+                    <div class="stats-card" style="animation-delay: 0.8s;">
+                        <div class="text-center">
+                            <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #EC4899 0%, #DB2777 100%);">
+                                <i class="fas fa-search"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark">Find a Doctor</h5>
+                            <p class="text-muted mb-0">Browse our network of specialists</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'patients:my_medical_records_list' %}" class="stat-link">
+                    <div class="stats-card" style="animation-delay: 0.9s;">
+                        <div class="text-center">
+                            <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);">
+                                <i class="fas fa-folder-open"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark">Medical Records</h5>
+                            <p class="text-muted mb-0">View your health history</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'patients:patient_profile' %}" class="stat-link">
+                    <div class="stats-card" style="animation-delay: 1s;">
+                        <div class="text-center">
+                            <div class="stat-icon mx-auto mb-3" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <h5 class="fw-bold text-dark">My Profile</h5>
+                            <p class="text-muted mb-0">Update your information</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

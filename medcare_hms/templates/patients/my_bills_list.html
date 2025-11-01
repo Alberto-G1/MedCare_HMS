@@ -1,40 +1,296 @@
 {% extends 'base_patient.html' %}
 
 {% load billing_extras %}
-{% block title %}My Billing History{% endblock %}
+{% block title %}My Billing History - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .bills-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 50%, #BBF7D0 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    /* Header */
+    .bills-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+    }
+
+    .bills-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .bills-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .bills-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .bills-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Content */
+    .bills-content {
+        width: 100%;
+        padding: 3rem 2rem;
+        margin: 0;
+    }
+
+    .bills-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 3px solid transparent;
+        background-image: linear-gradient(white, white), 
+                          linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+    }
+
+    /* Table */
+    .bills-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .bills-table thead {
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+    }
+
+    .bills-table thead th {
+        padding: 1.25rem 1.5rem;
+        font-weight: 700;
+        color: #0C4A6E;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border: none;
+    }
+
+    .bills-table thead th:first-child {
+        border-radius: 12px 0 0 0;
+    }
+
+    .bills-table thead th:last-child {
+        border-radius: 0 12px 0 0;
+    }
+
+    .bills-table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #E0F2FE;
+    }
+
+    .bills-table tbody tr:hover {
+        background: linear-gradient(135deg, #F0F9FF 0%, #F8FAFC 100%);
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(14, 116, 144, 0.1);
+    }
+
+    .bills-table tbody td {
+        padding: 1.25rem 1.5rem;
+        color: #475569;
+        vertical-align: middle;
+        border: none;
+    }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: inline-block;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-paid {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-unpaid {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .status-partial {
+        background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    /* Amount Styles */
+    .amount-total {
+        font-weight: 700;
+        color: #0C4A6E;
+        font-size: 1.05rem;
+    }
+
+    .amount-due {
+        font-weight: 700;
+        color: #DC2626;
+        font-size: 1.05rem;
+    }
+
+    /* Button */
+    .btn-view {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        box-shadow: 0 4px 12px rgba(14, 116, 144, 0.3);
+    }
+
+    .btn-view:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.4);
+        color: white;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: #94A3B8;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 768px) {
+        .bills-header h1 { font-size: 2rem; }
+        .bills-content { padding: 2rem 1rem; }
+        .bills-section { padding: 1.5rem; }
+        .bills-table thead th,
+        .bills-table tbody td {
+            padding: 1rem;
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h4 class="mb-0"><i class="fas fa-file-invoice-dollar me-2"></i>My Billing History</h4>
+<div class="bills-wrapper">
+    <!-- Header -->
+    <div class="bills-header">
+        <div class="bills-header-content">
+            <h1><i class="fas fa-file-invoice-dollar me-3"></i>My Billing History</h1>
+            <p>View and manage all your medical bills</p>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead class="table-light">
-                    <tr><th>Date</th><th>Total Amount</th><th>Amount Due</th><th>Status</th><th>Actions</th></tr>
-                </thead>
-                <tbody>
-                    {% for bill in bills %}
-                    <tr>
-                        <td>{{ bill.bill_date|date:"F d, Y" }}</td>
-                        <td>{{ bill.total_amount|currency_ugx }}</td>
-                        <td class="fw-bold text-danger">{{ bill.amount_due|currency_ugx }}</td>
-                        <td>
-                            {% if bill.status == 'Paid' %}<span class="badge bg-success">{{ bill.status }}</span>
-                            {% elif bill.status == 'Unpaid' %}<span class="badge bg-danger">{{ bill.status }}</span>
-                            {% else %}<span class="badge bg-warning">{{ bill.status }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'patients:my_bill_detail' bill.pk %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View Details</a>
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="5" class="text-center text-muted py-4">You have no billing records.</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+    <!-- Content -->
+    <div class="bills-content">
+        <div class="bills-section">
+            <div class="table-responsive">
+                <table class="bills-table">
+                    <thead>
+                        <tr>
+                            <th>Bill Date</th>
+                            <th>Total Amount</th>
+                            <th>Amount Due</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bill in bills %}
+                        <tr>
+                            <td><strong>{{ bill.bill_date|date:"F d, Y" }}</strong></td>
+                            <td><span class="amount-total">{{ bill.total_amount|currency_ugx }}</span></td>
+                            <td><span class="amount-due">{{ bill.amount_due|currency_ugx }}</span></td>
+                            <td>
+                                {% if bill.status == 'Paid' %}
+                                    <span class="status-badge status-paid">{{ bill.status }}</span>
+                                {% elif bill.status == 'Unpaid' %}
+                                    <span class="status-badge status-unpaid">{{ bill.status }}</span>
+                                {% else %}
+                                    <span class="status-badge status-partial">{{ bill.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'patients:my_bill_detail' bill.pk %}" class="btn-view">
+                                    <i class="fas fa-eye"></i>
+                                    <span>View Details</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="empty-state">
+                                <i class="fas fa-file-invoice"></i>
+                                <p>You have no billing records.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>

@@ -1,55 +1,390 @@
 {% extends 'base_patient.html' %}
 
-{% block title %}Medical Record Details{% endblock %}
+{% block title %}Medical Record Details - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding/margin from main content area */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .record-detail-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #DBEAFE 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes headerGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    /* Page Header */
+    .record-detail-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .record-detail-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .record-detail-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+    }
+
+    .record-detail-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+    }
+
+    .record-detail-header small {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-back {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-back:hover {
+        background: white;
+        color: #0E7490;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(255, 255, 255, 0.4);
+        border-color: white;
+    }
+
+    /* Content Container */
+    .record-detail-content {
+        width: 100%;
+        margin: 0;
+        padding: 3rem 2rem;
+    }
+
+    .detail-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 3px solid transparent;
+        background-image: linear-gradient(white, white), 
+                          linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        transition: all 0.3s ease;
+    }
+
+    .detail-section:hover {
+        box-shadow: 0 15px 50px rgba(14, 116, 144, 0.25);
+        transform: translateY(-3px);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid transparent;
+        border-image: linear-gradient(90deg, #0E7490, #0284C7, #14B8A6) 1;
+    }
+
+    .section-title i {
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 50%, #14B8A6 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section-title h5 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #0C4A6E;
+        margin: 0;
+    }
+
+    .detail-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .detail-label i {
+        color: #0E7490;
+    }
+
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0C4A6E;
+        line-height: 1.6;
+    }
+
+    .detail-value.large {
+        font-size: 1.3rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .notes-box {
+        background: linear-gradient(135deg, #F0F9FF 0%, #F8FAFC 100%);
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 2px solid #E0F2FE;
+        color: #475569;
+        line-height: 1.8;
+        white-space: pre-wrap;
+    }
+
+    .btn-download {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.3);
+    }
+
+    .btn-download:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(14, 116, 144, 0.4);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .record-detail-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .record-detail-header h1 {
+            font-size: 2rem;
+        }
+
+        .record-detail-content {
+            padding: 2rem 1rem;
+        }
+
+        .detail-section {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <div>
-            <h4 class="mb-0">Medical Record</h4>
-            <small class="text-muted">Dated: {{ record.record_date|date:"F d, Y" }}</small>
+<div class="record-detail-wrapper">
+    <!-- Full-Width Page Header -->
+    <div class="record-detail-header">
+        <div class="record-detail-header-content">
+            <div>
+                <h1><i class="fas fa-file-medical-alt me-3"></i>Medical Record</h1>
+                <small>Dated: {{ record.record_date|date:"F d, Y" }}</small>
+            </div>
+            <a href="{% url 'patients:my_medical_records_list' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                <span>Back to All Records</span>
+            </a>
         </div>
-        <a href="{% url 'patients:my_medical_records_list' %}" class="btn btn-sm btn-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Back to All Records
-        </a>
     </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="text-primary">Consultation Details</h5>
-                <dl>
-                    <dt>Doctor</dt>
-                    <dd>{{ record.doctor }}</dd>
+
+    <!-- Record Detail Content -->
+    <div class="record-detail-content">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-lg-6">
+                <div class="detail-section">
+                    <div class="section-title">
+                        <i class="fas fa-user-md"></i>
+                        <h5>Consultation Details</h5>
+                    </div>
                     
-                    <dt>Diagnosis</dt>
-                    <dd class="fw-bold">{{ record.diagnosis }}</dd>
-                    
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-user-doctor"></i>
+                            Doctor
+                        </div>
+                        <div class="detail-value large">
+                            {{ record.doctor }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-calendar-check"></i>
+                            Record Date
+                        </div>
+                        <div class="detail-value">
+                            {{ record.record_date|date:"F d, Y" }}
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-stethoscope"></i>
+                            Diagnosis
+                        </div>
+                        <div class="detail-value">
+                            {{ record.diagnosis }}
+                        </div>
+                    </div>
+
                     {% if record.appointment %}
-                    <dt>Linked Appointment</dt>
-                    <dd>{{ record.appointment.appointment_date|date:"F d, Y" }} at {{ record.appointment.appointment_time|time:"g:i A" }}</dd>
+                    <div class="detail-item">
+                        <div class="detail-label">
+                            <i class="fas fa-link"></i>
+                            Linked Appointment
+                        </div>
+                        <div class="detail-value">
+                            {{ record.appointment.appointment_date|date:"F d, Y" }} at {{ record.appointment.appointment_time|time:"g:i A" }}
+                        </div>
+                    </div>
                     {% endif %}
-                </dl>
+                </div>
+
+                <!-- Prescription Section -->
+                <div class="detail-section">
+                    <div class="section-title">
+                        <i class="fas fa-pills"></i>
+                        <h5>Prescription</h5>
+                    </div>
+
+                    {% if record.prescription %}
+                        <div class="notes-box">
+                            {{ record.prescription }}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted py-4">
+                            <i class="fas fa-info-circle me-2"></i>No prescription issued for this record.
+                        </p>
+                    {% endif %}
+                </div>
             </div>
-            <div class="col-md-6">
-                <h5 class="text-primary">Doctor's Notes</h5>
-                <p style="white-space: pre-wrap;">{{ record.notes }}</p>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <h5 class="text-primary">Prescription</h5>
-                <p style="white-space: pre-wrap;">{{ record.prescription|default:"No prescription issued." }}</p>
-            </div>
-            <div class="col-md-6">
-                <h5 class="text-primary">Attached Reports</h5>
-                {% if record.report_file %}
-                    <a href="{{ record.report_file.url }}" target="_blank" class="btn btn-sky">
-                        <i class="fas fa-download me-2"></i>Download Report
-                    </a>
-                {% else %}
-                    <p class="text-muted">No report was attached to this record.</p>
-                {% endif %}
+
+            <!-- Right Column -->
+            <div class="col-lg-6">
+                <!-- Doctor's Notes Section -->
+                <div class="detail-section">
+                    <div class="section-title">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h5>Doctor's Notes</h5>
+                    </div>
+                    
+                    <div class="notes-box">
+                        {{ record.notes }}
+                    </div>
+                </div>
+
+                <!-- Attached Reports Section -->
+                <div class="detail-section">
+                    <div class="section-title">
+                        <i class="fas fa-file-pdf"></i>
+                        <h5>Attached Reports</h5>
+                    </div>
+
+                    {% if record.report_file %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-file-download" style="font-size: 4rem; color: #0E7490; margin-bottom: 1.5rem;"></i>
+                            <p class="mb-4" style="color: #64748B; font-size: 1rem;">
+                                Medical report is available for download
+                            </p>
+                            <a href="{{ record.report_file.url }}" target="_blank" class="btn-download">
+                                <i class="fas fa-download"></i>
+                                <span>Download Report</span>
+                            </a>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-muted py-5">
+                            <i class="fas fa-info-circle me-2"></i>No report was attached to this record.
+                        </p>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

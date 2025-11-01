@@ -1,81 +1,498 @@
 {% extends 'base_patient.html' %}
 
-{% block title %}Book a New Appointment{% endblock %}
+{% block title %}Book Appointment - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .book-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 50%, #FCD34D 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes headerGradient {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    /* Header */
+    .book-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+    }
+
+    .book-header::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .book-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .book-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .book-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    /* Progress Indicator */
+    .progress-container {
+        width: 100%;
+        margin: 0;
+        padding: 2rem 1rem;
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 3rem;
+        position: relative;
+    }
+
+    .progress-steps::before {
+        content: '';
+        position: absolute;
+        top: 30px;
+        left: 25%;
+        width: 50%;
+        height: 4px;
+        background: #E0F2FE;
+        z-index: 0;
+    }
+
+    .progress-step {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        flex: 1;
+    }
+
+    .step-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: white;
+        border: 4px solid #E0F2FE;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.75rem;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #94A3B8;
+        transition: all 0.3s ease;
+    }
+
+    .progress-step.active .step-circle {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        border-color: #0E7490;
+        color: white;
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.4);
+        transform: scale(1.1);
+    }
+
+    .progress-step.completed .step-circle {
+        background: #10B981;
+        border-color: #10B981;
+        color: white;
+    }
+
+    .step-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #64748B;
+    }
+
+    .progress-step.active .step-label {
+        color: #0E7490;
+        font-weight: 700;
+    }
+
+    /* Content */
+    .book-content {
+        width: 100%;
+        margin: 0;
+        padding: 0 2rem 3rem;
+    }
+
+    .wizard-step {
+        display: none;
+    }
+
+    .wizard-step.active {
+        display: block;
+        animation: fadeInScale 0.5s ease-out;
+    }
+
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: scale(0.95); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Doctor Cards */
+    .doctors-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .doctor-card {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 3px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .doctor-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        animation: gradientShift 8s ease infinite;
+        background-size: 200% 100%;
+    }
+
+    @keyframes gradientShift {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(14, 116, 144, 0.2);
+    }
+
+    .doctor-card.selected {
+        border-color: #0E7490;
+        box-shadow: 0 20px 50px rgba(14, 116, 144, 0.3);
+        transform: translateY(-5px);
+    }
+
+    .doctor-avatar {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+        display: block;
+        border: 4px solid #E0F2FE;
+        transition: all 0.3s ease;
+    }
+
+    .doctor-card:hover .doctor-avatar,
+    .doctor-card.selected .doctor-avatar {
+        border-color: #0E7490;
+    }
+
+    .doctor-name {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #0C4A6E;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+
+    .doctor-specialty {
+        display: inline-block;
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%);
+        color: #0284C7;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-align: center;
+        margin: 0 auto;
+        display: block;
+        width: fit-content;
+    }
+
+    /* Form Section */
+    .form-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 3px solid transparent;
+        background-image: linear-gradient(white, white), 
+                          linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #0C4A6E;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-label i {
+        color: #0E7490;
+    }
+
+    .form-control, .form-select {
+        padding: 0.85rem 1.25rem;
+        border: 2px solid #E0F2FE;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #F0F9FF;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0E7490;
+        box-shadow: 0 0 0 0.2rem rgba(14, 116, 144, 0.1);
+        background: white;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    #time-slot-loader {
+        display: none;
+        color: #0E7490;
+        margin-top: 0.5rem;
+    }
+
+    /* Buttons */
+    .btn-nav {
+        padding: 0.85rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-prev {
+        background: rgba(255, 255, 255, 0.9);
+        color: #0E7490;
+        border: 2px solid #E0F2FE;
+    }
+
+    .btn-prev:hover {
+        background: white;
+        border-color: #0E7490;
+        transform: translateX(-3px);
+    }
+
+    .btn-next {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        color: white;
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.3);
+    }
+
+    .btn-next:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(14, 116, 144, 0.4);
+    }
+
+    .btn-next:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        color: white;
+        padding: 0.85rem 3rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border: none;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    .wizard-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid #E0F2FE;
+    }
+
+    @media (max-width: 768px) {
+        .book-header h1 { font-size: 2rem; }
+        .doctors-grid { grid-template-columns: 1fr; }
+        .wizard-actions { flex-direction: column; gap: 1rem; }
+        .btn-nav { width: 100%; justify-content: center; }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<style>
-    .doctor-card { border: 2px solid transparent; border-radius: 0.75rem; transition: all 0.3s ease; cursor: pointer; }
-    .doctor-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-    .doctor-card.selected { border-color: var(--primary-dark-teal); box-shadow: 0 8px 20px rgba(0,0,0,0.1); background-color: #f0f8ff; }
-    .doctor-card-img { width: 80px; height: 80px; object-fit: cover; }
-    #time-slot-loader { display: none; }
-</style>
+<div class="book-wrapper">
+    <!-- Header -->
+    <div class="book-header">
+        <div class="book-header-content">
+            <h1><i class="fas fa-calendar-plus me-3"></i>Book New Appointment</h1>
+            <p>Schedule your consultation in just 2 easy steps</p>
+        </div>
+    </div>
 
-<div class="row justify-content-center">
-    <div class="col-lg-10">
-        <div class="card card-custom">
-            <div class="card-header card-header-custom"><h4 class="mb-0">Schedule an Appointment</h4></div>
-            <div class="card-body p-4">
-                <form id="appointment-form" method="post" enctype="multipart/form-data" novalidate>
-                    {% csrf_token %}
-                    {{ form.doctor }} <!-- The hidden doctor input -->
-
-                    <!-- Step 1: Doctor Selection -->
-                    <div class="mb-4">
-                        <label class="form-label fw-bold">Step 1: Choose a Doctor</label>
-                        <div id="doctor-selection-container" class="row">
-                            {% for doc in doctors %}
-                            <div class="col-md-4 mb-3">
-                                <div class="card doctor-card h-100" data-doctor-id="{{ doc.id }}">
-                                    <div class="card-body text-center d-flex flex-column">
-                                        <img src="{{ doc.profile_picture.url }}" class="rounded-circle doctor-card-img mb-2 mx-auto" alt="{{ doc }}">
-                                        <h6 class="card-title mb-1">{{ doc }}</h6>
-                                        <p class="card-text text-muted small">{{ doc.specialization }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                        {% if form.doctor.errors %}<div id="doctor-error" class="text-danger small mt-1">{{ form.doctor.errors.as_text }}</div>{% endif %}
-                    </div>
-                    
-                    <!-- Step 2 & 3: Details (Initially hidden) -->
-                    <div id="appointment-details-section" class="d-none">
-                        <hr class="my-4">
-                        <label class="form-label fw-bold">Step 2: Select Date & Time</label>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.appointment_date.id_for_label }}">{{ form.appointment_date.label }}</label>
-                                {{ form.appointment_date }}
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.appointment_time.id_for_label }}">{{ form.appointment_time.label }}</label>
-                                {{ form.appointment_time }}
-                                <div id="time-slot-loader" class="spinner-border spinner-border-sm mt-2" role="status">
-                                    <span class="visually-hidden">Loading...</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <hr class="my-4">
-                        <label class="form-label fw-bold">Step 3: Provide Appointment Details</label>
-                        <div class="mb-3">
-                            <label for="{{ form.reason.id_for_label }}">{{ form.reason.label }}</label>
-                            {{ form.reason }}
-                        </div>
-                        <div class="mb-4">
-                            <label for="{{ form.attachment.id_for_label }}">{{ form.attachment.label }}</label>
-                            {{ form.attachment }}
-                        </div>
-                        
-                        <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                            <a href="{% url 'patients:my_appointments' %}" class="btn btn-secondary">Cancel</a>
-                            <button type="submit" class="btn btn-primary-custom">Submit Request</button>
-                        </div>
-                    </div>
-                </form>
+    <!-- Progress Indicator -->
+    <div class="progress-container">
+        <div class="progress-steps">
+            <div class="progress-step active" data-step="1">
+                <div class="step-circle">1</div>
+                <div class="step-label">Select Doctor</div>
+            </div>
+            <div class="progress-step" data-step="2">
+                <div class="step-circle">2</div>
+                <div class="step-label">Appointment Details</div>
             </div>
         </div>
+    </div>
+
+    <!-- Content -->
+    <div class="book-content">
+        <form id="appointment-form" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.doctor }}
+
+            <!-- Step 1: Doctor Selection -->
+            <div class="wizard-step active" id="step-1">
+                <div class="doctors-grid">
+                    {% for doc in doctors %}
+                    <div class="doctor-card" data-doctor-id="{{ doc.id }}">
+                        <img src="{{ doc.profile_picture.url }}" class="doctor-avatar" alt="{{ doc }}">
+                        <div class="doctor-name">{{ doc }}</div>
+                        <span class="doctor-specialty">{{ doc.specialization }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="wizard-actions">
+                    <a href="{% url 'patients:my_appointments' %}" class="btn-nav btn-prev">
+                        <i class="fas fa-times"></i>
+                        <span>Cancel</span>
+                    </a>
+                    <button type="button" class="btn-nav btn-next" id="next-to-step-2" disabled>
+                        <span>Next: Appointment Details</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Appointment Details -->
+            <div class="wizard-step" id="step-2">
+                <div class="form-section">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label for="{{ form.appointment_date.id_for_label }}" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                {{ form.appointment_date.label }}
+                            </label>
+                            {{ form.appointment_date }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="{{ form.appointment_time.id_for_label }}" class="form-label">
+                                <i class="fas fa-clock"></i>
+                                {{ form.appointment_time.label }}
+                            </label>
+                            {{ form.appointment_time }}
+                            <div id="time-slot-loader">
+                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                <span class="ms-2">Loading available slots...</span>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.reason.id_for_label }}" class="form-label">
+                                <i class="fas fa-comment-medical"></i>
+                                {{ form.reason.label }}
+                            </label>
+                            {{ form.reason }}
+                        </div>
+
+                        <div class="col-12">
+                            <label for="{{ form.attachment.id_for_label }}" class="form-label">
+                                <i class="fas fa-paperclip"></i>
+                                {{ form.attachment.label }}
+                            </label>
+                            {{ form.attachment }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="wizard-actions">
+                    <button type="button" class="btn-nav btn-prev" id="back-to-step-1">
+                        <i class="fas fa-arrow-left"></i>
+                        <span>Back to Doctor Selection</span>
+                    </button>
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Submit Appointment Request
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -83,63 +500,79 @@
 document.addEventListener('DOMContentLoaded', function() {
     const doctorCards = document.querySelectorAll('.doctor-card');
     const hiddenDoctorInput = document.getElementById('{{ form.doctor.id_for_label }}');
-    const detailsSection = document.getElementById('appointment-details-section');
+    const step1 = document.getElementById('step-1');
+    const step2 = document.getElementById('step-2');
+    const nextBtn = document.getElementById('next-to-step-2');
+    const backBtn = document.getElementById('back-to-step-1');
     const dateInput = document.getElementById('{{ form.appointment_date.id_for_label }}');
     const timeSelect = document.getElementById('{{ form.appointment_time.id_for_label }}');
     const timeLoader = document.getElementById('time-slot-loader');
+    const progressSteps = document.querySelectorAll('.progress-step');
 
     let selectedDoctorId = null;
 
+    // Doctor Selection
     doctorCards.forEach(card => {
         card.addEventListener('click', function() {
             doctorCards.forEach(c => c.classList.remove('selected'));
             this.classList.add('selected');
             selectedDoctorId = this.dataset.doctorId;
             hiddenDoctorInput.value = selectedDoctorId;
-            
-            detailsSection.classList.remove('d-none');
-            
-            if (dateInput.value) {
-                fetchAvailableTimes();
-            }
+            nextBtn.disabled = false;
         });
     });
 
-    dateInput.addEventListener('change', fetchAvailableTimes);
+    // Next Button
+    nextBtn.addEventListener('click', function() {
+        if (!selectedDoctorId) return;
+        
+        step1.classList.remove('active');
+        step2.classList.add('active');
+        
+        progressSteps[0].classList.remove('active');
+        progressSteps[0].classList.add('completed');
+        progressSteps[1].classList.add('active');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-    function fetchAvailableTimes() {
-        const selectedDate = dateInput.value;
-        if (!selectedDoctorId || !selectedDate) {
-            return;
-        }
+    // Back Button
+    backBtn.addEventListener('click', function() {
+        step2.classList.remove('active');
+        step1.classList.add('active');
+        
+        progressSteps[1].classList.remove('active');
+        progressSteps[0].classList.remove('completed');
+        progressSteps[0].classList.add('active');
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
 
-        timeLoader.style.display = 'block';
-        timeSelect.disabled = true;
-        timeSelect.innerHTML = '<option>Loading times...</option>';
-
-        const apiUrl = `{% url 'doctors:api_get_doctor_availability' %}?doctor_id=${selectedDoctorId}&date=${selectedDate}`;
-
-        fetch(apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                timeSelect.innerHTML = '';
-                if (data.available_slots && data.available_slots.length > 0) {
-                    timeSelect.innerHTML = '<option value="">--- Select a time ---</option>';
-                    data.available_slots.forEach(slot => {
-                        timeSelect.innerHTML += `<option value="${slot.value}">${slot.display}</option>`;
+    // Date/Time AJAX
+    if (dateInput && timeSelect) {
+        dateInput.addEventListener('change', function() {
+            if (!selectedDoctorId || !this.value) return;
+            
+            timeLoader.style.display = 'block';
+            timeSelect.disabled = true;
+            
+            fetch(`/doctors/get-available-times/?doctor_id=${selectedDoctorId}&date=${this.value}`)
+                .then(response => response.json())
+                .then(data => {
+                    timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+                    data.available_times.forEach(time => {
+                        const option = document.createElement('option');
+                        option.value = time;
+                        option.textContent = time;
+                        timeSelect.appendChild(option);
                     });
+                })
+                .catch(error => console.error('Error:', error))
+                .finally(() => {
+                    timeLoader.style.display = 'none';
                     timeSelect.disabled = false;
-                } else {
-                    timeSelect.innerHTML = '<option value="">No available slots on this day</option>';
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching availability:', error);
-                timeSelect.innerHTML = '<option value="">Could not load times</option>';
-            })
-            .finally(() => {
-                timeLoader.style.display = 'none';
-            });
+                });
+        });
     }
 });
 </script>

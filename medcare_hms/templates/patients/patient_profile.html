@@ -2,79 +2,507 @@
 {% load static %}
 {% load profile_tags %}
 
-{% block title %}My Patient Profile{% endblock %}
+{% block title %}My Profile - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding/margin from main content area */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .profile-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #DBEAFE 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes headerGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    /* Page Header */
+    .profile-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .profile-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .profile-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .profile-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+    }
+
+    .profile-header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-edit-profile {
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        color: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.05rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-edit-profile:hover {
+        background: white;
+        color: #0E7490;
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(255, 255, 255, 0.4);
+        border-color: white;
+    }
+
+    .btn-edit-profile i {
+        font-size: 1.2rem;
+    }
+
+    /* Profile Content Container */
+    .profile-content-container {
+        width: 100%;
+        margin: 0;
+        padding: 3rem 2rem;
+    }
+
+    /* Profile Picture Section */
+    .profile-picture-section {
+        text-align: center;
+        padding: 2.5rem;
+        background: white;
+        border-radius: 24px;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .profile-picture-section:hover {
+        box-shadow: 0 15px 50px rgba(14, 116, 144, 0.2);
+        transform: translateY(-5px);
+    }
+
+    .profile-picture-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #0E7490, #0284C7, #0EA5E9, #14B8A6, #0E7490);
+        background-size: 200% 100%;
+        animation: headerGradient 8s ease infinite;
+    }
+
+    .profile-image-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-image-container img {
+        width: 180px;
+        height: 180px;
+        border-radius: 50%;
+        border: 5px solid white;
+        box-shadow: 0 10px 30px rgba(14, 116, 144, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .profile-image-container:hover img {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(14, 116, 144, 0.4);
+    }
+
+    .profile-name {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #0C4A6E;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-email {
+        color: #64748B;
+        font-size: 1.05rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .profile-member-since {
+        color: #94A3B8;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid #E0F2FE;
+    }
+
+    .section-header i {
+        font-size: 1.5rem;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .section-header h5 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #0C4A6E;
+        margin: 0;
+    }
+
+    /* Info Items */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .info-item {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        border: 2px solid rgba(14, 116, 144, 0.15);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(14, 116, 144, 0.08);
+    }
+
+    .info-item:hover {
+        border-color: #0E7490;
+        transform: translateY(-5px) scale(1.02);
+        box-shadow: 0 12px 30px rgba(14, 116, 144, 0.2);
+    }
+
+    .info-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .info-label i {
+        color: #0E7490;
+    }
+
+    .info-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0C4A6E;
+    }
+
+    .info-value.not-provided {
+        color: #94A3B8;
+        font-style: italic;
+    }
+
+    /* Blood Group Badge */
+    .blood-group-badge {
+        background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 50px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    /* Medical History */
+    .medical-history-box {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #E0F2FE;
+        color: #475569;
+        line-height: 1.8;
+        min-height: 100px;
+    }
+
+    .medical-history-box.empty {
+        text-align: center;
+        color: #94A3B8;
+        font-style: italic;
+    }
+
+    /* Divider */
+    .section-divider {
+        height: 3px;
+        background: linear-gradient(90deg, transparent, #0E7490, #0284C7, #14B8A6, transparent);
+        margin: 3rem 0;
+        border-radius: 10px;
+        opacity: 0.3;
+    }
+
+    /* Section Container */
+    .profile-section {
+        background: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.12);
+        border: 1px solid rgba(14, 116, 144, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .profile-section:hover {
+        box-shadow: 0 15px 50px rgba(14, 116, 144, 0.18);
+        transform: translateY(-3px);
+    }
+
+    @media (max-width: 768px) {
+        .profile-wrapper {
+            padding: 0;
+        }
+
+        .profile-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .profile-header h1 {
+            font-size: 2rem;
+        }
+
+        .profile-content-container {
+            padding: 2rem 1rem;
+        }
+
+        .profile-section {
+            padding: 1.5rem;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .btn-edit-profile {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
-        <h4 class="mb-0"><i class="fas fa-user-circle me-2"></i>My Profile Information</h4>
-        <a href="{% url 'patients:edit_patient_profile' %}" class="btn btn-sky btn-sm">
-            <i class="fas fa-edit me-2"></i>Edit Profile
-        </a>
+<div class="profile-wrapper">
+    <!-- Full-Width Page Header -->
+    <div class="profile-header">
+        <div class="profile-header-content d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h1><i class="fas fa-user-circle me-3"></i>My Profile</h1>
+                <p>View and manage your personal information</p>
+            </div>
+            <a href="{% url 'patients:edit_patient_profile' %}" class="btn-edit-profile">
+                <i class="fas fa-edit"></i>
+                <span>Edit Profile</span>
+            </a>
+        </div>
     </div>
-    <div class="card-body p-4">
-        <div class="row">
+
+    <!-- Profile Content -->
+    <div class="profile-content-container">
+        <div class="row g-4">
             <!-- Left Column: Profile Picture & Basic Info -->
-            <div class="col-lg-4 text-center border-end">
-                {% profile_image user size="150" css_class="profile-page-image rounded mb-3" %}
-                <h4 class="fw-bold text-custom-dark">{{ profile.user.get_full_name|default:profile.user.username }}</h4>
-                <p class="text-muted">{{ profile.user.email }}</p>
-                <p class="text-muted">Member Since: {{ profile.user.date_joined|date:"F Y" }}</p>
+            <div class="col-lg-4">
+                <div class="profile-picture-section">
+                    <div class="profile-image-container">
+                        {% profile_image user size="180" css_class="profile-page-image" %}
+                    </div>
+                    <div class="profile-name">{{ profile.user.get_full_name|default:profile.user.username }}</div>
+                    <div class="profile-email">{{ profile.user.email }}</div>
+                    <div class="profile-member-since">
+                        <i class="far fa-calendar-alt"></i>
+                        Member Since {{ profile.user.date_joined|date:"F Y" }}
+                    </div>
+                </div>
             </div>
 
-            <!-- Right Column: Detailed Information -->
-            <div class="col-lg-8 ps-lg-5">
-                <!-- Personal Details -->
-                <h5 class="text-primary mb-3">Personal Details</h5>
-                <dl class="row">
-                    <dt class="col-sm-4">Full Name</dt>
-                    <dd class="col-sm-8">{{ profile.user.get_full_name|default:"Not Provided" }}</dd>
+            <!-- Right Column: Detailed Information Sections -->
+            <div class="col-lg-8">
+                <!-- Personal Details Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <i class="fas fa-user"></i>
+                        <h5>Personal Details</h5>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-signature"></i>Full Name</div>
+                            <div class="info-value">{{ profile.user.get_full_name|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="far fa-calendar"></i>Date of Birth</div>
+                            <div class="info-value">{{ profile.date_of_birth|date:"F d, Y"|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-venus-mars"></i>Gender</div>
+                            <div class="info-value">{{ profile.gender|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-phone"></i>Contact Number</div>
+                            <div class="info-value">{{ profile.user.userprofile.contact|default:"Not Provided" }}</div>
+                        </div>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Date of Birth</dt>
-                    <dd class="col-sm-8">{{ profile.date_of_birth|date:"F d, Y"|default:"Not Provided" }}</dd>
+                <!-- Medical Details Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <i class="fas fa-heartbeat"></i>
+                        <h5>Medical Details</h5>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-tint"></i>Blood Group</div>
+                            <div class="info-value">
+                                {% if profile.blood_group %}
+                                    <span class="blood-group-badge">{{ profile.blood_group }}</span>
+                                {% else %}
+                                    <span class="not-provided">Not Provided</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-file-medical"></i>Medical History</div>
+                            <div class="medical-history-box {% if not profile.medical_history %}empty{% endif %}">
+                                {{ profile.medical_history|linebreaksbr|default:"No medical history provided." }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <dt class="col-sm-4">Gender</dt>
-                    <dd class="col-sm-8">{{ profile.gender|default:"Not Provided" }}</dd>
-                    
-                    <dt class="col-sm-4">Contact Number</dt>
-                    <dd class="col-sm-8">{{ profile.user.userprofile.contact|default:"Not Provided" }}</dd>
-                </dl>
-                <hr class="my-4">
+                <!-- Address & Emergency Contact Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h5>Address & Emergency Contact</h5>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-home"></i>Address</div>
+                            <div class="info-value">{{ profile.address|linebreaksbr|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-user-shield"></i>Emergency Contact</div>
+                            <div class="info-value">{{ profile.emergency_contact_name|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-phone-volume"></i>Emergency Number</div>
+                            <div class="info-value">{{ profile.emergency_contact_number|default:"Not Provided" }}</div>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Medical Details -->
-                <h5 class="text-primary mb-3">Medical Details</h5>
-                <dl class="row">
-                    <dt class="col-sm-4">Blood Group</dt>
-                    <dd class="col-sm-8"><span class="badge bg-danger fs-6">{{ profile.blood_group|default:"Not Provided" }}</span></dd>
-
-                    <dt class="col-sm-4">Medical History</dt>
-                    <dd class="col-sm-8">{{ profile.medical_history|linebreaksbr|default:"No history provided." }}</dd>
-                </dl>
-                <hr class="my-4">
-
-                <!-- Address & Emergency Contact -->
-                <h5 class="text-primary mb-3">Address & Emergency Contact</h5>
-                 <dl class="row">
-                    <dt class="col-sm-4">Address</dt>
-                    <dd class="col-sm-8">{{ profile.address|linebreaksbr|default:"Not Provided" }}</dd>
-                    
-                    <dt class="col-sm-4">Emergency Contact</dt>
-                    <dd class="col-sm-8">{{ profile.emergency_contact_name|default:"Not Provided" }}</dd>
-                    
-                    <dt class="col-sm-4">Emergency Number</dt>
-                    <dd class="col-sm-8">{{ profile.emergency_contact_number|default:"Not Provided" }}</dd>
-                </dl>
-                <hr class="my-4">
-
-                <!-- Insurance Details -->
-                <h5 class="text-primary mb-3">Insurance Details</h5>
-                <dl class="row">
-                    <dt class="col-sm-4">Provider</dt>
-                    <dd class="col-sm-8">{{ profile.insurance_provider|default:"Not Provided" }}</dd>
-
-                    <dt class="col-sm-4">Policy Number</dt>
-                    <dd class="col-sm-8">{{ profile.insurance_policy_number|default:"Not Provided" }}</dd>
-                </dl>
+                <!-- Insurance Details Section -->
+                <div class="profile-section">
+                    <div class="section-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h5>Insurance Details</h5>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-building"></i>Insurance Provider</div>
+                            <div class="info-value">{{ profile.insurance_provider|default:"Not Provided" }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label"><i class="fas fa-id-card"></i>Policy Number</div>
+                            <div class="info-value">{{ profile.insurance_policy_number|default:"Not Provided" }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

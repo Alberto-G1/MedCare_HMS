@@ -393,6 +393,23 @@ def patient_dashboard(request):
         patient=patient_profile,
         status='Unpaid'
     ).count()
+    
+    # Recent prescriptions (for dashboard display)
+    from prescriptions.models import Prescription, PrescribedMedication
+    recent_prescription_ids = Prescription.objects.filter(
+        patient=patient_profile,
+        status='ACTIVE'
+    ).values_list('id', flat=True)[:4]
+    
+    recent_prescriptions = PrescribedMedication.objects.filter(
+        prescription__id__in=recent_prescription_ids
+    ).select_related('prescription')[:4]
+    
+    # Last medical record (for dashboard display)
+    from patients.models import MedicalRecord
+    last_medical_record = MedicalRecord.objects.filter(
+        patient=patient_profile
+    ).order_by('-record_date').first()
 
     # Check if essential profile fields are filled
     profile_is_complete = all([
@@ -406,6 +423,8 @@ def patient_dashboard(request):
         'profile': patient_profile,
         'upcoming_appointments': upcoming_appointments,
         'unpaid_bills_count': unpaid_bills_count,
+        'recent_prescriptions': recent_prescriptions,
+        'last_medical_record': last_medical_record,
         'profile_is_complete': profile_is_complete,
         'current_time': timezone.now(),
     }
