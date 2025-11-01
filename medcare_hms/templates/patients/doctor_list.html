@@ -1,33 +1,360 @@
 {% extends 'base_patient.html' %}
 
-{% block title %}Find a Doctor{% endblock %}
+{% block title %}Find a Doctor - MedCare HMS{% endblock %}
+
+{% block extra_head %}
+<style>
+    /* Remove default padding/margin from main content area */
+    .main-content-area {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .doctor-list-wrapper {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+        padding: 0;
+        animation: slideInUp 0.6s ease-out;
+        background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #DBEAFE 100%);
+        min-height: calc(100vh - 60px);
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes headerGradient {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    @keyframes patternSlide {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(60px) translateY(60px); }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Page Header */
+    .doctor-list-header {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 25%, #0EA5E9 50%, #14B8A6 75%, #0E7490 100%);
+        background-size: 400% 400%;
+        animation: headerGradient 15s ease infinite;
+        padding: 4rem 2rem;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.4);
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+    }
+
+    .doctor-list-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        opacity: 0.6;
+        animation: patternSlide 20s linear infinite;
+    }
+
+    .doctor-list-header-content {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        margin: 0;
+    }
+
+    .doctor-list-header h1 {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        letter-spacing: -0.5px;
+    }
+
+    .doctor-list-header p {
+        font-size: 1.2rem;
+        opacity: 0.95;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Doctor Cards Container */
+    .doctor-cards-container {
+        width: 100%;
+        margin: 0;
+        padding: 3rem 2rem;
+    }
+
+    .doctor-card {
+        background: white;
+        border-radius: 24px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.15);
+        border: 3px solid transparent;
+        background-image: linear-gradient(white, white), 
+                          linear-gradient(135deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        transition: all 0.4s ease;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+    }
+
+    .doctor-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #0E7490, #14B8A6, #22C55E, #0284C7, #38BDF8, #8B5CF6, #EC4899, #F59E0B);
+        background-size: 200% 100%;
+        animation: gradientShift 8s ease infinite;
+    }
+
+    .doctor-card:hover {
+        transform: translateY(-10px) scale(1.02);
+        box-shadow: 0 20px 60px rgba(14, 116, 144, 0.3);
+    }
+
+    .doctor-avatar-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+    }
+
+    .doctor-avatar {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #E0F2FE;
+        box-shadow: 0 10px 30px rgba(14, 116, 144, 0.3);
+        transition: all 0.3s ease;
+    }
+
+    .doctor-card:hover .doctor-avatar {
+        transform: scale(1.1);
+        border-color: #0E7490;
+        box-shadow: 0 15px 40px rgba(14, 116, 144, 0.5);
+    }
+
+    .doctor-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .doctor-specialization {
+        font-size: 1.1rem;
+        color: #0E7490;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .doctor-department {
+        font-size: 0.95rem;
+        color: #64748B;
+        margin-bottom: 1.5rem;
+    }
+
+    .department-badge {
+        background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+        color: #0C4A6E;
+        padding: 0.35rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        border: 2px solid #7DD3FC;
+    }
+
+    .btn-start-chat {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 50%, #14B8A6 100%);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 6px 20px rgba(14, 116, 144, 0.3);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        margin-top: auto;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-start-chat::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-start-chat:hover::before {
+        left: 100%;
+    }
+
+    .btn-start-chat:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(14, 116, 144, 0.4);
+        background: linear-gradient(135deg, #0C4A6E 0%, #0E7490 50%, #0284C7 100%);
+        color: white;
+    }
+
+    .btn-start-chat i {
+        font-size: 1.1rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(14, 116, 144, 0.1);
+        border: 3px solid #E0F2FE;
+    }
+
+    .empty-state i {
+        font-size: 5rem;
+        background: linear-gradient(135deg, #E0F2FE 0%, #BAE6FD 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1.5rem;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-state h3 {
+        background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #64748B;
+        font-size: 1.1rem;
+    }
+
+    @media (max-width: 768px) {
+        .doctor-list-header {
+            padding: 2.5rem 1.5rem;
+        }
+
+        .doctor-list-header h1 {
+            font-size: 2rem;
+        }
+
+        .doctor-cards-container {
+            padding: 2rem 1rem;
+        }
+
+        .doctor-card {
+            padding: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card card-custom">
-    <div class="card-header card-header-custom">
-        <h4 class="mb-0"><i class="fas fa-user-doctor me-2"></i>Our Specialists</h4>
+<div class="doctor-list-wrapper">
+    <!-- Full-Width Page Header -->
+    <div class="doctor-list-header">
+        <div class="doctor-list-header-content">
+            <h1><i class="fas fa-user-doctor me-3"></i>Our Specialists</h1>
+            <p>Find and connect with our experienced medical professionals</p>
+        </div>
     </div>
-    <div class="card-body">
-        <div class="row">
-            {% for doctor in doctors %}
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <img src="{{ doctor.profile_picture.url }}" class="rounded-circle mb-3" alt="Dr. {{ doctor.user.get_full_name }}" style="width: 120px; height: 120px; object-fit: cover;">
-                        <h5 class="card-title">{{ doctor }}</h5>
-                        <p class="card-text text-muted">{{ doctor.specialization }}</p>
-                        <p class="card-text"><small>{{ doctor.department.name|default:"" }}</small></p>
-                        <!-- THE "START CHAT" BUTTON -->
-                        <a href="{% url 'chat:start_chat' doctor.user.id %}" class="btn btn-sky mt-2">
-                            <i class="fas fa-comments me-2"></i>Start Chat
+
+    <!-- Doctor Cards -->
+    <div class="doctor-cards-container">
+        {% if doctors %}
+            <div class="row g-4">
+                {% for doctor in doctors %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="doctor-card">
+                        <div class="doctor-avatar-container">
+                            <img src="{{ doctor.profile_picture.url }}" class="doctor-avatar" alt="Dr. {{ doctor.user.get_full_name }}">
+                        </div>
+                        <div class="doctor-name">{{ doctor }}</div>
+                        <div class="doctor-specialization">
+                            <i class="fas fa-stethoscope me-2"></i>{{ doctor.specialization }}
+                        </div>
+                        {% if doctor.department.name %}
+                            <span class="department-badge">
+                                <i class="fas fa-hospital me-1"></i>{{ doctor.department.name }}
+                            </span>
+                        {% endif %}
+                        <a href="{% url 'chat:start_chat' doctor.user.id %}" class="btn-start-chat">
+                            <i class="fas fa-comments"></i>
+                            <span>Start Chat</span>
                         </a>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <p class="text-center text-muted">No doctors are currently available.</p>
-            {% endfor %}
-        </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="fas fa-user-doctor"></i>
+                <h3>No Doctors Available</h3>
+                <p>There are no doctors currently available. Please check back later.</p>
+            </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
