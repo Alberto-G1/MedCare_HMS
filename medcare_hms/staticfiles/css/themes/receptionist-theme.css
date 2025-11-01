@@ -1,0 +1,589 @@
+/* Receptionist Theme CSS Framework */
+/* Administrative Efficiency Theme with Light Cyan Accent */
+
+:root {
+    /* Receptionist-specific color palette */
+    --receptionist-primary: #5ce9f6;
+    --receptionist-primary-dark: #0891b2;
+    --receptionist-primary-light: #a5f3fc;
+    --receptionist-secondary: #0284C7;
+    --receptionist-accent: #22D3EE;
+    --receptionist-warning: #F59E0B;
+    --receptionist-danger: #EF4444;
+    --receptionist-success: #10B981;
+    --receptionist-info: #3B82F6;
+    --receptionist-neutral: #6B7280;
+    
+    /* Administrative efficiency gradients */
+    --receptionist-gradient-primary: linear-gradient(135deg, #5ce9f6 0%, #0891b2 100%);
+    --receptionist-gradient-secondary: linear-gradient(135deg, #22D3EE 0%, #0284C7 100%);
+    --receptionist-gradient-card: linear-gradient(145deg, #ffffff 0%, #f0fdff 100%);
+    --receptionist-gradient-efficiency: linear-gradient(135deg, #a5f3fc 0%, #67e8f9 100%);
+    
+    /* Professional administrative shadows */
+    --receptionist-shadow-primary: 0 4px 20px rgba(92, 233, 246, 0.25);
+    --receptionist-shadow-card: 0 8px 32px rgba(8, 145, 178, 0.15);
+    --receptionist-shadow-hover: 0 12px 40px rgba(92, 233, 246, 0.3);
+}
+
+/* Receptionist-specific component styling */
+.receptionist-theme {
+    /* Cards and containers */
+    .card-custom {
+        background: var(--receptionist-gradient-card);
+        border: 1px solid rgba(92, 233, 246, 0.2);
+        box-shadow: var(--receptionist-shadow-card);
+        transition: all 0.3s ease;
+        border-radius: 10px;
+    }
+    
+    .card-custom:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--receptionist-shadow-hover);
+    }
+    
+    .card-header-custom {
+        background: var(--receptionist-gradient-primary);
+        color: var(--receptionist-primary-dark);
+        border-bottom: 2px solid var(--receptionist-primary-dark);
+        border-radius: 10px 10px 0 0;
+        font-weight: 600;
+    }
+    
+    /* Administrative action buttons */
+    .btn-primary-custom {
+        background: var(--receptionist-gradient-primary);
+        border: none;
+        color: var(--receptionist-primary-dark);
+        font-weight: 600;
+        box-shadow: var(--receptionist-shadow-primary);
+        transition: all 0.3s ease;
+        border-radius: 6px;
+        padding: 0.75rem 1.5rem;
+    }
+    
+    .btn-primary-custom:hover {
+        background: var(--receptionist-primary-dark);
+        color: white;
+        transform: translateY(-1px);
+        box-shadow: var(--receptionist-shadow-hover);
+    }
+    
+    .btn-admin {
+        background: var(--receptionist-gradient-secondary);
+        border: none;
+        color: white;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 0.5rem 1.25rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-admin:hover {
+        background: var(--receptionist-secondary);
+        transform: translateY(-1px);
+    }
+    
+    .btn-efficiency {
+        background: var(--receptionist-gradient-efficiency);
+        border: none;
+        color: var(--receptionist-primary-dark);
+        font-weight: 600;
+        border-radius: 20px;
+        padding: 0.75rem 2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-efficiency:hover {
+        background: var(--receptionist-primary);
+        color: white;
+    }
+    
+    .btn-outline-custom {
+        border: 2px solid var(--receptionist-primary);
+        color: var(--receptionist-primary-dark);
+        background: transparent;
+        font-weight: 500;
+        border-radius: 6px;
+    }
+    
+    .btn-outline-custom:hover {
+        background: var(--receptionist-primary);
+        color: var(--receptionist-primary-dark);
+    }
+    
+    /* Status indicators for admin tasks */
+    .status-indicator {
+        &.active {
+            background: var(--receptionist-success);
+            color: white;
+        }
+        
+        &.pending {
+            background: var(--receptionist-warning);
+            color: white;
+        }
+        
+        &.completed {
+            background: var(--receptionist-primary);
+            color: var(--receptionist-primary-dark);
+        }
+        
+        &.cancelled {
+            background: var(--receptionist-neutral);
+            color: white;
+        }
+        
+        &.urgent {
+            background: var(--receptionist-danger);
+            color: white;
+        }
+    }
+    
+    /* Administrative metrics and stats */
+    .admin-metric {
+        background: white;
+        border-left: 4px solid var(--receptionist-primary);
+        box-shadow: var(--receptionist-shadow-card);
+        border-radius: 8px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .admin-metric:hover {
+        border-left-color: var(--receptionist-accent);
+        transform: translateX(3px);
+    }
+    
+    .metric-value {
+        color: var(--receptionist-primary-dark);
+        font-weight: 700;
+        font-size: 2rem;
+    }
+    
+    .metric-label {
+        color: var(--receptionist-primary-dark);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+    }
+    
+    /* Patient management cards */
+    .patient-management-card {
+        background: white;
+        border: 1px solid var(--receptionist-primary-light);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+    
+    .patient-management-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--receptionist-gradient-primary);
+        border-radius: 4px 0 0 4px;
+    }
+    
+    .patient-management-card:hover {
+        box-shadow: var(--receptionist-shadow-hover);
+        transform: translateY(-2px);
+    }
+    
+    .patient-id {
+        color: var(--receptionist-primary-dark);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+    
+    .patient-name {
+        color: var(--text-dark);
+        font-weight: 600;
+        font-size: 1.125rem;
+        margin-top: 0.25rem;
+    }
+    
+    .patient-info {
+        color: var(--receptionist-neutral);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+    
+    /* Appointment scheduling interface */
+    .scheduling-panel {
+        background: white;
+        border: 1px solid var(--receptionist-primary-light);
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: var(--receptionist-shadow-card);
+    }
+    
+    .time-slot {
+        background: white;
+        border: 2px solid var(--receptionist-primary-light);
+        border-radius: 6px;
+        padding: 0.75rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .time-slot:hover {
+        border-color: var(--receptionist-primary);
+        background: var(--receptionist-primary-light);
+    }
+    
+    .time-slot.selected {
+        background: var(--receptionist-primary);
+        color: var(--receptionist-primary-dark);
+        border-color: var(--receptionist-primary-dark);
+        font-weight: 600;
+    }
+    
+    .time-slot.unavailable {
+        background: #f3f4f6;
+        color: var(--receptionist-neutral);
+        border-color: #d1d5db;
+        cursor: not-allowed;
+    }
+    
+    /* Billing and payment management */
+    .billing-card {
+        background: white;
+        border: 1px solid var(--receptionist-primary-light);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .billing-card:hover {
+        box-shadow: var(--receptionist-shadow-card);
+    }
+    
+    .billing-amount {
+        color: var(--receptionist-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+    }
+    
+    .billing-status {
+        &.paid {
+            background: var(--receptionist-success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        &.pending {
+            background: var(--receptionist-warning);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        
+        &.overdue {
+            background: var(--receptionist-danger);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+    }
+    
+    /* Forms and data entry */
+    .form-control:focus {
+        border-color: var(--receptionist-primary);
+        box-shadow: 0 0 0 0.2rem rgba(92, 233, 246, 0.25);
+    }
+    
+    .form-select:focus {
+        border-color: var(--receptionist-primary);
+        box-shadow: 0 0 0 0.2rem rgba(92, 233, 246, 0.25);
+    }
+    
+    .form-group-admin {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label-admin {
+        color: var(--receptionist-primary-dark);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Dashboard widgets for front desk */
+    .frontdesk-widget {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: var(--receptionist-shadow-card);
+        border-top: 4px solid var(--receptionist-primary);
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+    
+    .frontdesk-widget:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--receptionist-shadow-hover);
+    }
+    
+    .widget-icon-admin {
+        width: 60px;
+        height: 60px;
+        background: var(--receptionist-gradient-primary);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--receptionist-primary-dark);
+        font-size: 1.5rem;
+        margin: 0 auto 1rem;
+        font-weight: 700;
+    }
+    
+    .widget-title-admin {
+        color: var(--receptionist-primary-dark);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .widget-value-admin {
+        color: var(--receptionist-primary-dark);
+        font-weight: 700;
+        font-size: 1.75rem;
+    }
+    
+    /* Quick actions panel */
+    .quick-actions {
+        background: var(--receptionist-gradient-efficiency);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quick-actions-title {
+        color: var(--receptionist-primary-dark);
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .action-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-item {
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 10px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--receptionist-primary-dark);
+    }
+    
+    .action-item:hover {
+        background: white;
+        transform: translateY(-2px);
+        box-shadow: var(--receptionist-shadow-card);
+        color: var(--receptionist-primary-dark);
+        text-decoration: none;
+    }
+    
+    .action-icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+        color: var(--receptionist-primary-dark);
+    }
+    
+    .action-label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    /* Data tables for admin lists */
+    .admin-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: var(--receptionist-shadow-card);
+    }
+    
+    .admin-table thead {
+        background: var(--receptionist-gradient-primary);
+        color: var(--receptionist-primary-dark);
+    }
+    
+    .admin-table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.875rem;
+        padding: 1rem;
+        border: none;
+    }
+    
+    .admin-table td {
+        padding: 1rem;
+        border-top: 1px solid var(--receptionist-primary-light);
+        vertical-align: middle;
+    }
+    
+    .admin-table tbody tr:hover {
+        background: var(--receptionist-gradient-card);
+    }
+    
+    /* Search and filter bar */
+    .search-bar {
+        background: white;
+        border: 2px solid var(--receptionist-primary-light);
+        border-radius: 25px;
+        padding: 0.75rem 1.5rem;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+    
+    .search-bar:focus-within {
+        border-color: var(--receptionist-primary);
+        box-shadow: var(--receptionist-shadow-primary);
+    }
+    
+    .search-input {
+        border: none;
+        outline: none;
+        flex: 1;
+        background: transparent;
+        color: var(--receptionist-primary-dark);
+        font-size: 1rem;
+    }
+    
+    .search-input::placeholder {
+        color: var(--receptionist-neutral);
+    }
+    
+    .search-icon {
+        color: var(--receptionist-primary);
+        font-size: 1.125rem;
+        margin-left: 0.5rem;
+    }
+}
+
+/* Responsive receptionist theme adjustments */
+@media (max-width: 768px) {
+    .receptionist-theme {
+        .action-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .frontdesk-widget {
+            padding: 1rem;
+        }
+        
+        .widget-icon-admin {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+        
+        .quick-actions {
+            padding: 1.5rem;
+        }
+        
+        .scheduling-panel {
+            padding: 1.5rem;
+        }
+        
+        .admin-table {
+            font-size: 0.875rem;
+        }
+        
+        .admin-table th,
+        .admin-table td {
+            padding: 0.75rem;
+        }
+    }
+}
+
+@media (max-width: 576px) {
+    .receptionist-theme {
+        .action-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .search-bar {
+            padding: 0.5rem 1rem;
+        }
+    }
+}
+
+/* Accessibility for administrative interfaces */
+.receptionist-theme {
+    .btn-primary-custom:focus,
+    .btn-admin:focus {
+        outline: 3px solid var(--receptionist-accent);
+        outline-offset: 2px;
+    }
+    
+    .time-slot:focus {
+        outline: 2px solid var(--receptionist-primary);
+        outline-offset: 2px;
+    }
+    
+    .action-item:focus {
+        outline: 2px solid var(--receptionist-primary-dark);
+        outline-offset: 2px;
+    }
+    
+    /* High contrast mode */
+    @media (prefers-contrast: high) {
+        .card-custom,
+        .admin-table {
+            border: 2px solid var(--receptionist-primary-dark);
+        }
+        
+        .btn-primary-custom,
+        .btn-admin {
+            border: 2px solid transparent;
+        }
+    }
+    
+    /* Reduced motion preference */
+    @media (prefers-reduced-motion: reduce) {
+        .card-custom,
+        .frontdesk-widget,
+        .action-item,
+        .time-slot {
+            transition: none;
+        }
+        
+        .card-custom:hover,
+        .frontdesk-widget:hover,
+        .action-item:hover {
+            transform: none;
+        }
+    }
+}
