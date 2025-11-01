@@ -1,47 +1,415 @@
 {% extends 'base_doctor.html' %}
+{% load static %}
 {% block title %}New Prescription{% endblock %}
+
+{% block extra_head %}
+<style>
+/* ==================== FULL-WIDTH LAYOUT ==================== */
+.dashboard-wrapper {
+    width: 100vw;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Full-width header matching doctor dashboard */
+.prescription-header {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    background: linear-gradient(135deg,
+        #0E7490 0%,
+        #0284C7 35%,
+        #14B8A6 70%,
+        #0C4A6E 100%
+    );
+    background-size: 300% 300%;
+    animation: headerGradient 15s ease infinite;
+    border-radius: 0 !important;
+    padding: 3rem 5vw;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+        0 20px 60px rgba(14, 116, 144, 0.3),
+        0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.prescription-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30Z' fill='rgba(255,255,255,0.08)'/%3E%3C/svg%3E");
+    opacity: 0.4;
+    animation: patternSlide 20s linear infinite;
+}
+
+.header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.prescription-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.prescription-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
+    margin-bottom: 1rem;
+}
+
+.patient-badge {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Content section */
+.content-section {
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    padding: 0 5vw;
+}
+
+/* Alert styling */
+.record-alert {
+    background: linear-gradient(135deg, rgba(14, 116, 144, 0.08) 0%, rgba(20, 184, 166, 0.05) 100%);
+    border-left: 4px solid #0E7490;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(14, 116, 144, 0.1);
+}
+
+.record-alert strong {
+    color: #0C4A6E;
+}
+
+/* Form card styling */
+.form-card {
+    background: white;
+    border-radius: 24px;
+    box-shadow: 0 10px 40px rgba(14, 116, 144, 0.08);
+    border: 1px solid rgba(2, 132, 199, 0.1);
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.form-card-header {
+    background: linear-gradient(145deg, #F0F9FF 0%, #E0F2FE 100%);
+    border-bottom: 2px solid rgba(2, 132, 199, 0.12);
+    padding: 1.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.form-card-header h5 {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    color: #0C4A6E;
+    font-weight: 700;
+    font-size: 1.35rem;
+    margin: 0;
+}
+
+.form-card-header i {
+    background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.form-card-body {
+    padding: 2rem;
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-weight: 700;
+    color: #0C4A6E;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    border: 2px solid rgba(2, 132, 199, 0.15);
+    border-radius: 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: rgba(240, 249, 255, 0.3);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #0284C7;
+    background: white;
+    box-shadow: 0 4px 16px rgba(2, 132, 199, 0.15);
+}
+
+/* Medication form styling */
+.medication-form {
+    background: rgba(240, 249, 255, 0.3);
+    border: 1px solid rgba(2, 132, 199, 0.15) !important;
+    border-radius: 16px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+    transition: all 0.3s ease;
+}
+
+.medication-form:hover {
+    background: rgba(2, 132, 199, 0.05);
+    border-color: rgba(2, 132, 199, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(2, 132, 199, 0.1);
+}
+
+/* Button styling */
+.btn-add-medication {
+    background: linear-gradient(135deg, #14B8A6 0%, #10B981 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-add-medication:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4);
+    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.btn-save-prescription {
+    background: linear-gradient(135deg, #0E7490 0%, #0284C7 100%);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 6px 20px rgba(2, 132, 199, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-save-prescription:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(2, 132, 199, 0.4);
+    background: linear-gradient(135deg, #0284C7 0%, #38BDF8 100%);
+}
+
+/* Animations */
+@keyframes headerGradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+@keyframes patternSlide {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(60px, 60px); }
+}
+
+/* Responsive Design */
+@media (min-width: 1400px) {
+    .content-section {
+        padding: 0 8vw;
+    }
+    .prescription-header {
+        padding: 3rem 8vw;
+    }
+}
+
+@media (max-width: 1199px) {
+    .content-section {
+        padding: 0 4vw;
+    }
+    .prescription-header {
+        padding: 2.5rem 4vw;
+    }
+}
+
+@media (max-width: 767px) {
+    .content-section {
+        padding: 0 3vw;
+    }
+    .prescription-header {
+        padding: 2rem 3vw;
+    }
+    .prescription-title {
+        font-size: 1.8rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .prescription-subtitle {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .prescription-title {
+        font-size: 1.75rem;
+    }
+    .form-card-body {
+        padding: 1.5rem;
+    }
+}
+
+body, html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    overflow-x: hidden;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-4">
-  <h2>Create Prescription for {{ patient.user.get_full_name }}</h2>
-  {% if linked_record %}
-  <div class="alert alert-info">
-    Linked to Medical Record #{{ linked_record.id }} ({{ linked_record.record_date|date:'Y-m-d' }}){% if linked_record.appointment %} – Appointment {{ linked_record.appointment.appointment_date|date:'Y-m-d' }}{% endif %}.<br>
-    {% if linked_record.prescription %}<strong>Legacy Text Found:</strong> Pre-filled into notes; you can edit or remove it.{% endif %}
-  </div>
-  {% endif %}
-  <form method="post" id="prescription-form">
-    {% csrf_token %}
-    <div class="card mb-3">
-      <div class="card-header">Prescription Details</div>
-      <div class="card-body">{{ form.as_p }}</div>
-    </div>
-    <div class="card mb-3">
-      <div class="card-header d-flex justify-content-between align-items-center">
-        <span>Medications</span>
-        <small class="text-muted">Leave unused rows blank</small>
-      </div>
-      <div class="card-body">
-        {{ formset.management_form }}
-        <div id="medication-forms">
-        {% for f in formset %}
-          <div class="medication-form border rounded p-3 mb-3">
-            <div class="row g-2">
-              <div class="col-md-3">{{ f.medication_name.label_tag }} {{ f.medication_name }}</div>
-              <div class="col-md-2">{{ f.dosage.label_tag }} {{ f.dosage }}</div>
-              <div class="col-md-2">{{ f.frequency.label_tag }} {{ f.frequency }}</div>
-              <div class="col-md-2">{{ f.duration_days.label_tag }} {{ f.duration_days }}</div>
-              <div class="col-md-3">{{ f.instructions.label_tag }} {{ f.instructions }}</div>
+<div class="dashboard-wrapper">
+    <!-- Full-width header matching doctor dashboard -->
+    <div class="prescription-header">
+        <div class="header-content">
+            <h1 class="prescription-title">
+                <i class="fas fa-prescription"></i>
+                Create Prescription
+            </h1>
+            <p class="prescription-subtitle">Create a new prescription for your patient</p>
+            <div class="patient-badge">
+                <i class="fas fa-user-injured"></i>
+                <span>{{ patient.user.get_full_name }}</span>
             </div>
-            {% if f.DELETE %}<div class="form-check mt-2">{{ f.DELETE }} <label class="form-check-label">Remove</label></div>{% endif %}
-          </div>
-        {% endfor %}
         </div>
-        <button type="button" id="add-medication" class="btn btn-sm btn-outline-primary"><i class="fas fa-plus"></i> Add Medication</button>
-      </div>
     </div>
-    <button class="btn btn-primary" type="submit">Save Prescription</button>
-  </form>
-</div>
+
+    <!-- Content section -->
+    <div class="content-section">
+        {% if linked_record %}
+        <div class="record-alert">
+            <strong><i class="fas fa-link me-2"></i>Linked to Medical Record</strong><br>
+            Record #{{ linked_record.id }} ({{ linked_record.record_date|date:'Y-m-d' }}){% if linked_record.appointment %} – Appointment {{ linked_record.appointment.appointment_date|date:'Y-m-d' }}{% endif %}.<br>
+            {% if linked_record.prescription %}<strong>Legacy Text Found:</strong> Pre-filled into notes; you can edit or remove it.{% endif %}
+        </div>
+        {% endif %}
+
+        <form method="post" id="prescription-form">
+            {% csrf_token %}
+            
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5>
+                        <i class="fas fa-clipboard-list"></i>
+                        Prescription Details
+                    </h5>
+                </div>
+                <div class="form-card-body">
+                    {{ form.as_p }}
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="form-card-header">
+                    <h5>
+                        <i class="fas fa-pills"></i>
+                        Medications
+                    </h5>
+                    <small class="text-muted">Leave unused rows blank</small>
+                </div>
+                <div class="form-card-body">
+                    {{ formset.management_form }}
+                    <div id="medication-forms">
+                        {% for f in formset %}
+                        <div class="medication-form">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <label>{{ f.medication_name.label }}</label>
+                                    {{ f.medication_name }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label>{{ f.dosage.label }}</label>
+                                    {{ f.dosage }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label>{{ f.frequency.label }}</label>
+                                    {{ f.frequency }}
+                                </div>
+                                <div class="col-md-2">
+                                    <label>{{ f.duration_days.label }}</label>
+                                    {{ f.duration_days }}
+                                </div>
+                                <div class="col-md-3">
+                                    <label>{{ f.instructions.label }}</label>
+                                    {{ f.instructions }}
+                                </div>
+                            </div>
+                            {% if f.DELETE %}
+                            <div class="form-check mt-2">
+                                {{ f.DELETE }}
+                                <label class="form-check-label">Remove this medication</label>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="add-medication" class="btn-add-medication">
+                        <i class="fas fa-plus"></i>
+                        Add Medication
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn-save-prescription" type="submit">
+                    <i class="fas fa-save"></i>
+                    Save Prescription
+                </button>
+            </div>
+        </form>
+    </div><!-- Close content-section -->
+</div><!-- Close dashboard-wrapper -->
 <template id="empty-form-template">
   <div class="medication-form border rounded p-3 mb-3">
     <div class="row g-2">
