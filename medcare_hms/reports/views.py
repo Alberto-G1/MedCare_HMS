@@ -112,3 +112,26 @@ def prescriptions_activity_api(request):
     labels = [mapping.get(r['status'], r['status']) for r in status_counts]
     data = [r['count'] for r in status_counts]
     return JsonResponse({'labels': labels, 'data': data})
+
+
+@login_required
+@admin_required
+def user_distribution_api(request):
+    """Return counts of users by role for a pie chart."""
+    from accounts.models import UserProfile
+    
+    role_counts = (
+        UserProfile.objects.values('role').annotate(count=Count('id')).order_by('-count')
+    )
+    
+    role_mapping = {
+        'ADMIN': 'Admins',
+        'DOCTOR': 'Doctors',
+        'RECEPTIONIST': 'Receptionists',
+        'PATIENT': 'Patients'
+    }
+    
+    labels = [role_mapping.get(r['role'], r['role']) for r in role_counts]
+    data = [r['count'] for r in role_counts]
+    
+    return JsonResponse({'labels': labels, 'data': data})
