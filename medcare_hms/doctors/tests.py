@@ -68,6 +68,7 @@ class DoctorViewsTest(TestCase):
         form_data = {
             'first_name': 'John',
             'last_name': 'Doe',
+            'email': 'jane@example.com',
             'specialization': 'Oncology',
             'license_number': 'LIC12345',
             'years_of_experience': 15,
@@ -95,7 +96,7 @@ class DoctorFormsTest(TestCase):
         doctor_profile = DoctorProfile.objects.create(user=user, specialization='General Medicine')
         
         form_data = {
-            'first_name': 'Jane', 'last_name': 'Smith', 'specialization': 'Neurology',
+            'first_name': 'Jane', 'last_name': 'Smith','email': 'jane@example.com',  'specialization': 'Neurology',
             'license_number': 'LIC54321', 'years_of_experience': 5, 'availability': 'Weekends'
         }
         form = DoctorProfileForm(data=form_data, instance=doctor_profile)
