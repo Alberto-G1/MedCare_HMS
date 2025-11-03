@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/revenue-over-time/', views.revenue_over_time_api, name='revenue_over_time_api'),
     path('api/revenue-by-doctor/', views.revenue_by_doctor_api, name='revenue_by_doctor_api'),
     path('api/prescriptions-activity/', views.prescriptions_activity_api, name='prescriptions_activity_api'),
+    path('api/user-distribution/', views.user_distribution_api, name='user_distribution_api'),
 ]

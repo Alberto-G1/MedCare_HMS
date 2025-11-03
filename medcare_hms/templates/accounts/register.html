@@ -786,9 +786,11 @@
                             <i class="fas fa-user-tag input-icon"></i>
                             <select name="role" class="form-select-modern" required>
                                 <option value="">Select your role</option>
-                                <option value="patient" {% if form.role.value == 'patient' %}selected{% endif %}>Patient</option>
-                                <option value="doctor" {% if form.role.value == 'doctor' %}selected{% endif %}>Doctor</option>
-                                <option value="receptionist" {% if form.role.value == 'receptionist' %}selected{% endif %}>Receptionist</option>
+                                {% for value,label in form.role.field.choices %}
+                                    {% if value %}
+                                        <option value="{{ value }}" {% if form.role.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+                                    {% endif %}
+                                {% endfor %}
                             </select>
                         </div>
                         {% if form.role.errors %}

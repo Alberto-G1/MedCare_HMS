@@ -552,25 +552,39 @@ document.addEventListener('DOMContentLoaded', function() {
     if (dateInput && timeSelect) {
         dateInput.addEventListener('change', function() {
             if (!selectedDoctorId || !this.value) return;
-            
+
+            const apiUrl = `{% url 'doctors:api_get_doctor_availability' %}?doctor_id=${selectedDoctorId}&date=${this.value}`;
+
             timeLoader.style.display = 'block';
             timeSelect.disabled = true;
-            
-            fetch(`/doctors/get-available-times/?doctor_id=${selectedDoctorId}&date=${this.value}`)
+            timeSelect.innerHTML = '<option value="">Loading available slots...</option>';
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
-                    timeSelect.innerHTML = '<option value="">Select a time slot</option>';
-                    data.available_times.forEach(time => {
-                        const option = document.createElement('option');
-                        option.value = time;
-                        option.textContent = time;
-                        timeSelect.appendChild(option);
-                    });
+                    timeSelect.innerHTML = '';
+
+                    if (data.available_slots && data.available_slots.length > 0) {
+                        timeSelect.innerHTML = '<option value="">Select a time slot</option>';
+                        data.available_slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot.value;
+                            option.textContent = slot.display;
+                            timeSelect.appendChild(option);
+                        });
+                        timeSelect.disabled = false;
+                    } else {
+                        timeSelect.innerHTML = '<option value="">No available slots on this day</option>';
+                        timeSelect.disabled = true;
+                    }
                 })
-                .catch(error => console.error('Error:', error))
+                .catch(error => {
+                    console.error('Error fetching availability:', error);
+                    timeSelect.innerHTML = '<option value="">Could not load time slots</option>';
+                    timeSelect.disabled = true;
+                })
                 .finally(() => {
                     timeLoader.style.display = 'none';
-                    timeSelect.disabled = false;
                 });
         });
     }

@@ -532,6 +532,22 @@
         </div>
     </div>
 </div>
+
+<!-- Third Row of Charts -->
+<div class="row charts-row">
+    <div class="col-lg-6 mb-4">
+        <div class="card card-custom h-100">
+            <div class="card-header card-header-custom">
+                <h5><i class="fas fa-users"></i>User Distribution</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="userDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
@@ -640,7 +656,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const ctx = document.getElementById('revenueChart');
         if (ctx) {
-            new Chart(ctx, {
+            window.revenueChart = new Chart(ctx, {
                 type: 'line',
                 data: { 
                     labels, 
@@ -714,7 +730,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const ctx = document.getElementById('revenueDoctorChart');
         if (ctx) {
-            new Chart(ctx, {
+            window.revenueDoctorChart = new Chart(ctx, {
                 type: 'bar',
                 data: { 
                     labels, 
@@ -783,7 +799,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         
         const ctx = document.getElementById('prescriptionsChart');
         if (ctx) {
-            new Chart(ctx, {
+            window.prescriptionsChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: { 
                     labels, 
@@ -823,8 +839,110 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (e) {
         console.error('Error loading prescriptions chart:', e);
     }
+
+    // User Distribution
+    try {
+        const response = await fetch('{% url "reports:user_distribution_api" %}');
+        if (!response.ok) throw new Error(`User distribution fetch failed: ${response.status}`);
+        const {labels, data} = await response.json();
+        
+        const ctx = document.getElementById('userDistributionChart');
+        if (ctx) {
+            window.userDistributionChart = new Chart(ctx, {
+                type: 'pie',
+                data: { 
+                    labels, 
+                    datasets:[{ 
+                        data, 
+                        backgroundColor:[
+                            'rgba(14, 116, 144, 0.8)',
+                            'rgba(20, 184, 166, 0.8)',
+                            'rgba(245, 158, 11, 0.8)',
+                            'rgba(34, 197, 94, 0.8)'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 3,
+                        hoverBorderWidth: 4,
+                        hoverOffset: 15
+                    }]
+                },
+                options: { 
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins:{ 
+                        legend:{ 
+                            position:'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 12 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('User distribution chart created successfully');
+        }
+    } catch (e) {
+        console.error('Error loading user distribution chart:', e);
+    }
     
     console.log('All charts initialization complete');
+
+    // Auto-refresh function for revenue charts and KPIs
+    async function refreshRevenueData() {
+        try {
+            // Refresh KPIs
+            const kpiResponse = await fetch('{% url "reports:kpi_summary_api" %}');
+            if (kpiResponse.ok) {
+                const data = await kpiResponse.json();
+                document.getElementById('kpi-total-revenue').textContent = formatCurrency(data.totalRevenue);
+                document.getElementById('kpi-outstanding-revenue').textContent = formatCurrency(data.outstandingRevenue);
+            }
+
+            // Refresh Revenue per Month chart
+            if (window.revenueChart) {
+                const revenueResponse = await fetch('{% url "reports:revenue_over_time_api" %}');
+                if (revenueResponse.ok) {
+                    const {labels, data} = await revenueResponse.json();
+                    window.revenueChart.data.labels = labels;
+                    window.revenueChart.data.datasets[0].data = data;
+                    window.revenueChart.update('none');
+                }
+            }
+
+            // Refresh Revenue by Doctor chart
+            if (window.revenueDoctorChart) {
+                const doctorResponse = await fetch('{% url "reports:revenue_by_doctor_api" %}');
+                if (doctorResponse.ok) {
+                    const {labels, data} = await doctorResponse.json();
+                    window.revenueDoctorChart.data.labels = labels;
+                    window.revenueDoctorChart.data.datasets[0].data = data;
+                    window.revenueDoctorChart.update('none');
+                }
+            }
+
+            console.log('Revenue data refreshed successfully');
+        } catch (e) {
+            console.error('Error refreshing revenue data:', e);
+        }
+    }
+
+    // Refresh every 30 seconds (same as appointments and prescriptions)
+    setInterval(refreshRevenueData, 30000);
 });
 </script>
 {% endblock %}
